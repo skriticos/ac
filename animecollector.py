@@ -1,68 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 from __future__ import with_statement
-
-"""
-   This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
-'''
- This is 'Anime Collector' - a program written to help users keep track of and sort anime.
- Dependencies: Twisted, Python, GTK, pyGTK.
-'''
-
-'''
-#Working:
-	# GUI
-	# MAL module.
-	# Pull list.
-	# Edit score & watched eps.
-# To be implemented:
-	# Edit everything.
-	# New from files.
-	# Watch players for anime.
-	# Pipe output of currently watching.
-	# Torrent (feed) watching.
-	# Torrent (client) watching.
-	# File organising.
-	# File mass import.
-	# AniDB module.
-'''
-
-'''
- See also:
-	/animecollector
-		animecollector.py			# Main application.
-		main.glade				# GUI description file.
-		config.cfg				# Configuration file.
-		README					# Readme.
-		LICENCE					# GPL V3
-		/modules				# All modules here.
-			__init__.py
-			myanimelist.py		# MyAnimeList.net module.		
-			anidb.py		# AniDB module.
-'''
 
 import os
 import sys
 import Queue
-
 import pickle
-
 import webbrowser
-
 import ConfigParser
 
 from twisted.internet import gtk2reactor
@@ -70,99 +14,23 @@ gtk2reactor.install()
 from twisted.internet import reactor
 from twisted.web import client
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    print "GTK Not Availible"
-    sys.exit(1)
+import pygtk
+import gtk
+import gtk.glade
 import gobject
-
 import time
 from datetime import date
 
-#import modules.anidb
 import modules.myanimelist
 import modules.players
 
-VERSION = 0.25
-AUTHOR = "Gareth Latty (info@lattyware.co.uk)"
-
-STATUS = {
-    1	:	"Watching",
-    2	:	"Completed",
-    3	:	"On Hold",
-    4	:	"Unknown", 			#4 appears to be unused - added in case it is.
-    5	:	"Dropped",
-    6	:	"Plan To Watch",
-}
-
-# From status to their position in the combo box.
-STATUS_COMBO = {
-    1	:	0,
-    2	:	1,
-    3	:	2,
-    4	:	-1,
-    5	:	3,
-    6	:	4,
-}
-
-COMBO_STATUS = {
-    0	:	1,
-    1	:	2,
-    2	:	3,
-    -1	:	4,
-    3	:	5,
-    4	:	6,
-}
-
-# Status for series.
-SERIES_STATUS = {
-    1	:	"Airing",
-    2	:	"Aired",
-    3	:	"Not Aired",
-}
-
-# Types for series.
-SERIES_TYPE = {
-    1	:	"TV",
-    2	:	"OVA",
-    3	:	"Movie",
-    4	:	"Special",
-    5	:	"ONA",
-}
-
-MAL_DATALIST = [
-    ("series_animedb_id", int),
-    ("series_title", unicode),
-    ("series_synonyms", unicode),
-    ("series_type", int),
-    ("series_episodes", int),
-    ("series_status", int),
-    ("series_start", date),
-    ("series_end", date),
-    ("series_image", str),
-    ("my_id", int),
-    ("my_watched_episodes", int),
-    ("my_start_date", date),
-    ("my_finish_date", date),
-    ("my_score", int),
-    ("my_status", int),
-    ("my_rewatching", int),
-    ("my_rewatching_ep", int),
-]
+from data import *
 
 PATH = os.getcwd()
+ADD = True # ??
+REMOVE = False # ??
 
-ADD = True
-REMOVE = False
-
-
+# XXX: remove this
 class debugger:
 
     def __init__(self, verbosity):
@@ -203,7 +71,6 @@ class leeroyjenkins:
 
         self.initgui()
 
-        #self.anidb = modules.anidb.dataSource(self.debug, (self.config.connection)["anidbLogin"]["server"], int((self.config.connection)["anidbLogin"]["port"]), int((self.config.connection)["anidbLogin"]["localPort"]))
         self.mal = modules.myanimelist.dataSource(self.debug)
 
         self.players = modules.players.detectPlayers(self.debug)
@@ -366,26 +233,6 @@ class leeroyjenkins:
         self.debug.out("Hiding edit window...", 2)
         self.getWidget("window_edit").hide()
 
-    '''def fillEdit( self ):
-		self.debug.out( "Filling up the edit window...")
-		self.editWidgets = {}
-		self.editWidgets[ "ac" ] = {}
-		ac = self.getWidget( "viewport_ac" )
-		for ( name, dtype ) in AC_DATALIST:
-			if dtype is str:
-				self.editWidgets[ "ac" ][ name ] = gtk.Entry()
-			elif dtype is int:
-				self.editWidgets[ "ac" ][ name ] = gtk.SpinButton()
-			elif dtype is unicode:
-				self.editWidgets[ "ac" ][ name ] = gtk.Entry()
-			elif dtype is date:
-				self.editWidgets[ "ac" ][ name ] = gtk.Entry()
-		vbox = gtk.VBox( False, 0 )
-		ac.add( vbox )
-		for ( name, widget ) in self.editWidgets[ "ac" ].iteritems():
-			vbox.pack_start( widget, True, True, 0 )
-		ac.show_all()'''
-
     def popup(self, widget, event=None):
         if event.button == 3:
             x = int(event.x)
@@ -430,42 +277,6 @@ class leeroyjenkins:
                     else:
                         self.statusMessage("MAL update failed.")
                     self.populateTreeViews()
-
-        '''if not self.anidb.status.empty():
-            try:
-                value = self.anidb.status.get_nowait()
-            except Queue.Empty:
-                value = None
-            if value:
-                (task, success, data) = value
-                if task == "identify":
-                    if success:
-                        if data:
-                            self.statusMessage("Logged in to AniDB: " +
-                                               str(data))
-                        else:
-                            self.statusMessage("Logged in to AniDB.")
-                        self.getWidget("button_anidb_login").hide()
-                        self.getWidget("button_anidb_logout").show()
-                    else:
-                        self.statusMessage("AniDB Log in failed: " + str(data))
-                    self.working("anidbLogin", REMOVE)
-                elif task == "unidentify":
-                    if success:
-                        if data:
-                            self.statusMessage("Logged out of AniDB: " +
-                                               str(data))
-                        else:
-                            self.statusMessage("Logged out of AniDB.")
-                        self.getWidget("button_anidb_login").show()
-                        self.getWidget("button_anidb_logout").hide()
-                        if self.quitting:
-                            sys.exit(0)
-                    else:
-                        self.statusMessage("AniDB Log out failed: " +
-                                           str(data))
-                    self.working("anidbLogout", REMOVE)
-        '''
         return True
 
     def runAbout(self, widget):

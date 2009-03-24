@@ -1,4 +1,4 @@
 *.pyc
 *.pyo
 config.cfg
-mal.pkg
+mal.pkl
