@@ -5,7 +5,7 @@
 
 from __future__ import with_statement
 
-import os, sys, Queue, pickle, webbrowser, ConfigParser, \
+import os, sys, Queue, pickle, webbrowser, \
 		pygtk, gtk, gtk.glade, gobject, time
 
 from twisted.internet import gtk2reactor
@@ -17,6 +17,7 @@ from twisted.web import client
 import modules.myanimelist
 from modules.players import get_playing
 
+from config import ac_config
 from data import *
 
 ## Unsorted ##
@@ -35,66 +36,10 @@ class debugger:
 		if self.debug >= level:
 			print level, ": ", msg
 
-preference_groups = []
-
+preference_groups = [] # ??
 
 ## Class declarations ##
 
-class config(object):
-	main = None
-	option_groups = None
-
-	def __init__(self):
-
-		home_cfg_path = os.path.join(os.path.expanduser("~"), \
-				".animecollector.cfg")
-		if os.access(home_cfg_path, os.R_OK):
-			self.path = home_cfg_path
-		else:
-			self.path = "config.cfg"
-
-		self.main = ConfigParser.ConfigParser()
-		self.read()
-
-		self.connection = { "mallogin": { 
-				"username": None, "password": None, "autologin": None }}
-		
-		self.list = { "refresh" : {
-				"autorefresh": None,
-				"autorefreshevery": None, 
-				"autorefreshdelay": None }}
-		
-		self.ui = { "tray": { "onStartup": None, "onClose": None },
-					"window": { "maximiseOnStartup": None }}
-		
-		self.options = { "ui": { "bars": None, "barsVisible": None },
-						 "debug": {"verbosity": None },
-						 "other": {"runBefore": None }}
-
-		self.option_groups = [[self.connection, "connection", True], 
-							 [self.list, "list", True], 
-							 [self.ui, "ui", True], 
-							 [self.options, "options", False]]
-
-		for opts in self.option_groups:
-			for (name, group) in opts[0].iteritems():
-				for (item, value) in group.iteritems():
-					opts[0][name][item] = self.main.get(opts[1], name +
-														"_" + item)
-
-	def update(self):
-		for opts in self.option_groups:
-			for (name, group) in opts[0].iteritems():
-				for (item, value) in group.iteritems():
-					self.main.set(opts[1], name + "_" + item, opts[0][name][item])
-
-	def read(self):
-		configpath = open(self.path, "r")
-		self.main.readfp(configpath)
-
-	def write(self):
-		configpath = open(self.path, "w")
-		self.main.write(configpath)
 
 # def init():
 # 	""" Initialization of the application """
@@ -215,7 +160,7 @@ class leeroyjenkins:
 	quitting = False
 
 	def __init__(self):
-		self.config = config()
+		self.config = ac_config()
 		self.preference_groups = []
 		for groups in self.config.option_groups:
 			if groups[2]:
