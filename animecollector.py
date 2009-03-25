@@ -1,4 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+
+## Import section ##
 
 from __future__ import with_statement
 
@@ -16,6 +19,8 @@ from modules.players import get_playing
 
 from data import *
 
+## Unsorted ##
+
 PATH = os.getcwd()
 ADD = True # ??
 REMOVE = False # ??
@@ -32,14 +37,19 @@ class debugger:
 
 preference_groups = []
 
+
+## Class declarations ##
+
 class config(object):
 	main = None
 	option_groups = None
 
 	def __init__(self):
 
-		if os.access("~/animecollector.cfg", os.R_OK):
-			self.path = "~/animecollector.cfg"
+		home_cfg_path = os.path.join(os.path.expanduser("~"), \
+				".animecollector.cfg")
+		if os.access(home_cfg_path, os.R_OK):
+			self.path = home_cfg_path
 		else:
 			self.path = "config.cfg"
 
@@ -233,7 +243,7 @@ class leeroyjenkins:
 		   "TRUE":
 			self.mal_login()
    
-		if os.path.isfile('mal.pkl'):
+		if os.path.isfile('mal.pkl') and os.path.getsize('mal.pkl') > 0:
 			with open('mal.pkl') as f:
 				self.data_mal = pickle.load(f)
 		else:
