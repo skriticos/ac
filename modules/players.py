@@ -44,7 +44,6 @@ def get_playing(players, search_dirs):
 					file_listing.append(line.strip())
 				for file in file_listing:
 					for dir in search_dirs:
-						if not isinstance(dir, unicode): continue
 						file = file.split(' -> ',1)[-1].rstrip()
 						if file[:len(dir)] == dir and \
 								os.path.isfile(file) and \
