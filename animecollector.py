@@ -2,27 +2,17 @@
 
 from __future__ import with_statement
 
-import os
-import sys
-import Queue
-import pickle
-import webbrowser
-import ConfigParser
+import os, sys, Queue, pickle, webbrowser, ConfigParser, \
+		pygtk, gtk, gtk.glade, gobject, time
 
 from twisted.internet import gtk2reactor
 gtk2reactor.install()
+
 from twisted.internet import reactor
 from twisted.web import client
 
-import pygtk
-import gtk
-import gtk.glade
-import gobject
-import time
-from datetime import date
-
 import modules.myanimelist
-import modules.players
+from modules.players import get_playing
 
 from data import *
 
@@ -56,7 +46,6 @@ class leeroyjenkins:
     quitting = False
 
     def __init__(self):
-
         self.config = config()
         self.preferenceGroups = []
         for groups in self.config.optionGroups:
@@ -73,13 +62,13 @@ class leeroyjenkins:
 
         self.mal = modules.myanimelist.dataSource(self.debug)
 
-        self.players = modules.players.detectPlayers(self.debug)
+        # self.players = modules.players.detectPlayers(self.debug)
 
         self.fillPrefs()
 
         self.context = self.wTree.get_widget("statusbar").get_context_id("animecollector")
         gobject.timeout_add(100, self.update)
-        gobject.timeout_add(5000, self.players.check)
+        # gobject.timeout_add(5000, self.players.check)
 
         if (self.config.connection)["malLogin"]["autoLogin"].upper() == \
            "TRUE":
