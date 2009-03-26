@@ -24,10 +24,8 @@ class dataSource:
     _password = None
     _cookies = None
 
-    def __init__(self, debug):
+    def __init__(self):
         """ Initialises all of the data for this source. """
-
-        self.debug = debug
 
         self.dataList = [
             ("series_animedb_id", int),

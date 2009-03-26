@@ -26,18 +26,6 @@ PATH = os.getcwd()
 ADD = True # ??
 REMOVE = False # ??
 
-# XXX: remove this
-class debugger:
-
-	def __init__(self, verbosity):
-		self.debug = verbosity
-
-	def out(self, msg=None, level=1):
-		if self.debug >= level:
-			print level, ": ", msg
-
-preference_groups = [] # ??
-
 
 						   ### Class declarations ###
 
@@ -58,35 +46,32 @@ class leeroyjenkins(object):
 	def __init__(self):
 		self.config = ac_config()
 
-
-
-		self.preference_groups = []
-		
-		# turning in circles here
-		for groups in self.config.option_groups:
-			if groups[2]:
-				self.preference_groups.append(groups)
-
-		self.debug = debugger(int((self.config.options)["debug"]["verbosity"]))
-
 		self.stati = ["current", "completed", "onHold", "planToWatch"]
 
-		self.bars = (self.config.options)["ui"]["bars"].split(",")
+		self.bars = self.config.ui['startup_bars']
 
 		self.initgui()
 
-		self.mal = modules.myanimelist.dataSource(self.debug)
+		self.mal = modules.myanimelist.dataSource()
 
 		# self.players = modules.players.detectPlayers(self.debug)
 
-		self.fillPrefs()
+		# self.fillPrefs()
+		# self.hideEdit()
+		# self.getWidget("window_edit").hide()
+
+		# quick hack
+		button = self.getWidget("togglebutton_edit")
+		bar = self.getWidget("editBar")
+		menuitem = self.getWidget("menuitem_bars_edit")
+		bar.hide()
+		button.set_active(False)
 
 		self.context = self.wTree.get_widget("statusbar").get_context_id("animecollector")
 		gobject.timeout_add(100, self.update)
 		# gobject.timeout_add(5000, self.players.check)
 
-		if (self.config.connection)["mallogin"]["autologin"].upper() == \
-		   "TRUE":
+		if self.config.mal['autologin']:
 			self.mal_login()
    
 		if os.path.isfile('mal.pkl') and os.path.getsize('mal.pkl') > 0:
@@ -96,30 +81,19 @@ class leeroyjenkins(object):
 			open('mal.pkl', 'w')
 			self.data_mal = {}
 
-		if (self.config.list)["refresh"]["autorefresh"].upper() == "TRUE":
-			self.refresh(None)
-
-		if (self.config.ui)["tray"]["onStartup"].upper() == "TRUE":
+		if self.config.ui['tray_onstartup']:
 			self.getWidget("window_main").hide()
 
-		if (self.config.ui)["tray"]["onClose"].upper() == "TRUE":
+		if self.config.ui['tray_onclose']:
 			self.getWidget("window_main").connect("delete-event", self.toggleMain)
 		else:
 			self.getWidget("window_main").connect("delete-event", self.quit)
 
-		if (self.config.ui)["window"]["maximiseOnStartup"].upper() == "TRUE":
-			self.getWidget("window_main").maximize()
-
 		self.populateTreeViews()
 		
-		if (self.config.options)["other"]["runBefore"].upper() == "FALSE":
-			self.getWidget("window_wizard").show()
-
 		reactor.run()
 
 	def initgui(self):
-
-		self.debug.out("Initiating GUI...")
 
 		self.wTree = gtk.glade.XML("main.glade")
 
@@ -131,7 +105,7 @@ class leeroyjenkins(object):
 			self.getWidget("menuitem_bars_" + bar).connect("toggled",
 														   self.switchBar)
 
-		for bar in (self.config.options)["ui"]["barsVisible"].split(","):
+		for bar in self.config.ui['startup_bars']:
 			self.getWidget(bar + "Bar").show()
 			self.getWidget("togglebutton_" + bar).set_active(True)
 
@@ -169,56 +143,55 @@ class leeroyjenkins(object):
 			"on_menuitem_tree_play_activate": self.to_implement,
 			"on_menuitem_tree_edit_activate": self.showEdit,
 			"on_button_full_edit_cancel_clicked": self.hideEdit,
-			"on_button_wizard_skip_clicked": self.wizardInteract,
-			"on_button_wizard_previous_clicked": self.wizardInteract,
-			"on_button_wizard_next_clicked": self.wizardInteract,
-			"on_button_wizard_ok_clicked": self.wizardInteract,
+			# "on_button_wizard_skip_clicked": self.wizardInteract,
+			# "on_button_wizard_previous_clicked": self.wizardInteract,
+			# "on_button_wizard_next_clicked": self.wizardInteract,
+			# "on_button_wizard_ok_clicked": self.wizardInteract,
 		}
 
 		self.wTree.signal_autoconnect(dic)
 
 		self.trayicon.set_visible(True)
 
-	def wizardInteract(self, widget, event=None):
-		if widget == self.getWidget("button_wizard_skip"):
-			self.debug.out("User skipped wizard...", 2)
-			self.getWidget("window_wizard").hide()
-			self.config.options["other"]["runBefore"] = True
-			self.config.update()
-			self.config.write()
-			self.config.read()
-		elif widget == self.getWidget("button_wizard_previous"):
-			self.debug.out("User went back a page on wizard...", 3)
-			if self.getWidget("wizard_page_2").flags() & gtk.VISIBLE:
-				self.getWidget("wizard_page_1").show()
-				self.getWidget("wizard_page_2").hide()
-				self.getWidget("button_wizard_ok").hide()
-				self.getWidget("button_wizard_next").show()
-				self.getWidget("button_wizard_previous").set_sensitive(False)
-		elif widget == self.getWidget("button_wizard_next"):
-			self.debug.out("User went forwards a page on wizard...", 3)
-			if self.getWidget("wizard_page_1").flags() & gtk.VISIBLE:
-				self.getWidget("wizard_page_1").hide()
-				self.getWidget("wizard_page_2").show()
-				self.getWidget("button_wizard_next").hide()
-				self.getWidget("button_wizard_ok").show() 
-				self.getWidget("button_wizard_previous").set_sensitive(True)
-		elif widget == self.getWidget("button_wizard_ok"):
-			self.debug.out("User finished wizard...", 2)
-			self.getWidget("window_wizard").hide()
-			prefs = [self.config.connection, "connection", True]
-			for (name, group) in prefs[0].iteritems():
-				for (item, value) in group.iteritems():
-					pref = self.setPref("wizard_" + prefs[1] + "_" + name + "_" + item)
-					if pref:
-						prefs[0][name][item] = pref
-			self.config.options["other"]["runBefore"] = True
-			self.config.update()
-			self.config.write()
-			self.config.read()
+#	def wizardInteract(self, widget, event=None):
+#		if widget == self.getWidget("button_wizard_skip"):
+#			self.debug.out("User skipped wizard...", 2)
+#			self.getWidget("window_wizard").hide()
+#			self.config.options["other"]["runBefore"] = True
+#			self.config.update()
+#			self.config.write()
+#			self.config.read()
+#		elif widget == self.getWidget("button_wizard_previous"):
+#			self.debug.out("User went back a page on wizard...", 3)
+#			if self.getWidget("wizard_page_2").flags() & gtk.VISIBLE:
+#				self.getWidget("wizard_page_1").show()
+#				self.getWidget("wizard_page_2").hide()
+#				self.getWidget("button_wizard_ok").hide()
+#				self.getWidget("button_wizard_next").show()
+#				self.getWidget("button_wizard_previous").set_sensitive(False)
+#		elif widget == self.getWidget("button_wizard_next"):
+#			self.debug.out("User went forwards a page on wizard...", 3)
+#			if self.getWidget("wizard_page_1").flags() & gtk.VISIBLE:
+#				self.getWidget("wizard_page_1").hide()
+#				self.getWidget("wizard_page_2").show()
+#				self.getWidget("button_wizard_next").hide()
+#				self.getWidget("button_wizard_ok").show() 
+#				self.getWidget("button_wizard_previous").set_sensitive(True)
+#		elif widget == self.getWidget("button_wizard_ok"):
+#			self.debug.out("User finished wizard...", 2)
+#			self.getWidget("window_wizard").hide()
+#			prefs = [self.config.connection, "connection", True]
+#			for (name, group) in prefs[0].iteritems():
+#				for (item, value) in group.iteritems():
+#					pref = self.setPref("wizard_" + prefs[1] + "_" + name + "_" + item)
+#					if pref:
+#						prefs[0][name][item] = pref
+#			self.config.options["other"]["runBefore"] = True
+#			self.config.update()
+#			self.config.write()
+#			self.config.read()
 
 	def toggleMain(self, widget, event=None):
-		self.debug.out("Toggle main window...", 2)
 		window = self.getWidget("window_main")
 		if window.flags() & gtk.VISIBLE:
 			window.hide()
@@ -227,14 +200,12 @@ class leeroyjenkins(object):
 		return True
 
 	def to_implement(self, widget=None, event=None):
-		self.debug.out("To be implemented...")
+		pass
 
 	def showEdit(self, widget, event=None):
-		self.debug.out("Show edit window...", 2)
 		self.getWidget("window_edit").show()
 
-	def hideEdit(self, widget, event=None):
-		self.debug.out("Hiding edit window...", 2)
+	def hideEdit(self, widget=None, event=None):
 		self.getWidget("window_edit").hide()
 
 	def popup(self, widget, event=None):
@@ -244,7 +215,6 @@ class leeroyjenkins(object):
 			time = event.time
 			pthinfo = widget.get_path_at_pos(x, y)
 			if pthinfo is not None:
-				self.debug.out("Treelist right-click...", 2)
 				(path, col, cellx, celly) = pthinfo
 				widget.grab_focus()
 				widget.set_cursor(path, col, 0)
@@ -252,7 +222,6 @@ class leeroyjenkins(object):
 												  event.button, time, (widget, pthinfo))
 
 	def update(self):
-		self.debug.out("Regular call to update from module queues...", 4)
 		if len(self.worklist):
 			self.wTree.get_widget("progressbar").pulse()
 
@@ -284,26 +253,23 @@ class leeroyjenkins(object):
 		return True
 
 	def runAbout(self, widget):
-		self.debug.out("Showing about dialog...", 2)
 		self.getWidget("aboutdialog").run()
 
 	def hideAbout(self, widget, event=None):
-		self.debug.out("Hiding about dialog...", 2)
 		self.getWidget("aboutdialog").hide()
 
-	def setPrefs(self):
-		self.debug.out("Setting preferences...", 2)
-		for prefs in self.preference_groups:
-			for (name, group) in prefs[0].iteritems():
-				for (item, value) in group.iteritems():
-					prefs[0][name][item] = self.setPref("prefs_" + prefs[1] +
-														"_" + name + "_" + item)
-		self.config.update()
-		self.config.write()
-		self.config.read()
+#	def setPrefs(self):
+#		self.debug.out("Setting preferences...", 2)
+#		for prefs in self.preference_groups:
+#			for (name, group) in prefs[0].iteritems():
+#				for (item, value) in group.iteritems():
+#					prefs[0][name][item] = self.setPref("prefs_" + prefs[1] +
+#														"_" + name + "_" + item)
+#		self.config.update()
+#		self.config.write()
+#		self.config.read()
 
 	def setPref(self, widgetName):
-		self.debug.out("Set preference...", 3)
 		widget = self.getWidget(widgetName)
 		widgetType = type(widget)
 		if widgetType is gtk.Entry:
@@ -313,20 +279,18 @@ class leeroyjenkins(object):
 		elif widgetType is gtk.SpinButton:
 			pref = int(widget.get_value())
 		else:
-			self.debug.out("Unable to get value from widget (" + widgetName + ") of type: " + str(widgetType))
 			return None
 		return str(pref)
 
-	def fillPrefs(self):
-		self.debug.out("Filling preferences...", 2)
-		for prefs in self.preference_groups:
-			for (name, group) in prefs[0].iteritems():
-				for (item, value) in group.iteritems():
-					self.fillPref("prefs_" + prefs[1] + "_" + name + "_" +
-								  item, prefs[0][name][item])
+#	def fillPrefs(self):
+#		for prefs in self.preference_groups:
+#			for (name, group) in prefs[0].iteritems():
+#				for (item, value) in group.iteritems():
+#					self.fillPref("prefs_" + prefs[1] + "_" + name + "_" +
+#								  item, prefs[0][name][item])
 
+	# sets window preferences, needs cleanup
 	def fillPref(self, widgetName, value):
-		self.debug.out("Fill preference...", 3)
 		widget = self.getWidget(widgetName)
 		widgetType = type(widget)
 		if widgetType is gtk.Entry:
@@ -338,11 +302,8 @@ class leeroyjenkins(object):
 				widget.set_active(False)
 		elif widgetType is gtk.SpinButton:
 			widget.set_value(int(value))
-		else:
-			self.debug.out("Unable to set widget (" + widgetName + ") of type: " + str(widgetType) + " to value: " + str(value))
 
 	def mal_logout(self, widget=None):
-		self.debug.out("Logging out of MAL...", 2)
 		self.mal.unidentify()
 		self.getWidget("button_mal_login").show()
 		self.getWidget("button_mal_logout").hide()
@@ -350,7 +311,6 @@ class leeroyjenkins(object):
 		self.statusMessage("Logged Out.")
 
 	def anidb_logout(self, widget=None):
-		self.debug.out("Logging out of AniDB...", 2)
 		self.working("anidbLogout", ADD)
 		self.anidb.unidentify()
 
@@ -358,16 +318,13 @@ class leeroyjenkins(object):
 		if self.getWidget("entry_login_password").get_text():
 			self.username = self.getWidget("entry_login_username").get_text()
 			self.password = self.getWidget("entry_login_password").get_text()
-			#self.username = self.getWidget("entry_login_username").set_text("")
-			# self.password = self.getWidget("entry_login_password").set_text("")
 			self.getWidget("window_login").hide()
 		else:
-			if (self.config.connection)["mallogin"]["password"]:
-				self.username = (self.config.connection)["mallogin"]["username"]
-				self.password = (self.config.connection)["mallogin"]["password"]
+			# note: wrapping config to main, why??
+			if self.config.mal['username'] and self.config.mal['password']:
+				self.username = self.config.mal['username'] 
+				self.password = self.config.mal['password']
 			else:
-				if (self.config.connection)["mallogin"]["username"]:
-					self.getWidget("entry_login_username").set_text((self.config.connection)["mallogin"]["username"])
 				self.getWidget("window_login").show()
 				return 0
 
@@ -375,9 +332,12 @@ class leeroyjenkins(object):
 		self.working("mallogin", ADD)
 
 		self.mal.identify(self.username, self.password)
+		
+		if self.config.mal['login_autorefresh']:
+			self.refresh(None)
+
 
 	def anidb_login(self, widget=None):
-		self.debug.out("Logging in to AniDB...", 2)
 		if self.getWidget("entry_login_password").get_text():
 			self.username = self.getWidget("entry_login_username").get_text()
 			self.password = self.getWidget("entry_login_password").get_text()
@@ -400,7 +360,6 @@ class leeroyjenkins(object):
 		self.anidb.identify(self.username, self.password)
 
 	def mal_updated(self, success):
-		self.debug.out("Updated from MAL...", 2)
 		if success:
 			self.data_mal.update(self.mal.return_as_dic())
 			mal_list_pickle = file('mal.pkl', 'w')
@@ -413,7 +372,6 @@ class leeroyjenkins(object):
 
 	def fillStatusCombo(self):
 
-		self.debug.out("Filling status combo box...", 2)
 
 		combo = self.getWidget("combobox_status")
 		cell = gtk.CellRendererText()
@@ -433,7 +391,6 @@ class leeroyjenkins(object):
 
 	def sanDate(self, thedate):
 
-		self.debug.out("Sanitising a date...", 3)
 
 		if type(thedate) is date:
 			if thedate:
@@ -460,14 +417,12 @@ class leeroyjenkins(object):
 				return None
 
 	def sanUnicode(self, thestring):
-		self.debug.out("Sanitising a unicode...", 3)
 		if thestring:
 			return unicode(thestring)
 		else:
 			return None
 
 	def getValue(self, tree, node):
-		self.debug.out("Getting a value from XML...", 3)
 		endnode = tree.getElementsByTagName(node)
 		if endnode:
 			if endnode[0]:
@@ -484,16 +439,12 @@ class leeroyjenkins(object):
 			return None
 
 	def populateTreeViews(self):
-		self.debug.out("Populating tree views...")
 		for tree in self.stati:
 			self.populateTreeView(self.getWidget("treeview_" + tree))
 
 	def populateTreeView(self, tree):
 
 		status = self.treeviewToStatus(tree)
-
-		self.debug.out("Populating tree view (" + STATUS[status] +
-					   ")...", 2)
 
 		for column in tree.get_columns():
 			tree.remove_column(column)
@@ -553,11 +504,9 @@ class leeroyjenkins(object):
 		tree.set_model(slist)
 
 	def statusMessage(self, message):
-		self.debug.out("Setting status message...", 3)
 		self.wTree.get_widget("statusbar").push(self.context, message)
 
 	def treeviewToStatus(self, widget):
-		self.debug.out("Getting status from treeview...", 3)
 		if widget == self.getWidget("treeview_current"):
 			return 1
 		elif widget == self.getWidget("treeview_completed"):
@@ -570,11 +519,9 @@ class leeroyjenkins(object):
 			return 6
 
 	def getWidget(self, widgetname):
-		self.debug.out("Getting widget...", 4)
 		return self.wTree.get_widget(widgetname)
 
 	def getCurrentTreeview(self, deathnote):
-		self.debug.out("Getting current treeview...", 3)
 		widget = deathnote.get_tab_label(deathnote.get_nth_page(deathnote.get_current_page()))
 		if widget == self.wTree.get_widget("label_current"):
 			return self.wTree.get_widget("treeview_current")
@@ -586,20 +533,17 @@ class leeroyjenkins(object):
 			return self.wTree.get_widget("treeview_planToWatch")
 
 	def callMAL(self, uri, method="POST", postdata=None, headers=None):
-		self.debug.out("Making call to MAL...")
 		return client.getPage(uri, method=method, cookies=self.cookiesMAL,
 							  postdata=postdata, agent="animecollector",
 							  headers=headers)
 
 	def working(self, ident, add):
-		self.debug.out("Working toggle...", 3)
 		if add:
 			self.worklist.append(ident)
 		else:
 			self.worklist.remove(ident)
 
 	def edit(self, widget, event=None):
-		self.debug.out("Editing data...")
 		self.working("edit", ADD)
 		self.statusMessage("Making edit...")
 		edits = [("status", COMBO_STATUS[self.getWidget("combobox_status").get_active()]),
@@ -612,7 +556,6 @@ class leeroyjenkins(object):
 		self.buzhug.commit(self.current, edits)
 
 	def switchBar(self, widget, event=None):
-		self.debug.out("Switching bar...", 3)
 		for bar in self.bars:
 			button = self.getWidget("togglebutton_" + bar)
 			menuitem = self.getWidget("menuitem_bars_" + bar)
@@ -628,7 +571,6 @@ class leeroyjenkins(object):
 					button.set_active(False)
 
 	def updateEditBar(self, widget, event=None):
-		self.debug.out("Updating the edit bar...", 3)
 		status = self.treeviewToStatus(widget)
 		(tree, itr) = widget.get_selection().get_selected()
 		(self.current, ) = tree.get(itr, 0)
@@ -656,7 +598,6 @@ class leeroyjenkins(object):
 		self.getWidget("spinbutton_timesRewatched").set_value(record["my_rewatching"])
 
 	def refresh(self, widget, event=None):
-		self.debug.out("Refreshing MAL data...")
 		if self.username:
 			self.statusMessage("Refreshing MAL list.")
 			self.working("malUpdate", ADD)
@@ -665,21 +606,17 @@ class leeroyjenkins(object):
 			self.statusMessage("Unable to refresh list: Not logged in.")
 
 	def applyPrefs(self, widget, event=None):
-		self.debug.out("Applying preferences...", 2)
 		self.setPrefs()
 		self.getWidget("window_preferences").hide()
 
 	def showPrefs(self, widget, event=None):
-		self.debug.out("Showing preferences...", 3)
 		self.getWidget("window_preferences").show()
 
 	def hidePrefs(self, widget, event=None):
-		self.debug.out("Hiding preferences...", 3)
 		self.getWidget("window_preferences").hide()
 		self.fillPrefs()
 
 	def hideLogin(self, widget, event=None):
-		self.debug.out("Hiding login window...", 3)
 		self.getWidget("window_login").hide()
 		self.getWidget("entry_login_username").set_text("")
 		self.getWidget("entry_login_password").set_text("")
@@ -687,11 +624,9 @@ class leeroyjenkins(object):
 	def quit(self, widget, event=None):
 		self.quitting = True
 		#self.anidb_logout()
-		self.debug.out("Quitting...")
 		sys.exit(0)
 
 	def web(self, widget, event=None):
-		self.debug.out("Loading up web browser...")
 		if widget == self.getWidget("button_mal"):
 			uri = "http://myanimelist.net"
 		elif widget == self.getWidget("button_anidb"):
