@@ -27,16 +27,24 @@ ADD = True # ??
 REMOVE = False # ??
 
 
+							   ### Constants ###
+
+startup_bars = ['list', 'edit']
+
+
+							### Initialize data ###
+
+config = ac_config()
+iface_data = gtk.glade.XML("main.glade")
+
+
 						   ### Class declarations ###
 
 class leeroyjenkins(object):
 
-	wTree = None
-	config = None
 	context = None
 	worklist = []
 	current = None
-	bars = []
 	stati = []
 	username = None
 	password = None
@@ -44,11 +52,9 @@ class leeroyjenkins(object):
 	quitting = False
 
 	def __init__(self):
-		self.config = ac_config()
 
+		# ??
 		self.stati = ["current", "completed", "onHold", "planToWatch"]
-
-		self.bars = self.config.ui['startup_bars']
 
 		self.initgui()
 
@@ -67,11 +73,11 @@ class leeroyjenkins(object):
 		bar.hide()
 		button.set_active(False)
 
-		self.context = self.wTree.get_widget("statusbar").get_context_id("animecollector")
+		self.context = iface_data.get_widget("statusbar").get_context_id("animecollector")
 		gobject.timeout_add(100, self.update)
 		# gobject.timeout_add(5000, self.players.check)
 
-		if self.config.mal['autologin']:
+		if config.mal['autologin']:
 			self.mal_login()
    
 		if os.path.isfile('mal.pkl') and os.path.getsize('mal.pkl') > 0:
@@ -81,10 +87,10 @@ class leeroyjenkins(object):
 			open('mal.pkl', 'w')
 			self.data_mal = {}
 
-		if self.config.ui['tray_onstartup']:
+		if config.ui['tray_onstartup']:
 			self.getWidget("window_main").hide()
 
-		if self.config.ui['tray_onclose']:
+		if config.ui['tray_onclose']:
 			self.getWidget("window_main").connect("delete-event", self.toggleMain)
 		else:
 			self.getWidget("window_main").connect("delete-event", self.quit)
@@ -95,9 +101,7 @@ class leeroyjenkins(object):
 
 	def initgui(self):
 
-		self.wTree = gtk.glade.XML("main.glade")
-
-		for bar in self.bars:
+		for bar in startup_bars:
 			self.getWidget("togglebutton_" + bar).show()
 			self.getWidget("togglebutton_" + bar).connect("toggled",
 														  self.switchBar)
@@ -105,7 +109,7 @@ class leeroyjenkins(object):
 			self.getWidget("menuitem_bars_" + bar).connect("toggled",
 														   self.switchBar)
 
-		for bar in self.config.ui['startup_bars']:
+		for bar in startup_bars:
 			self.getWidget(bar + "Bar").show()
 			self.getWidget("togglebutton_" + bar).set_active(True)
 
@@ -130,15 +134,15 @@ class leeroyjenkins(object):
 			"on_button_mal_refresh_clicked": self.refresh,
 			"on_button_edit_clicked": self.edit,
 			"on_button_mal_login_clicked": self.mal_login,
-			"on_button_anidb_login_clicked": self.anidb_login,
-			"on_button_anidb_logout_clicked": self.anidb_logout,
+			# "on_button_anidb_login_clicked": self.anidb_login,
+			# "on_button_anidb_logout_clicked": self.anidb_logout,
 			"on_button_mal_logout_clicked": self.mal_logout,
 			"on_button_login_cancel_clicked": self.hideLogin,
 			"on_button_login_ok_clicked": self.mal_login,
 			"on_menuitem_help_about_activate": self.runAbout,
 			"on_aboutdialog_response": self.hideAbout,
 			"on_button_mal_clicked": self.web,
-			"on_button_anidb_clicked": self.web,
+			# "on_button_anidb_clicked": self.web,
 			"on_button_ac_clicked": self.web,
 			"on_menuitem_tree_play_activate": self.to_implement,
 			"on_menuitem_tree_edit_activate": self.showEdit,
@@ -149,7 +153,7 @@ class leeroyjenkins(object):
 			# "on_button_wizard_ok_clicked": self.wizardInteract,
 		}
 
-		self.wTree.signal_autoconnect(dic)
+		iface_data.signal_autoconnect(dic)
 
 		self.trayicon.set_visible(True)
 
@@ -157,10 +161,10 @@ class leeroyjenkins(object):
 #		if widget == self.getWidget("button_wizard_skip"):
 #			self.debug.out("User skipped wizard...", 2)
 #			self.getWidget("window_wizard").hide()
-#			self.config.options["other"]["runBefore"] = True
-#			self.config.update()
-#			self.config.write()
-#			self.config.read()
+#			config.options["other"]["runBefore"] = True
+#			config.update()
+#			config.write()
+#			config.read()
 #		elif widget == self.getWidget("button_wizard_previous"):
 #			self.debug.out("User went back a page on wizard...", 3)
 #			if self.getWidget("wizard_page_2").flags() & gtk.VISIBLE:
@@ -180,16 +184,16 @@ class leeroyjenkins(object):
 #		elif widget == self.getWidget("button_wizard_ok"):
 #			self.debug.out("User finished wizard...", 2)
 #			self.getWidget("window_wizard").hide()
-#			prefs = [self.config.connection, "connection", True]
+#			prefs = [config.connection, "connection", True]
 #			for (name, group) in prefs[0].iteritems():
 #				for (item, value) in group.iteritems():
 #					pref = self.setPref("wizard_" + prefs[1] + "_" + name + "_" + item)
 #					if pref:
 #						prefs[0][name][item] = pref
-#			self.config.options["other"]["runBefore"] = True
-#			self.config.update()
-#			self.config.write()
-#			self.config.read()
+#			config.options["other"]["runBefore"] = True
+#			config.update()
+#			config.write()
+#			config.read()
 
 	def toggleMain(self, widget, event=None):
 		window = self.getWidget("window_main")
@@ -222,8 +226,8 @@ class leeroyjenkins(object):
 												  event.button, time, (widget, pthinfo))
 
 	def update(self):
-		if len(self.worklist):
-			self.wTree.get_widget("progressbar").pulse()
+# 		if len(self.worklist):
+# 			iface_data.get_widget("progressbar").pulse()
 
 		if not self.mal.status.empty():
 			try:
@@ -265,9 +269,9 @@ class leeroyjenkins(object):
 #				for (item, value) in group.iteritems():
 #					prefs[0][name][item] = self.setPref("prefs_" + prefs[1] +
 #														"_" + name + "_" + item)
-#		self.config.update()
-#		self.config.write()
-#		self.config.read()
+#		config.update()
+#		config.write()
+#		config.read()
 
 	def setPref(self, widgetName):
 		widget = self.getWidget(widgetName)
@@ -310,9 +314,9 @@ class leeroyjenkins(object):
 		self.getWidget("button_mal_refresh").set_sensitive(False)
 		self.statusMessage("Logged Out.")
 
-	def anidb_logout(self, widget=None):
-		self.working("anidbLogout", ADD)
-		self.anidb.unidentify()
+# 	def anidb_logout(self, widget=None):
+# 		self.working("anidbLogout", ADD)
+# 		self.anidb.unidentify()
 
 	def mal_login(self, widget=None):
 		if self.getWidget("entry_login_password").get_text():
@@ -321,9 +325,9 @@ class leeroyjenkins(object):
 			self.getWidget("window_login").hide()
 		else:
 			# note: wrapping config to main, why??
-			if self.config.mal['username'] and self.config.mal['password']:
-				self.username = self.config.mal['username'] 
-				self.password = self.config.mal['password']
+			if config.mal['username'] and config.mal['password']:
+				self.username = config.mal['username'] 
+				self.password = config.mal['password']
 			else:
 				self.getWidget("window_login").show()
 				return 0
@@ -333,31 +337,31 @@ class leeroyjenkins(object):
 
 		self.mal.identify(self.username, self.password)
 		
-		if self.config.mal['login_autorefresh']:
+		if config.mal['login_autorefresh']:
 			self.refresh(None)
 
 
-	def anidb_login(self, widget=None):
-		if self.getWidget("entry_login_password").get_text():
-			self.username = self.getWidget("entry_login_username").get_text()
-			self.password = self.getWidget("entry_login_password").get_text()
-			self.username = self.getWidget("entry_login_username").set_text("")
-			self.password = self.getWidget("entry_login_password").set_text("")
-			self.getWidget("window_login").hide()
-		else:
-			if (self.config.connection)["anidbLogin"]["password"]:
-				self.username = (self.config.connection)["anidbLogin"]["username"]
-				self.password = (self.config.connection)["anidbLogin"]["password"]
-			else:
-				if (self.config.connection)["anidbLogin"]["username"]:
-					self.getWidget("entry_login_username").set_text((self.config.connection)["anidbLogin"]["username"])
-				self.getWidget("window_login").show()
-				return 0
-
-		self.statusMessage("Attempting to log in to AniDB...")
-		self.working("anidbLogin", ADD)
-
-		self.anidb.identify(self.username, self.password)
+# 	def anidb_login(self, widget=None):
+# 		if self.getWidget("entry_login_password").get_text():
+# 			self.username = self.getWidget("entry_login_username").get_text()
+# 			self.password = self.getWidget("entry_login_password").get_text()
+# 			self.username = self.getWidget("entry_login_username").set_text("")
+# 			self.password = self.getWidget("entry_login_password").set_text("")
+# 			self.getWidget("window_login").hide()
+# 		else:
+# 			if (config.connection)["anidbLogin"]["password"]:
+# 				self.username = (config.connection)["anidbLogin"]["username"]
+# 				self.password = (config.connection)["anidbLogin"]["password"]
+# 			else:
+# 				if (config.connection)["anidbLogin"]["username"]:
+# 					self.getWidget("entry_login_username").set_text((config.connection)["anidbLogin"]["username"])
+# 				self.getWidget("window_login").show()
+# 				return 0
+# 
+# 		self.statusMessage("Attempting to log in to AniDB...")
+# 		self.working("anidbLogin", ADD)
+# 
+# 		self.anidb.identify(self.username, self.password)
 
 	def mal_updated(self, success):
 		if success:
@@ -504,7 +508,7 @@ class leeroyjenkins(object):
 		tree.set_model(slist)
 
 	def statusMessage(self, message):
-		self.wTree.get_widget("statusbar").push(self.context, message)
+		iface_data.get_widget("statusbar").push(self.context, message)
 
 	def treeviewToStatus(self, widget):
 		if widget == self.getWidget("treeview_current"):
@@ -519,18 +523,18 @@ class leeroyjenkins(object):
 			return 6
 
 	def getWidget(self, widgetname):
-		return self.wTree.get_widget(widgetname)
+		return iface_data.get_widget(widgetname)
 
 	def getCurrentTreeview(self, deathnote):
 		widget = deathnote.get_tab_label(deathnote.get_nth_page(deathnote.get_current_page()))
-		if widget == self.wTree.get_widget("label_current"):
-			return self.wTree.get_widget("treeview_current")
-		elif widget == self.wTree.get_widget("label_completed"):
-			return self.wTree.get_widget("treeview_completed")
-		elif widget == self.wTree.get_widget("label_onHold"):
-			return self.wTree.get_widget("treeview_onHold")
-		elif widget == self.wTree.get_widget("label_planToWatch"):
-			return self.wTree.get_widget("treeview_planToWatch")
+		if widget == iface_data.get_widget("label_current"):
+			return iface_data.get_widget("treeview_current")
+		elif widget == iface_data.get_widget("label_completed"):
+			return iface_data.get_widget("treeview_completed")
+		elif widget == iface_data.get_widget("label_onHold"):
+			return iface_data.get_widget("treeview_onHold")
+		elif widget == iface_data.get_widget("label_planToWatch"):
+			return iface_data.get_widget("treeview_planToWatch")
 
 	def callMAL(self, uri, method="POST", postdata=None, headers=None):
 		return client.getPage(uri, method=method, cookies=self.cookiesMAL,
@@ -556,7 +560,7 @@ class leeroyjenkins(object):
 		self.buzhug.commit(self.current, edits)
 
 	def switchBar(self, widget, event=None):
-		for bar in self.bars:
+		for bar in startup_bars:
 			button = self.getWidget("togglebutton_" + bar)
 			menuitem = self.getWidget("menuitem_bars_" + bar)
 			bar = self.getWidget(bar + "Bar")
@@ -629,8 +633,8 @@ class leeroyjenkins(object):
 	def web(self, widget, event=None):
 		if widget == self.getWidget("button_mal"):
 			uri = "http://myanimelist.net"
-		elif widget == self.getWidget("button_anidb"):
-			uri = "http://anidb.net"
+# 		elif widget == self.getWidget("button_anidb"):
+# 			uri = "http://anidb.net"
 		elif widget == self.getWidget("button_ac"):
 			uri = "http://animecollector.lattyware.co.uk"
 		webbrowser.open(uri, new=2, autoraise=1)

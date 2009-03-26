@@ -30,7 +30,6 @@ login_autorefresh = False
 [ui]
 tray_onclose = True
 tray_onstartup = False
-startup_bars = list,edit
 
 [search_dirs]   # Directories where played files are searched for
 dir1 = /home
@@ -47,8 +46,7 @@ class ac_config(ConfigParser):
 	
 	Properties
 		mal = {'username': str, 'password': str, 'autologin': boolean}
-		ui = {'tray_onclose': boolean, 'tray_onstartup': boolean,
-			  'startup_bars': list }
+		ui = {'tray_onclose': boolean, 'tray_onstartup': boolean }
 	"""
 
 	def __init__(self):
@@ -75,13 +73,13 @@ class ac_config(ConfigParser):
 		self.mal['username'] = self.get('mal', 'username')
 		self.mal['password'] = self.get('mal', 'password')
 		self.mal['autologin'] = self.getboolean('mal', 'autologin')
-		self.mal['autorefresh'] = self.getboolean('mal', 'login_autorefresh')
+		self.mal['login_autorefresh'] = \
+				self.getboolean('mal', 'login_autorefresh')
 
 		# User interface options
 		self.ui = dict()
 		self.ui['tray_onclose'] = self.getboolean('ui', 'tray_onclose')
 		self.ui['tray_onstartup'] = self.getboolean('ui', 'tray_onstartup')
-		self.ui['startup_bars'] = self.get('ui', 'startup_bars').split(',')
 
 
 	def write_file(self):
@@ -96,10 +94,6 @@ class ac_config(ConfigParser):
 		
 		self.set('ui', 'tray_onclose', self.ui['tray_onclose'])
 		self.set('ui', 'tray_onstartup', self.ui['tray_onstartup'])
-		str_starup_bars = str()
-		for x in self.ui['startup_bars']:
-			str_starup_bars += x + ','
-		self.set('ui', 'startup_bars', str_starup_bars.rstrip(','))
 
 
 
