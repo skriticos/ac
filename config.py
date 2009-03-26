@@ -12,13 +12,13 @@
 #		Class that phrases the configuration file.
 
 
-### Import section ###
+							 ### Import section ###
 
 import os
 from ConfigParser import ConfigParser
 
 
-### Constants ###
+							   ### Constants ###
 
 DEFAULT_CONFIG = """\
 [list]
@@ -50,14 +50,21 @@ dir2 = /home/foo
 ac_config_path = os.path.join(os.path.expanduser("~"), ".animecollector.cfg")
 
 
-### Class declarations ###
+						   ### Class declarations ###
 
-class ac_config(object):
-	main = None
+class ac_config(ConfigParser):
+	""" Configuration phraser and data class.
+	
+	Properties
+		mal = {'username':str, 'password':str, 'autologin':boolean}
+	"""
+
 	option_groups = None
 
 	def __init__(self):
-		""" Loads and reads the configuration file. """
+		""" Loads and reads the configuration file.  """
+
+		ConfigParser.__init__(self)
 
 		# Create default configuration if it is missing:
 		if not os.path.isfile(ac_config_path):
@@ -65,9 +72,19 @@ class ac_config(object):
 			x.write(DEFAULT_CONFIG)
 			x.close()
 
+		# Read configuration file:
+		self.read(ac_config_path)
 
-		self.main = ConfigParser()
-		self.read()
+		##
+		self.cfgdict = ConfigParser()
+		self.cfgdict.read(ac_config_path)
+		##
+
+		self.mal = dict()
+		self.mal['username'] = self.get('mal', 'username')
+		self.mal['password'] = self.get('mal', 'password')
+		self.mal['autologin'] = self.getboolean('mal', 'autologin')
+
 
 		self.connection = { "mallogin": { 
 				"username": None, "password": None, "autologin": None }}
@@ -92,19 +109,15 @@ class ac_config(object):
 		for opts in self.option_groups:
 			for (name, group) in opts[0].iteritems():
 				for (item, value) in group.iteritems():
-					opts[0][name][item] = self.main.get(opts[1], name +
+					opts[0][name][item] = self.cfgdict.get(opts[1], name +
 														"_" + item)
 
 	def update(self):
 		for opts in self.option_groups:
 			for (name, group) in opts[0].iteritems():
 				for (item, value) in group.iteritems():
-					self.main.set(opts[1], name + "_" + item, opts[0][name][item])
-
-	def read(self):
-		configpath = open(ac_config_path, "r")
-		self.main.readfp(configpath)
+					self.cfgdict.set(opts[1], name + "_" + item, opts[0][name][item])
 
 	def write(self):
 		configpath = open(ac_config_path, "w")
-		self.main.write(configpath)
+		self.cfgdict.write(configpath)

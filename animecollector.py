@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-## Import section ##
+							  ## Import section ##
 
 from __future__ import with_statement
 
@@ -20,7 +20,7 @@ from modules.players import get_playing
 from config import ac_config
 from data import *
 
-## Unsorted ##
+								### Unsorted ###
 
 PATH = os.getcwd()
 ADD = True # ??
@@ -38,114 +38,10 @@ class debugger:
 
 preference_groups = [] # ??
 
-## Class declarations ##
 
+						   ### Class declarations ###
 
-# def init():
-# 	""" Initialization of the application """
-
-#	# Read configuration
-# 	config = config()
-# 	preference_groups = []
-# 	for groups in config.option_groups:
-# 		if groups[2]:
-# 			preference_groups.append(groups)
-
-# config.option_groups:  [[{'mallogin': {'username': '', 'password': '',
-# 'autologin': 'False'}, 'anidbLogin': {'username': '', 'localPort': '9876',
-# 'ping': 'True', 'autologin': 'False', 'server': 'api.anidb.info',
-# 'password': '', 'port': '9000'}}, 'connection', True], [{'refresh':
-# {'autorefreshevery': 'False', 'autorefresh': 'True',
-# 'autorefreshdelay': '5'}}, 'list', True], [{'window':
-# {'maximiseOnStartup': 'False'}, 'tray': {'onClose': 'True',
-# 'onStartup': 'False'}}, 'ui', True], [{'debug':
-# {'verbosity': '0'}, 'other': {'runBefore': 'True'},
-# 'ui': {'bars': 'list,edit', 'barsVisible': 'list'}},
-# 'options', False]]
-
-# group:
-# [{	'mallogin': {'username': '', 'password': '', 'autologin': 'False'},
-#   	'anidbLogin': {'username': '', 'localPort': '9876', 'ping': 'True',
-# 		'autologin': 'False', 'server': 'api.anidb.info', 'password': '',
-#     	'port': '9000'}}, 
-#   	'connection', 
-#   	True]
-# 
-# group:
-# [	{'refresh': {'autorefreshevery': 'False', 'autorefresh': 'True',
-# 		'autorefreshdelay': '5'}}, 
-# 	'list', 
-# 	True]
-# 
-# group:
-# [	{'window': {'maximiseOnStartup': 'False'}, 
-# 	'tray': {'onClose':
-# 		'True', 'onStartup': 'False'}}, 
-# 	'ui', 
-# 	True]
-
-# 
-# 
-# def init_gui():
-# 	ui = gtk.glade.XML("main.glade")
-# 
-# 	for bar in self.bars:
-# 		self.getWidget("togglebutton_" + bar).show()
-# 		self.getWidget("togglebutton_" + bar).connect("toggled",
-# 													  self.switchBar)
-# 		self.getWidget("menuitem_bars_" + bar).show()
-# 		self.getWidget("menuitem_bars_" + bar).connect("toggled",
-# 													   self.switchBar)
-# 
-# 	for bar in (self.config.options)["ui"]["barsVisible"].split(","):
-# 		self.getWidget(bar + "Bar").show()
-# 		self.getWidget("togglebutton_" + bar).set_active(True)
-# 
-# 	for tree in self.stati:
-# 		self.getWidget("treeview_" + tree).connect("cursor_changed",
-# 												   self.updateEditBar)
-# 		self.getWidget("treeview_" + tree).connect("button_press_event",
-# 												   self.popup)
-# 
-# 	self.trayicon = gtk.StatusIcon()
-# 	self.trayicon.set_from_file("ac.ico")
-# 	self.trayicon.connect("activate", self.toggleMain)
-# 
-# 	self.fillStatusCombo()
-# 
-# 	dic = {
-# 		"on_menuitem_file_quit_activate": self.quit,
-# 		"on_menuitem_edit_preferences_activate": self.showPrefs,
-# 		"on_button_preferences_clicked": self.showPrefs,
-# 		"on_button_prefs_cancel_clicked": self.hidePrefs,
-# 		"on_button_prefs_apply_clicked": self.applyPrefs,
-# 		"on_button_mal_refresh_clicked": self.refresh,
-# 		"on_button_edit_clicked": self.edit,
-# 		"on_button_mal_login_clicked": self.mal_login,
-# 		"on_button_anidb_login_clicked": self.anidb_login,
-# 		"on_button_anidb_logout_clicked": self.anidb_logout,
-# 		"on_button_mal_logout_clicked": self.mal_logout,
-# 		"on_button_login_cancel_clicked": self.hideLogin,
-# 		"on_button_login_ok_clicked": self.mal_login,
-# 		"on_menuitem_help_about_activate": self.runAbout,
-# 		"on_aboutdialog_response": self.hideAbout,
-# 		"on_button_mal_clicked": self.web,
-# 		"on_button_anidb_clicked": self.web,
-# 		"on_button_ac_clicked": self.web,
-# 		"on_menuitem_tree_play_activate": self.to_implement,
-# 		"on_menuitem_tree_edit_activate": self.showEdit,
-# 		"on_button_full_edit_cancel_clicked": self.hideEdit,
-# 		"on_button_wizard_skip_clicked": self.wizardInteract,
-# 		"on_button_wizard_previous_clicked": self.wizardInteract,
-# 		"on_button_wizard_next_clicked": self.wizardInteract,
-# 		"on_button_wizard_ok_clicked": self.wizardInteract,
-# 	}
-# 
-# 	self.wTree.signal_autoconnect(dic)
-# 
-# 	self.trayicon.set_visible(True)
-
-class leeroyjenkins:
+class leeroyjenkins(object):
 
 	wTree = None
 	config = None
@@ -161,7 +57,12 @@ class leeroyjenkins:
 
 	def __init__(self):
 		self.config = ac_config()
+
+
+
 		self.preference_groups = []
+		
+		# turning in circles here
 		for groups in self.config.option_groups:
 			if groups[2]:
 				self.preference_groups.append(groups)
@@ -454,12 +355,11 @@ class leeroyjenkins:
 		self.anidb.unidentify()
 
 	def mal_login(self, widget=None):
-		self.debug.out("Logging in to MAL...", 2)
 		if self.getWidget("entry_login_password").get_text():
 			self.username = self.getWidget("entry_login_username").get_text()
 			self.password = self.getWidget("entry_login_password").get_text()
-			self.username = self.getWidget("entry_login_username").set_text("")
-			self.password = self.getWidget("entry_login_password").set_text("")
+			#self.username = self.getWidget("entry_login_username").set_text("")
+			# self.password = self.getWidget("entry_login_password").set_text("")
 			self.getWidget("window_login").hide()
 		else:
 			if (self.config.connection)["mallogin"]["password"]:

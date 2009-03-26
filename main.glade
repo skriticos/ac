@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <glade-interface>
   <requires lib="gnome"/>
-  <requires-version lib="gnome" version="0.0"/>
-  <requires-version lib="gtk+" version="2.12"/>
   <widget class="GtkWindow" id="window_warn">
     <property name="title" translatable="yes">Warning</property>
     <property name="resizable">False</property>
@@ -3828,7 +3826,7 @@ Watched:</property>
                                                       <widget class="GtkSpinButton" id="spinbutton_episodesWatched">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
-                                                        <property name="adjustment">0 0 500 1 1 1</property>
+                                                        <property name="adjustment">0 0 500 1 1 0</property>
                                                         <property name="snap_to_ticks">True</property>
                                                         <property name="numeric">True</property>
                                                         <signal name="value_changed" handler="on_spinbutton_episodesWatched_value_changed"/>
@@ -3882,7 +3880,7 @@ Watched:</property>
                                                   <widget class="GtkSpinButton" id="spinbutton_score">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="adjustment">0 0 10 1 1 1</property>
+                                                    <property name="adjustment">0 0 10 1 1 0</property>
                                                     <property name="snap_to_ticks">True</property>
                                                     <property name="numeric">True</property>
                                                     <signal name="value_changed" handler="on_spinbutton_score_value_changed"/>
@@ -4056,7 +4054,7 @@ Rewatched:</property>
                                                         <property name="visible">True</property>
                                                         <property name="sensitive">False</property>
                                                         <property name="can_focus">True</property>
-                                                        <property name="adjustment">0 0 500 1 1 1</property>
+                                                        <property name="adjustment">0 0 500 1 1 0</property>
                                                         <property name="snap_to_ticks">True</property>
                                                         <property name="numeric">True</property>
                                                         <signal name="value_changed" handler="on_spinbutton_episodesRewatched_value_changed"/>
@@ -4112,7 +4110,7 @@ Rewatched:</property>
                                                     <property name="visible">True</property>
                                                     <property name="sensitive">False</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="adjustment">0 0 100 1 10 10</property>
+                                                    <property name="adjustment">0 0 100 1 10 0</property>
                                                     <signal name="value_changed" handler="on_spinbutton_timesRewatched_value_changed"/>
                                                   </widget>
                                                   <packing>
@@ -4972,7 +4970,7 @@ Rewatched:</property>
                                     <property name="sensitive">False</property>
                                     <property name="can_focus">True</property>
                                     <property name="tooltip_text">Not actually implemented yet.</property>
-                                    <property name="adjustment">0 0 100 1 10 10</property>
+                                    <property name="adjustment">0 0 100 1 10 0</property>
                                   </widget>
                                 </child>
                                 <child>
