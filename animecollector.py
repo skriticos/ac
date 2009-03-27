@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 
+# XXX: rename controls to meaningfull names
+
 							  ## Import section ##
 
 from __future__ import with_statement
@@ -29,13 +31,52 @@ REMOVE = False # ??
 
 							   ### Constants ###
 
-startup_bars = ['list', 'edit']
+startup_ctls = ['list', 'edit']
 
 
 							### Initialize data ###
 
 config = ac_config()
-iface_data = gtk.glade.XML("main.glade")
+iface_data = gtk.glade.XML('main.glade')
+mal_socket = modules.myanimelist.data_source()
+
+
+								### Methods ###
+
+def toggle_ctlgrp(widget, event=None):
+	""" Toggle a group of controls.
+
+	This function toggles the state of connected control groups.
+	It switches connected options in the menubar and on the buttonbar,
+	and shows/hides their planes.
+	"""
+
+	for ctl in startup_ctls:
+		button = iface_data.get_widget('togglebutton_' + ctl)
+		menuitem = iface_data.get_widget('menuitem_bars_' + ctl)
+		ctl = iface_data.get_widget(ctl + 'Bar')
+		
+		if (widget is button) or (widget is menuitem):
+			if widget.get_active():
+				ctl.show()
+				menuitem.set_active(True)
+				button.set_active(True)
+			else:
+				ctl.hide()
+				menuitem.set_active(False)
+				button.set_active(False)
+
+
+							 ### Initialize GUI ###
+
+# Initialize control groups
+for bar in startup_ctls:
+	iface_data.get_widget('togglebutton_' + bar).show()
+	iface_data.get_widget('togglebutton_' + bar).connect('toggled',
+			toggle_ctlgrp)
+	iface_data.get_widget('menuitem_bars_' + bar).show()
+	iface_data.get_widget('menuitem_bars_' + bar).connect('toggled',
+			toggle_ctlgrp)
 
 
 						   ### Class declarations ###
@@ -57,8 +98,6 @@ class leeroyjenkins(object):
 		self.stati = ["current", "completed", "onHold", "planToWatch"]
 
 		self.initgui()
-
-		self.mal = modules.myanimelist.dataSource()
 
 		# self.players = modules.players.detectPlayers(self.debug)
 
@@ -101,15 +140,7 @@ class leeroyjenkins(object):
 
 	def initgui(self):
 
-		for bar in startup_bars:
-			self.getWidget("togglebutton_" + bar).show()
-			self.getWidget("togglebutton_" + bar).connect("toggled",
-														  self.switchBar)
-			self.getWidget("menuitem_bars_" + bar).show()
-			self.getWidget("menuitem_bars_" + bar).connect("toggled",
-														   self.switchBar)
-
-		for bar in startup_bars:
+		for bar in startup_ctls:
 			self.getWidget(bar + "Bar").show()
 			self.getWidget("togglebutton_" + bar).set_active(True)
 
@@ -229,9 +260,9 @@ class leeroyjenkins(object):
 # 		if len(self.worklist):
 # 			iface_data.get_widget("progressbar").pulse()
 
-		if not self.mal.status.empty():
+		if not mal_socket.status.empty():
 			try:
-				value = self.mal.status.get_nowait()
+				value = mal_socket.status.get_nowait()
 			except Queue.Empty:
 				value = None
 			if value:
@@ -308,7 +339,7 @@ class leeroyjenkins(object):
 			widget.set_value(int(value))
 
 	def mal_logout(self, widget=None):
-		self.mal.unidentify()
+		mal_socket.unidentify()
 		self.getWidget("button_mal_login").show()
 		self.getWidget("button_mal_logout").hide()
 		self.getWidget("button_mal_refresh").set_sensitive(False)
@@ -335,7 +366,7 @@ class leeroyjenkins(object):
 		self.statusMessage("Attempting to log in to MAL...")
 		self.working("mallogin", ADD)
 
-		self.mal.identify(self.username, self.password)
+		mal_socket.identify(self.username, self.password)
 		
 		if config.mal['login_autorefresh']:
 			self.refresh(None)
@@ -365,7 +396,7 @@ class leeroyjenkins(object):
 
 	def mal_updated(self, success):
 		if success:
-			self.data_mal.update(self.mal.return_as_dic())
+			self.data_mal.update(mal_socket.return_as_dic())
 			mal_list_pickle = file('mal.pkl', 'w')
 			pickle.dump(self.data_mal, mal_list_pickle)
 			self.statusMessage("List retrieved.")
@@ -556,11 +587,11 @@ class leeroyjenkins(object):
 		olddata = self.data_mal
 		for (name, value) in edits:
 			(self.data_mal)[self.current][name] = value
-		self.mal.commit(self.current, edits, olddata, self.data_mal)
+		mal_socket.commit(self.current, edits, olddata, self.data_mal)
 		self.buzhug.commit(self.current, edits)
 
 	def switchBar(self, widget, event=None):
-		for bar in startup_bars:
+		for bar in startup_ctls:
 			button = self.getWidget("togglebutton_" + bar)
 			menuitem = self.getWidget("menuitem_bars_" + bar)
 			bar = self.getWidget(bar + "Bar")
@@ -605,7 +636,7 @@ class leeroyjenkins(object):
 		if self.username:
 			self.statusMessage("Refreshing MAL list.")
 			self.working("malUpdate", ADD)
-			self.mal.update()
+			mal_socket.update()
 		else:
 			self.statusMessage("Unable to refresh list: Not logged in.")
 
