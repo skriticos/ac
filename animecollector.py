@@ -37,7 +37,7 @@ startup_ctls = ['list', 'edit']
 							### Initialize data ###
 
 config = ac_config()
-iface_data = gtk.glade.XML('main.glade')
+ui_data = gtk.glade.XML('main.glade')
 mal_socket = modules.myanimelist.data_source()
 
 
@@ -52,9 +52,9 @@ def toggle_ctlgrp(widget, event=None):
 	"""
 
 	for ctl in startup_ctls:
-		button = iface_data.get_widget('togglebutton_' + ctl)
-		menuitem = iface_data.get_widget('menuitem_bars_' + ctl)
-		ctl = iface_data.get_widget(ctl + 'Bar')
+		button = ui_data.get_widget('togglebutton_' + ctl)
+		menuitem = ui_data.get_widget('menuitem_bars_' + ctl)
+		ctl = ui_data.get_widget(ctl + 'Bar')
 		
 		if (widget is button) or (widget is menuitem):
 			if widget.get_active():
@@ -70,13 +70,13 @@ def toggle_ctlgrp(widget, event=None):
 							 ### Initialize GUI ###
 
 # Initialize control groups
-for bar in startup_ctls:
-	iface_data.get_widget('togglebutton_' + bar).show()
-	iface_data.get_widget('togglebutton_' + bar).connect('toggled',
-			toggle_ctlgrp)
-	iface_data.get_widget('menuitem_bars_' + bar).show()
-	iface_data.get_widget('menuitem_bars_' + bar).connect('toggled',
-			toggle_ctlgrp)
+for ctl in startup_ctls:
+	ui_data.get_widget('togglebutton_' + ctl).show()
+	ui_data.get_widget('togglebutton_' + ctl).connect('toggled', toggle_ctlgrp)
+	ui_data.get_widget('menuitem_bars_' + ctl).show()
+	ui_data.get_widget('menuitem_bars_' + ctl).connect('toggled', toggle_ctlgrp)
+
+ui_data.get_widget("togglebutton_list").set_active(True)
 
 
 						   ### Class declarations ###
@@ -94,7 +94,7 @@ class leeroyjenkins(object):
 
 	def __init__(self):
 
-		# ??
+		# -> treeview_stati
 		self.stati = ["current", "completed", "onHold", "planToWatch"]
 
 		self.initgui()
@@ -106,13 +106,13 @@ class leeroyjenkins(object):
 		# self.getWidget("window_edit").hide()
 
 		# quick hack
-		button = self.getWidget("togglebutton_edit")
-		bar = self.getWidget("editBar")
-		menuitem = self.getWidget("menuitem_bars_edit")
-		bar.hide()
-		button.set_active(False)
+# 		button = self.getWidget("togglebutton_edit")
+# 		bar = self.getWidget("editBar")
+# 		menuitem = self.getWidget("menuitem_bars_edit")
+# 		bar.hide()
+# 		button.set_active(False)
 
-		self.context = iface_data.get_widget("statusbar").get_context_id("animecollector")
+		self.context = ui_data.get_widget("statusbar").get_context_id("animecollector")
 		gobject.timeout_add(100, self.update)
 		# gobject.timeout_add(5000, self.players.check)
 
@@ -140,9 +140,6 @@ class leeroyjenkins(object):
 
 	def initgui(self):
 
-		for bar in startup_ctls:
-			self.getWidget(bar + "Bar").show()
-			self.getWidget("togglebutton_" + bar).set_active(True)
 
 		for tree in self.stati:
 			self.getWidget("treeview_" + tree).connect("cursor_changed",
@@ -184,7 +181,7 @@ class leeroyjenkins(object):
 			# "on_button_wizard_ok_clicked": self.wizardInteract,
 		}
 
-		iface_data.signal_autoconnect(dic)
+		ui_data.signal_autoconnect(dic)
 
 		self.trayicon.set_visible(True)
 
@@ -258,7 +255,7 @@ class leeroyjenkins(object):
 
 	def update(self):
 # 		if len(self.worklist):
-# 			iface_data.get_widget("progressbar").pulse()
+# 			ui_data.get_widget("progressbar").pulse()
 
 		if not mal_socket.status.empty():
 			try:
@@ -539,7 +536,7 @@ class leeroyjenkins(object):
 		tree.set_model(slist)
 
 	def statusMessage(self, message):
-		iface_data.get_widget("statusbar").push(self.context, message)
+		ui_data.get_widget("statusbar").push(self.context, message)
 
 	def treeviewToStatus(self, widget):
 		if widget == self.getWidget("treeview_current"):
@@ -554,18 +551,18 @@ class leeroyjenkins(object):
 			return 6
 
 	def getWidget(self, widgetname):
-		return iface_data.get_widget(widgetname)
+		return ui_data.get_widget(widgetname)
 
 	def getCurrentTreeview(self, deathnote):
 		widget = deathnote.get_tab_label(deathnote.get_nth_page(deathnote.get_current_page()))
-		if widget == iface_data.get_widget("label_current"):
-			return iface_data.get_widget("treeview_current")
-		elif widget == iface_data.get_widget("label_completed"):
-			return iface_data.get_widget("treeview_completed")
-		elif widget == iface_data.get_widget("label_onHold"):
-			return iface_data.get_widget("treeview_onHold")
-		elif widget == iface_data.get_widget("label_planToWatch"):
-			return iface_data.get_widget("treeview_planToWatch")
+		if widget == ui_data.get_widget("label_current"):
+			return ui_data.get_widget("treeview_current")
+		elif widget == ui_data.get_widget("label_completed"):
+			return ui_data.get_widget("treeview_completed")
+		elif widget == ui_data.get_widget("label_onHold"):
+			return ui_data.get_widget("treeview_onHold")
+		elif widget == ui_data.get_widget("label_planToWatch"):
+			return ui_data.get_widget("treeview_planToWatch")
 
 	def callMAL(self, uri, method="POST", postdata=None, headers=None):
 		return client.getPage(uri, method=method, cookies=self.cookiesMAL,
