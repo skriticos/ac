@@ -1,25 +1,23 @@
 
 # config.py - configuration defaults and phraser
 #
-# Contents
-# --------
-#
-# DEFAULT_CONFIG
-#		Empty configuration that is used to create a blank configuration file if
-#		there is none.
-#
-# ac_config
-#		Class that phrases the configuration file.
+# Contains the default configuration and the configuration handling class.
 
 
-							 ### Import section ###
+# =======
+# Imports
+# =======
 
-import os
 from ConfigParser import ConfigParser
+from os import path
 
 
-							   ### Constants ###
+# =========
+# Constants
+# =========
 
+# Empty configuration that is used to create a blank configuration file if
+# there is none.
 DEFAULT_CONFIG = """\
 [mal]
 username =
@@ -36,13 +34,16 @@ dir1 = /home
 dir2 = /home/foo
 """
 
-config_path = os.path.join(os.path.expanduser("~"), ".animecollector.cfg")
+config_path = path.join(path.expanduser("~"), ".animecollector.cfg")
 
 
-						   ### Class declarations ###
+# =================
+# Class declaration
+# =================
 
 class ac_config(ConfigParser):
-	""" Configuration phraser and data class.
+	"""
+	Configuration phraser and data class.
 	
 	Properties
 		mal = {'username': str, 'password': str, 'autologin': boolean}
@@ -50,12 +51,14 @@ class ac_config(ConfigParser):
 	"""
 
 	def __init__(self):
-		""" Loads and reads the configuration file.  """
+		"""
+		Loads and reads the configuration file.
+		"""
 
 		ConfigParser.__init__(self)
 
 		# Create default configuration if it is missing:
-		if not os.path.isfile(config_path):
+		if not path.isfile(config_path):
 			x = open(config_path, 'w')
 			x.write(DEFAULT_CONFIG)
 			x.close()
@@ -64,7 +67,9 @@ class ac_config(ConfigParser):
 
 	
 	def read_file(self):
-		""" Read instance properties from configuration file. """
+		"""
+		Read instance properties from configuration file.
+		"""
 		
 		self.read(config_path)
 
@@ -83,7 +88,9 @@ class ac_config(ConfigParser):
 
 
 	def write_file(self):
-		""" Write instance properties to configuration file. """
+		"""
+		Write instance properties to configuration file.
+		"""
 
 		self.write(config_path)
 
@@ -94,7 +101,4 @@ class ac_config(ConfigParser):
 		
 		self.set('ui', 'tray_onclose', self.ui['tray_onclose'])
 		self.set('ui', 'tray_onstartup', self.ui['tray_onstartup'])
-
-
-
 
