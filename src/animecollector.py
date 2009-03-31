@@ -2,8 +2,10 @@
 
 
 # XXX: fix login (track it)
+# XXX: check out, why the dropped list is not loading
 # XXX: comment and make code readable
 # XXX: write played file <-> database match module and integrate in the GUI
+# XXX: release 1.0-testing
 
 
 							  ## Import section ##
@@ -19,8 +21,8 @@ gtk2reactor.install()
 from twisted.internet import reactor
 from twisted.web import client
 
-import modules.myanimelist
-from modules.players import get_playing
+import myanimelist
+from players import get_playing
 
 from config import ac_config
 from data import *
@@ -49,7 +51,7 @@ tree_stati = ["current", "completed", "onHold", "planToWatch", "dropped"]
 
 config = ac_config()
 ui_data = gtk.glade.XML('main.glade')
-mal_socket = modules.myanimelist.data_source()
+mal_socket = myanimelist.data_source()
 context = ui_data.get_widget("statusbar").get_context_id("animecollector")
 cb_init(ui_data, mal_socket, config, context)
 
