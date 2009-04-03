@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+# XXX: move the main module to a callable class
 # XXX: fix login (track it)
 # XXX: check out, why the dropped list is not loading
 # XXX: comment and make code readable
@@ -21,13 +22,13 @@ gtk2reactor.install()
 from twisted.internet import reactor
 from twisted.web import client
 
-import myanimelist
-from players import get_playing
+from AnimeCollector import myanimelist
+from AnimeCollector.players import get_playing
 
-from config import ac_config
-from data import *
+from AnimeCollector.config import ac_config
+from AnimeCollector.data import *
 
-from callbacks import \
+from AnimeCollector.callbacks import \
 		cb_hide_about, \
 		cb_hide_login, \
 		cb_hide_prefs, \
@@ -49,8 +50,12 @@ tree_stati = ["current", "completed", "onHold", "planToWatch", "dropped"]
 
 							### Initialize data ###
 
+# Locate the data files
+import AnimeCollector.config
+data_path = os.path.join(os.path.dirname(AnimeCollector.config.__file__), 'data')
+
 config = ac_config()
-ui_data = gtk.glade.XML('main.glade')
+ui_data = gtk.glade.XML(os.path.join(data_path, 'main.glade'))
 mal_socket = myanimelist.data_source()
 context = ui_data.get_widget("statusbar").get_context_id("animecollector")
 cb_init(ui_data, mal_socket, config, context)

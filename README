@@ -1,22 +1,53 @@
-Note: This is still alpha software. 99% of features are not yet implemented (see the source code for a detailed explanation).
-That said, it does work.
 
-To Run:
-	./animecollector
-	
-Dependencies:
+======================================================
+README -- last update: Tue, 31 Mar 2009 16:53:11 +0200
+======================================================
+
+
+Note: 
+	This is still alpha software. 99% of features are not yet implemented
+	(see the source code for a detailed explanation). That said, it does work.
+
+	Package for Ubuntu is in planning.
+
+
+Installation
+============
+
+1. First, you need to make sure the dependencies are met:
+
+	For Ubuntu users: 
+		$ sudo apt-get install pygtk python-twisted
+
+	For Arch users: 
+		# pacman -S pygtk twisted
+
+	For anyone else: Do some searches in your package manager, or grab from
+	the sites and compile. Frankly, Python and GTK will be there already
+	99% of the time (and should be handled as dependancies for pygtk by any
+	package manager).
+
+2. Build the application
+
+	$ python setup.py build
+
+3. Install the application
+
+	$ sudo python setup.py install
+	or
+	# python setup.py install
+
+4. Run program
+
+	$ animecollector
+
+		
+Dependencies
+============
+
 	Python:			http://python.org/ 
 	GTK:			http://www.gtk.org/
 	pyGTK:			http://www.pygtk.org/
 	Twisted: 		http://twistedmatrix.com/
 
-Not too many changes since the last release, main one is swapping buzhug for pickling, which should be faster, and means one less dependancy.
 
-For Arch users:
-(As root): pacman -S pygtk twisted
-
-For Ubuntu users:
-sudo apt-get install pygtk python-twisted
-
-For anyone else:
-Do some searches in your package manager, or grab from the sites and compile. Frankly, Python and GTK will be there already 99% of the time (and should be handled as dependancies for pygtk by any package manager).

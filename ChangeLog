@@ -1,0 +1,51 @@
+  2009-03-31 skriticos <seth.kriticos@googlemail.com>
+
+ * ac.ico, anidb.ico, animecollector.py, callbacks.py, config.py, data.py,
+ main.glade, mal.ico, modules/myanimelist.py, modules/players.py, src/ac.ico,
+ src/anidb.ico, src/animecollector.py, src/callbacks.py, src/config.py,
+ src/data.py, src/main.glade, src/mal.ico, src/myanimelist.py, src/players.py:
+ Moved the code and image files to the src directory
+
+  2009-03-29 skriticos <seth.kriticos@googlemail.com>
+
+ * animecollector.py: Small change
+
+  2009-03-27 skriticos <seth.kriticos@googlemail.com>
+
+ * animecollector.py, modules/myanimelist.py: Extracted function to toggle a
+ control group.  - Renamed it. - Extracted the first elements for the initgui
+ method. - Changed the name of the mal socket class.
+
+  2009-03-26 skriticos <seth.kriticos@googlemail.com>
+
+ * animecollector.py, config.py, modules/myanimelist.py: v0.26  Completed
+ config refactoring.
+
+ * animecollector.py, config.py, main.glade: Removed warnings and fixed login
+ bug.  Also continued re-factoring the config class. This is about 1/2 done.
+ When ready the main program has to be adapted for the new data-structures.
+
+  2009-03-25 skriticos <seth.kriticos@googlemail.com>
+
+ * .gitigrone, animecollector.py, config.cfg, config.py: Config move and
+ initial configuration file  - Moved the entire configuration class to the
+ config.py file - Added default configuration file template to the config.py
+ file, which will be written to the configuration directory if there is none
+ in the users home directory.
+
+ * animecollector.py: Bugfix and config search path.  - Program now does not
+ crash on start-up if the database file is empty. - The configuration file is
+ now first searched in the ~/.animecollector.cfg file, then in the current
+ directory.
+
+ * AUTHORS, animecollector.py, config.cfg, modules/players.py: Started work on
+ the cleaning of the configuration class  Dropped anidb support for the time
+ being.
+
+ * AUTHORS, animecollector.py, modules/players.py: Added working and clean
+ player tracker
+
+  2009-03-24 skriticos <seth.kriticos@googlemail.com>
+
+ * .gitigrone, animecollector.py, data.py: First cleanup  Separated data into
+ a separate file. Did some minor bloat removal and cleanup.
