@@ -75,9 +75,12 @@ def cb_mal_login(widget=None):
 			"Attempting to log in to MAL...")
 
 	mal_socket.identify(config.mal['username'], config.mal['password'])
+#		ui_data.get_widget("statusbar").push(context, "Login successful...")
+#	else:
+#		ui_data.get_widget("statusbar").push(context, "Login failed...")
 	
 	if config.mal['login_autorefresh']:
-		refresh(None)
+		cb_refresh(None)
 
 
 def cb_mal_logout(widget=None):

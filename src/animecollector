@@ -180,6 +180,19 @@ def populate_tree_view(tree):
 	tree.set_model(slist)
 
 
+#def mal_updated(success):
+#	if success:
+#		pkl_data.update(mal_socket.return_as_dic())
+#		mal_list_pickle = file('mal.pkl', 'w')
+#		pickle.dump(pkl_data, mal_list_pickle)
+#		ui_data.get_widget("statusbar").push(context, "List retrived.")
+#	else:
+#		ui_data.get_widget("statusbar").push(context, 
+#				"Failed to retrive list.")
+#	for tree in tree_stati:
+#		populate_tree_view(ui_data.get_widget("treeview_" + tree))
+
+
 							 ### Initialize GUI ###
 
 # Initialize control groups

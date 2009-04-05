@@ -71,6 +71,11 @@ class data_source:
 		request.deferred.addCallback(self._deffer_identify, request)
 		request.deferred.addErrback(self._deffer_identify, None)
 
+		# XXX: this thing must get a return value telling if the login was
+		#      successfull
+		# Note: reseach how well this deferred thing works togeher with gtk
+		# callbacks. Do some tracing and clean the module.
+
 	def unidentify(self):
 		self._cookies = None
 
@@ -184,6 +189,7 @@ class data_source:
 
 	def _deffer_identify(self, request, data):
 		""" Checks, if the authentication with the mal server was successfull. 
+		(in a deffered way over a few sideways.)
 		"""
 
 		if data:
@@ -242,5 +248,6 @@ class data_source:
 			return None
 
 	def _add_to_queue(self, data, success, otherdata=None):
+		# XXX: seems to magically signal that the login was successfull.
 		self.status.put((data, success, otherdata))
 
