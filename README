@@ -1,53 +1,99 @@
 
 ======================================================
-README -- last update: Tue, 31 Mar 2009 16:53:11 +0200
+README -- last update: Sun, 12 Apr 2009 19:04:51 +0200
 ======================================================
+
+Introduction
+============
+
+AnimeCollector is a lightwight, open source anime player tracking and 
+MyAnimeList syncronizing desktop application written in python.
+It uses the GTK+ interface library for the general user interface.
+
+
+The target features are:
+
+- Optional automatic player tracker which tracks the files you are playing and
+  updates your local anime database
+- Optional automatic file renamer, which renames the files you are playing and
+  puts them in your anime directory
+- MyAnimeList server syncronization with your local database of your anime list
+- Display and editing of your anime entries via the graphical user interface
+
+
+Development principles:
+
+- Clean, modular and maintainable source code
+- Portable source code
 
 
 Note: 
 	This is still alpha software. 99% of features are not yet implemented
 	(see the source code for a detailed explanation). That said, it does work.
 
-	Package for Ubuntu is in planning.
-
 
 Installation
 ============
 
-1. First, you need to make sure the dependencies are met:
+1. Install GTK+ and pyGTK
 
-	For Ubuntu users: 
-		$ sudo apt-get install pygtk python-twisted
+    In most cases you won't have to bother because they will be there already if
+    you are using a GNOME desktop. If not, consult your package installation
+    manual on how to install these packages.
+    
+    On Ubuntu and Debian you can use: 
+       apt-get install python-gtk2 
+       
+    On arch something like:
+       pacman -S pygtk
 
-	For Arch users: 
-		# pacman -S pygtk twisted
 
-	For anyone else: Do some searches in your package manager, or grab from
-	the sites and compile. Frankly, Python and GTK will be there already
-	99% of the time (and should be handled as dependancies for pygtk by any
-	package manager).
+2. Build and install the application
 
-2. Build the application
+	$ python setup.py build && sudo python setup.py install
 
-	$ python setup.py build
 
-3. Install the application
-
-	$ sudo python setup.py install
-	or
-	# python setup.py install
-
-4. Run program
+3. Run program
 
 	$ animecollector
+
+
+Porting
+=======
+
+AnimeCollector is developed on Linux with GTK and will work on this kind of 
+systems out of the box. It would be nice to make it work this way on other 
+systems too.
+
+Therefore it is designed in a portable way, but there are some modules wich
+do system specific things you will have to port to your platform:
+
+1. The data/configuration is put in the home directory of the user. This should
+   work on all platforms as it is implemented now, but it might cause some 
+   issues here and there, so you better take a look if it works.
+   
+2. The playtracker (players.py) is using procfs to track currently played files.
+   This should work on all UNIXy platforms. MacOS X needs some installation 
+   effort, but as far as I know it should be not much hassle to make it work 
+   there. On windows you are probably out of luck with this module. You 
+   basically have two choices there: implement a windows way or dissable the
+   tracker.
+   
+3. The system tray icon and the menu entry are GNOME specific. If you are 
+   porting to non-GNOME environments, you have to reimplement it for your 
+   desktop environment.
+
+Most of the other things (especially the user interface and server 
+syncronization) should work fine with no adjustment.
+
+Summary: a MacOS X / UNIX port sholud be quite easy. Windows is on a medium
+         porting difficulty level.
 
 		
 Dependencies
 ============
 
 	Python:			http://python.org/ 
-	GTK:			http://www.gtk.org/
+	GTK+:			http://www.gtk.org/
 	pyGTK:			http://www.pygtk.org/
-	Twisted: 		http://twistedmatrix.com/
-
 

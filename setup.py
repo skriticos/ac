@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='AnimeCollector',
-      version='0.26',
+      version='9.1-unstable',
       description='Open source GUI MAL Updater',
       author='Sebastian Bartos',
       author_email='seth.kriticos@googlemail.com',
