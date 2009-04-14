@@ -136,10 +136,10 @@ def _login(username, password):
 		return False
 
 	# check if login was successful
-	if login_response.count('<div class="goodresult">'):
-		return True
-	else:
+	if login_response.count('<div class="badresult">'):
 		return False
+	else:
+		return True
 
 
 def _fetch_list(username):
