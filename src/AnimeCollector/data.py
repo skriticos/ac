@@ -24,7 +24,8 @@ mal_data_schema = {
 	'my_score': int,
 	'my_status': int,
 	'my_rewatching': int,
-	'my_rewatching_ep': int}
+	'my_rewatching_ep': int,
+	'my_last_updated': int}
 
 
 # These are the status code mappings the mal server is sending in the XML file
@@ -38,7 +39,7 @@ mal_anime_status_codes = [
 
 
 # from datetime import date
-# 
+#
 # STATUS = {
 #     1	:	"Watching",
 #     2	:	"Completed",
@@ -47,7 +48,7 @@ mal_anime_status_codes = [
 #     5	:	"Dropped",
 #     6	:	"Plan To Watch",
 # }
-# 
+#
 # # From status to their position in the combo box.
 # STATUS_COMBO = {
 #     1	:	0,
@@ -57,7 +58,7 @@ mal_anime_status_codes = [
 #     5	:	3,
 #     6	:	4,
 # }
-# 
+#
 # COMBO_STATUS = {
 #     0	:	1,
 #     1	:	2,
@@ -66,14 +67,14 @@ mal_anime_status_codes = [
 #     3	:	5,
 #     4	:	6,
 # }
-# 
+#
 # # Status for series.
 # SERIES_STATUS = {
 #     1	:	"Airing",
 #     2	:	"Aired",
 #     3	:	"Not Aired",
 # }
-# 
+#
 # # Types for series.
 # SERIES_TYPE = {
 #     1	:	"TV",
@@ -82,7 +83,7 @@ mal_anime_status_codes = [
 #     4	:	"Special",
 #     5	:	"ONA",
 # }
-# 
+#
 # MAL_DATALIST = [
 #     ("series_animedb_id", int),
 #     ("series_title", unicode),
