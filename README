@@ -79,6 +79,16 @@ do system specific things you will have to port to your platform:
    basically have two choices there: implement a windows way or dissable the
    tracker.
    
+   Update: was mesmetizing about this module as it is the main inhibitor for
+           instant crossplatform portability.
+           
+           What I came up was that the mac port would have a choice to use
+           profs via FUSE and no structural code change or something like
+           lsof -c <player> -F n | grep <media directory base>
+           
+           For the windows folks somehing similar can be achived with the handle
+           program (needs to be externaly downloaded)
+   
 3. The system tray icon and the menu entry are GNOME specific. If you are 
    porting to non-GNOME environments, you have to reimplement it for your 
    desktop environment.

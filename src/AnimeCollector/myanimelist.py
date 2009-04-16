@@ -175,7 +175,7 @@ def _fetch_list(username):
 				if node.nodeName == u'my_last_updated':
 					try:
 						ac_node[node.nodeName] = \
-							date.fromtimestamp(node.firstChild.nodeValue)
+							date.fromtimestamp(int(node.firstChild.nodeValue))
 					except:
 						print 'timestamp conversion failed, should not happen'
 				# process integer slots
