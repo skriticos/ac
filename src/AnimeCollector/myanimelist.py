@@ -5,7 +5,7 @@
 
 from cookielib import LWPCookieJar
 import cPickle
-from datetime import date
+from datetime import date, datetime
 from os import path
 from urllib import urlencode
 from urllib2 import \
@@ -172,12 +172,9 @@ def _fetch_list(username):
 				node.unlink()
 			else:
 				# process my_last_updated unix timestamp
-				if node.nodeName == u'my_last_updated':
-					try:
-						ac_node[node.nodeName] = \
-							date.fromtimestamp(int(node.firstChild.nodeValue))
-					except:
-						print 'timestamp conversion failed, should not happen'
+				if mal_data_schema[node.nodeName] is datetime:
+					ac_node[node.nodeName] = \
+						datetime.fromtimestamp(int(node.firstChild.nodeValue))
 				# process integer slots
 				elif mal_data_schema[node.nodeName] is int:
 					ac_node[node.nodeName] = int(node.firstChild.nodeValue)
@@ -227,6 +224,10 @@ def _filter_sync_changes(ac_remote_anime_dict, ac_local_anime_dict):
 	local_keys = ac_local_anime_dict.keys()
 	new_entry_keys = \
 		filter(lambda x:x not in remote_keys, local_keys)
+	
+	##
+	print new_entry_keys
+	
 	deleted_entry_keys = \
 		filter(lambda x:x not in local_keys, remote_keys)
 	for key in new_entry_keys:

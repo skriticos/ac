@@ -3,7 +3,7 @@
 # Copyright (c) 2009 Sebastian Bartos
 # See COPYING for details
 
-from datetime import date
+from datetime import date, datetime
 
 
 ## Schema of the xml data the MyAnimeList server sends
@@ -25,7 +25,7 @@ mal_data_schema = {
 	'my_status': int,
 	'my_rewatching': int,
 	'my_rewatching_ep': int,
-	'my_last_updated': int}
+	'my_last_updated': datetime}
 
 
 ## Here is a sample of the data representation the myanimelist module produces,
