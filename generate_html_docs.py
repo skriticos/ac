@@ -11,7 +11,7 @@ Note: plese don't commit the actual html files, as it leads to merging conflits.
 Whishlist: add an index file or migrate to a real document generator.
 """
 
-from os import path, system
+from os import path, system, mkdir
 
 basedir = path.abspath(path.dirname(__file__))
 srcdir = path.join(basedir, 'src')
@@ -19,7 +19,7 @@ docdir = path.join(basedir, 'doc')
 moduledir = path.join(basedir, 'src', 'AnimeCollector')
 
 if not path.isdir(docdir):
-	os.mkdir(docdir)
+	mkdir(docdir)
 
 import os
 os.chdir(docdir)
