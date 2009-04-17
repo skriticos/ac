@@ -3,7 +3,7 @@
 # Copyright (c) 2008-2009 Sebastian Bartos.
 # See COPYING for details.
 
-from AnimeCollector import main
+from AnimeCollector import gtkmain
 
-main.core()
+gtkmain.run()
 

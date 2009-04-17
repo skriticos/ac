@@ -5,7 +5,7 @@ from distutils.core import setup
 setup(name='AnimeCollector',
       version='9.1-unstable',
       description='Open source GUI MAL Updater',
-      author='Sebastian Bartos',
+      author='AnimeCollector group - see AUTHORS file',
       author_email='seth.kriticos@googlemail.com',
       url='http://myanimelist.net/clubs.php?cid=10642',
       packages=['AnimeCollector'],

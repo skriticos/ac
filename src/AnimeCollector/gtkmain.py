@@ -100,11 +100,10 @@ def init_gui():
 	gtk.main()
 
 
-# =========================
-# Core AnimeCollector class
-# =========================
-
-def core():
+def run():
+	"""
+	Runs the AnimeCollector application.
+	"""
 	global config
 	config = ac_config()
 	init_gui()
