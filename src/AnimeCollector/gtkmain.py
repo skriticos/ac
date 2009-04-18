@@ -23,6 +23,7 @@ from webbrowser import open as webopen
 
 from config import ac_config
 from myanimelist import anime_data
+from globs import ac_package_path
 
 
 # ====================================
@@ -62,7 +63,7 @@ class widget_wrapper(object):
 	def __init__(self):
 		# load user interface
 		self.widgets = \
-			glade.XML(path.join(path.dirname(__file__), 'data', 'ui.glade'))
+			glade.XML(path.join(ac_package_path, 'data', 'ui.glade'))
 		self.widgets.signal_autoconnect(glade_handlers.__dict__)
 
 	def __getitem__(self, key): return self.widgets.get_widget(key)
@@ -93,7 +94,7 @@ def init_gui():
 
 	# load and display systray icon and connect it to the handler
 	trayicon = gtk.StatusIcon()
-	trayicon.set_from_file(path.join(path.dirname(__file__), 'data', 'ac.ico'))
+	trayicon.set_from_file(path.join(ac_package_path, 'data', 'ac.ico'))
 	trayicon.connect('activate', switch_main_visible)
 
 	# ready.. steady.. go!

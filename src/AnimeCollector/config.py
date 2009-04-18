@@ -1,6 +1,9 @@
 
+# Copyright (c) 2008 Gareth Latty
+# Copyright (c) 2009 Sebastian Bartos
+# See COPYING for details
+
 # config.py - configuration defaults and phraser
-#
 # Contains the default configuration and the configuration handling class.
 
 
@@ -10,6 +13,7 @@
 
 from ConfigParser import ConfigParser
 from os import path
+from globs import ac_config_path
 
 
 # =========
@@ -34,7 +38,6 @@ dir1 = /home
 dir2 = /home/foo
 """
 
-config_path = path.join(path.expanduser("~"), ".animecollector.cfg")
 
 
 # =================
@@ -58,8 +61,8 @@ class ac_config(ConfigParser):
 		ConfigParser.__init__(self)
 
 		# Create default configuration if it is missing:
-		if not path.isfile(config_path):
-			x = open(config_path, 'w')
+		if not path.isfile(ac_config_path):
+			x = open(ac_config_path, 'w')
 			x.write(DEFAULT_CONFIG)
 			x.close()
 
@@ -71,7 +74,7 @@ class ac_config(ConfigParser):
 		Read instance properties from configuration file.
 		"""
 		
-		self.read(config_path)
+		self.read(ac_config_path)
 
 		# myAnimeList login credentials and options
 		self.mal = dict()
@@ -92,7 +95,7 @@ class ac_config(ConfigParser):
 		Write instance properties to configuration file.
 		"""
 
-		self.write(config_path)
+		self.write(ac_config_path)
 
 		self.set('mal', 'username', self.mal['username'])
 		self.set('mal', 'password', self.mal['password'])

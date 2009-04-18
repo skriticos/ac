@@ -84,7 +84,7 @@ from datetime import datetime
 ## TEST STAGE FUNCTIONS
 
 def stage1(username):
-	"""	Perform a fetch to ~/data.pkl """
+	"""	Perform a fetch. """
 
 	gd = dict()
 

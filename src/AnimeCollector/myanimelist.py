@@ -15,12 +15,8 @@ from urllib2 import \
 from socket import setdefaulttimeout
 from xml.dom.minidom import parseString
 
-from data import \
-	mal_data_schema
-
-
-# ToDo: debug _filter_sync_changes and _push_update
-
+from data import mal_data_schema
+from globs import ac_data_path
 
 class anime_data(object):
 	"""
@@ -40,8 +36,6 @@ class anime_data(object):
 		environment. Optionally sync with MAL on startup.
 		"""
 
-		self.db_path = path.join(path.expanduser("~"), ".animecollector.dat")
-
 		self.username = username
 		self.password = password
 
@@ -54,8 +48,8 @@ class anime_data(object):
 
 		# initialize local data (read file if existent)
 		self.db = {}
-		if path.isfile(self.db_path):
-			db_handle = open(self.db_path, 'rb')
+		if path.isfile(ac_data_path):
+			db_handle = open(ac_data_path, 'rb')
 			self.db = cPickle.load(db_handle)
 			db_handle.close()
 
@@ -71,7 +65,7 @@ class anime_data(object):
 		"""
 		if _login(self.username, self.password):
 			self.db = _fetch_list(self.username)
-			db_handle = open(self.db_path, 'wb')
+			db_handle = open(ac_data_path, 'wb')
 			cPickle.dump(self.db, db_handle)
 			db_handle.close()
 			return self.db
@@ -95,7 +89,7 @@ class anime_data(object):
 				del self.db[deleted_entry_keys]
 			for key, value in remote_updates.items():
 				self.db[key] = value
-			db_handle = open(self.db_path, 'wb')
+			db_handle = open(ac_data_path, 'wb')
 			cPickle.dump(self.db, db_handle)
 			db_handle.close()
 			return (remote_updates, deleted_entry_keys)
