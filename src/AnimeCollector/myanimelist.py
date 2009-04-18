@@ -266,22 +266,29 @@ def _push_list(local_updates):
 
 		# construct push request for entry update
 		postdata = urlencode({
-			'series_id': anime['mal_my_id'],
-			'anime_db_series_id': anime['mal_id'],
+			# id entry
+			'series_animedb_id': str(anime['series_animedb_id']),
+			'series_title': str(anime['series_animedb_id']),
+			
+			# set interesting values
+			'completed_eps': str(anime['my_watched_episodes']),
+			'status': str(anime['my_status']),
+			'score': str(anime['my_score']),
+			
+			# protocol stuff
 			'close_on_update': 'true',
-			'status': anime['watching_status'],
-			'completed_eps': anime['episodes_watched'],
-			'score': anime['score'],
 			'submitIt': 2 })
+
 		push_base_url = \
 			'http://myanimelist.net/panel.php?keepThis=true&go=edit&id=' + \
-			str(anime['mal_my_id']) + '&hidenav=true'
+			str(anime['my_id']) + '&hidenav=true&TB_iframe=false'
 
 		push_request = Request(push_base_url, postdata, headers)
 
 		# push update request
 		try:
-			urlopen(push_request)
+			response = urlopen(push_request)
+			# print response.read()  -- for testing
 		except URLError, e:
 			if hasattr(e, 'reason'):
 				print 'We failed to reach a server.'
