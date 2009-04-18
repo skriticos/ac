@@ -222,13 +222,11 @@ def _filter_sync_changes(ac_remote_anime_dict, ac_local_anime_dict):
 	# search for entirely new enries and deleted entries
 	remote_keys = ac_remote_anime_dict.keys()
 	local_keys = ac_local_anime_dict.keys()
-	new_entry_keys = \
-		filter(lambda x:x not in remote_keys, local_keys)
-	
-	##
-	print new_entry_keys
 	
 	deleted_entry_keys = \
+		filter(lambda x:x not in remote_keys, local_keys)
+	
+	new_entry_keys = \
 		filter(lambda x:x not in local_keys, remote_keys)
 	for key in new_entry_keys:
 		remote_updates[key] = ac_remote_anime_dict[key]
@@ -236,13 +234,17 @@ def _filter_sync_changes(ac_remote_anime_dict, ac_local_anime_dict):
 	# search in both dictionaries for differing update keys and append to the
 	# other's updates depending on which key is newer
 	common_keys = filter(lambda x:x in local_keys, remote_keys)
+
 	for key in common_keys:
-		if ac_remote_anime_dict[key['my_last_updated']] > \
-				ac_local_anime_dict[key['my_last_updated']]:
+		
+		remote_timestamp = ac_remote_anime_dict[key]['my_last_updated']
+		local_timestamp = ac_local_anime_dict[key]['my_last_updated']
+
+		if remote_timestamp > local_timestamp:
 			remote_updates[key] = ac_remote_anime_dict[key]
-		elif ac_remote_anime_dict[key['my_last_updated']] < \
-				ac_local_anime_dict[key['my_last_updated']]:
+		elif remote_timestamp < local_timestamp:
 			local_updates[key] = ac_local_anime_dict[key]
+
 	return (remote_updates, local_updates, deleted_entry_keys)
 
 
