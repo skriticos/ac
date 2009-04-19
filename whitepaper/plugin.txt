@@ -1,0 +1,122 @@
+
+=========================================
+AnimeCollector plug-in system white-paper
+=========================================
+
+:author: Sebastian Bartos (skriticos) <seth.kriticos@googlemail.com>
+:update: Sun, 19 Apr 2009 14:37:50 +0200
+:revision: 1
+
+Introduction
+============
+
+This paper describes the plug-in system planned for AnimeCollector MyAnimeList
+synchronization application. As the application is going to be a no-frills thing
+with simple GTK+ GUI, config, tracker and sync module, we will provide the
+plug-in interface to add additional functionality through a clear plug-in API.
+Candidates for this are automatic file renames, GUI replacement, skins and
+probably a bunch of stuff I did not think about.
+
+
+Plug-in from command line
+=========================
+
+Plug-ins can be specified to be loaded form command line. This makes it possible
+to easily create launchers (desktop icons for instance) that load plug-ins.
+
+The syntax for this is:
+
+animecollector --load-plugin=<plugin-name1> --load-plugin=<plugin-name2> ..  or 
+animecollector -p <plugin-name1> -p <plugin-name2> ..
+
+
+Plug-in from configuration
+==========================
+
+Plug-in can be specified to be loaded form user configuration file too. 
+
+The configuration syntax is:
+
+[plugins]
+enable = True           # global user plug-in swich
+
+plugin_name-1 = True    # enabled plug-in
+plugin_name-2 = False   # disabled plug-ins
+
+The enable parameter is the global plug-in on/off switch. By default it is 
+disabled. Users have to enable it to use plug-ins (security measure).
+Enabling can be done with the preferences dialogue or editing the configuration 
+file.
+
+
+Plug-in search path
+===================
+
+First the application searches for plug-ins in the AnimeCollector python package
+directory ( On Linux this will be something like:
+   /usr/lib/python/site-packages/AnimeCollector/plugin/<plugin-name>
+
+If it does not find it there, it starts looking for plug-ins in the user plug-in 
+directory (most likely this: ~/.animecollector/plugin/<plugin-name>)
+
+
+Security
+========
+
+Plug-ins are disabled by default, but can be easily enabled in the preferences
+dialogue. For people that don't trust their home directory for scripts, there 
+are also some coded parameters in the globs.py application script file:
+
+PLUGINS = True/False   # True by default, this is the absolute on/off switch for
+                       # plug-ins. If it is off, no plug-ins will ever be loaded
+PLUGINS_USER True/False   # True by default, this specifies if user directory
+                          # plug-ins are allowed or not. If it is disabled, 
+                          # plug-ins can only be loaded from the system package
+                          # directory.
+
+
+Plug-in stages
+==============
+
+Plug-ins can be loaded at the following points in the application execution:
+
+on-config: after the configuration is loaded
+on-data: after the data/myanimelist module is loaded
+on-gui: when the general user interface is loaded (inside of the main loop)
+on-quit: when the program is shutting down
+
+Plug-in loading routine is located in the animecollector main script file.
+
+
+Plug-in API
+===========
+
+Plug-ins can be written as normal python packages or scripts that can be 
+imported by names.
+
+There is a control API that has to be specified to make the plug-in work.
+
+import plugin_name
+
+plugin_name.stage = <stage>  # The stage at with the plug-in should be loaded.
+plugin_name.override = [<stages>]   # This list specifies if the plug-in should 
+                                    # completely override (replace) stages, and
+                                    # if so, which ones. Possible values are:
+                                    # 'data' 'gui' 'tracker'
+                                    # Others may come later.
+plugin_name.run()  # This is the function/class that is called to actually run
+                   # the plug-in.
+                   # Depending on the stage the plug-in is loaded it gets 
+                   # references to the already loaded instances
+                   # (config, data, tracker, gui)
+                         
+
+Note: this is meta code. The actual implementation will use importing by
+      string (module = __import__('plugin_foo')) or similar.
+
+
+Example plug-in
+===============
+
+Not there yet. Planned.
+
