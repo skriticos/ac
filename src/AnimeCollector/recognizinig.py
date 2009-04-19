@@ -4,15 +4,13 @@
 
 
 # Standardlib
-import string
 import re
 import cPickle
 import difflib
 from os import path
 
-# Mal dataschema
-from data import mal_data_schema
-
+# AnimeCollector 
+from globs import ac_data_path
 
 class filename_processor:
      """
@@ -61,8 +59,8 @@ class filename_processor:
         
      def getSeason(self):
           """
-          ckeck if there are more than one and return
-          the season of the current watched
+          Check if there are more than one and return
+          the season of the current watched. Future feature. ^^
           """
           pass
  
@@ -72,45 +70,79 @@ class engine:
 
     def __init__(self, filename):
 
-        self.db_path = path.join(path.expanduser("~"), ".animecollector.dat")
         self.filename = filename
         self.current_entry = str
           
-        # Read database 
-        if path.exists(self.db_path):
-            dbhandle = open(self.db_path)
+        # Read database, if it can't be read return false
+        # Read database, if it can't be read return false
+        if path.exists(ac_data_path):
+            dbhandle = open(ac_data_path, "rb")
             self.db  = cPickle.load(dbhandle)
             dbhandle.close()
+        else:
+            return False
 
         # Dictonary for matching results and radio
         # Schema: {'anme_name' : ratio}
-        self.matching = {}
+        self.matching = dict()
 
         # filename_processor object 
-        fp = file_processor(self.filename)
+        fp = filename_processor(self.filename)
         self.anime = fp.getName()
         self.episode = fp.getEpisode()
         self.season = fp.getSeason() 
           
     def __del__(self):
         """ Maybe needed to close a opened file/DB"""
-        pass
-
-    def __matching(self):
-        """The matching algorythm. Returns self.matching"""
+        #TODO: Find a OS undependend way for checking if a file is open.
         pass
         
-    def __sort(self):
-        """Sort and return self.matching for the highest ratio. """
-        pass
-
-    def __update(self):
-        """Updates the episode in DB"""
-        pass
+    def __matching(self):
+        """ 
+        Evaluates a ratio of probable equally and returns the most likely Anime
+        """
+        matching = dict()
+        # Fill a dict with the 
+        for anime in self.db[key]:
+            matching[anime].append(0)
+        
+        # The essence machting algorithm
+        for anime in matching[key]:
+            ratio = difflib.SequenceMatcher(None, anime, self.anime)
+            self.matching[anime] = ratio
+        
+        # Sorting self.matching and retrun it...
+        # Well, this is a bit of a hack since you can't really sort dicts
+        # TODO: Should be tested :D
+        rLst = self.matching.items()
+        rSort = [ [v[1],v[0]] for v in rLst]
+        rSort.sort()
+        self.matching = [rSort[i][1] for i in range(0,len(rSort))]
+        
+        return self.matching
 
     def match(self):
         """
         Main method, returns true on success and 
-        false and an errormsg on failure
-        """
-        pass
+        false failure. Maybe codes would be better (e.g. 1 = Success,
+        2 = Episode allready watched, 3 = no series found).        
+        """ 
+        
+        dictMatch = __matching()
+        
+        # Check if there is a ratio over 0.8
+        if dictMatch[0] < 0.8:
+            return False
+        
+        # Update self.db
+        for k in self.db:
+            if k == dictMatch[0]:
+                self.db[k]['my_watched_episodes'] = self.episode
+        
+        # Write changes to locale db
+        dbhandle = open(ac_data_path, "rb")
+        cPickle.dump(self.db, dbhandle)
+        dbhandle.close()
+        
+        return True
+
