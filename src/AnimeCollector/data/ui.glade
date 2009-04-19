@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Mon Apr 13 02:13:53 2009 -->
+<!--Generated with glade3 3.4.5 on Sun Apr 19 20:45:17 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="main_window">
     <property name="title" translatable="yes">AnimeCollector</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="default_width">500</property>
+    <property name="default_height">400</property>
     <property name="icon">ac.ico</property>
     <child>
       <widget class="GtkVBox" id="vbox1">
@@ -178,9 +180,17 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
-              <widget class="GtkTreeView" id="treeview_watching">
+              <widget class="GtkScrolledWindow" id="scrolledwindow1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <child>
+                  <widget class="GtkTreeView" id="treeview_watching">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </widget>
+                </child>
               </widget>
             </child>
             <child>
@@ -194,7 +204,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkTreeView" id="treeview2">
+              <widget class="GtkTreeView" id="treeview_completed">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </widget>
@@ -214,7 +224,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkTreeView" id="treeview3">
+              <widget class="GtkTreeView" id="treeview_plantowatch">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </widget>
@@ -234,7 +244,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkTreeView" id="treeview4">
+              <widget class="GtkTreeView" id="treeview_dropped">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </widget>
