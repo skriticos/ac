@@ -39,7 +39,14 @@ class glade_handlers(object):
 	at the data/ui.glade file (glade XML).
 	"""
 
-	def gtk_main_quit(event): gtk.main_quit()
+	def gtk_main_quit(event):
+		gtk.main_quit()
+	def on_main_window_delete_event(widget, event):
+		switch_main_visible(event)
+		return True   # True means we want the window to stay around
+		# XXX: install swich based on the configuration option what has to
+		#      happen when delete event is called
+
 	def on_button_ac_clicked(event):
 		webopen('http://myanimelist.net/clubs.php?cid=10642', 2)
 	def on_button_mal_clicked(event):
@@ -159,8 +166,7 @@ def init_gui():
 
 	populate_tree_view(widgets, None)
 
-	# ready.. steady.. go!
-	gtk.main()
+	return trayicon
 
 
 def run():
@@ -172,5 +178,9 @@ def run():
 	global mal_anime_data
 	mal_anime_data = \
 			anime_data(config.mal['username'], config.mal['password'])
-	init_gui()
+	global trayicon
+	trayicon = init_gui()
+
+	# ready.. steady.. go!
+	gtk.main()
 
