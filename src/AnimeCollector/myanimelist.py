@@ -56,6 +56,13 @@ class anime_data(object):
 		if initsync:
 			self.sync()
 
+	def save(self):
+		""" Only saves the current state to disk w/o network activity.
+		"""
+		db_handle = open(ac_data_path, 'wb')
+		cPickle.dump(self.db, db_handle)
+		db_handle.close()
+
 	def fetch(self):
 		"""
 		Only fetch anime data from MyAnimeList server (overwrites local data,

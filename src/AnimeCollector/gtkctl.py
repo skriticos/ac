@@ -4,6 +4,12 @@
 # See COPYING for details
 
 """
+---- TODO ----
+Create clear data interfaces with the gui.
+Eliminate magic and clean up code.
+--------------
+
+
 This file contains the classes and methods for setting up the AnimeCollector
 application. I does the following things:
    - Load the configuration file
@@ -16,7 +22,7 @@ This module also has important global class instances:
 	- widgets: widget_wrapper for the interfoce
 """
 
-import gtk
+import gtk, pango
 from gtk import glade, TreeView, ListStore
 import gobject
 from os import path
@@ -26,10 +32,6 @@ from config import ac_config
 from myanimelist import anime_data
 from globs import ac_package_path
 
-
-# ====================================
-# Classes to set up the user interface
-# ====================================
 
 class glade_handlers(object):
 	"""
@@ -41,23 +43,25 @@ class glade_handlers(object):
 
 	def gtk_main_quit(event):
 		gtk.main_quit()
-	def on_main_window_delete_event(widget, event):
-		switch_main_visible(event)
-		return True   # True means we want the window to stay around
-		# XXX: install swich based on the configuration option what has to
-		#      happen when delete event is called
-
 	def on_button_ac_clicked(event):
 		webopen('http://myanimelist.net/clubs.php?cid=10642', 2)
 	def on_button_mal_clicked(event):
 		webopen('http://myanimelist.net', 2)
-	def on_button_sync_clicked(event):
-		# TODO:
-		# sync_mal(config.mal['username'], config.mal['password'], LOCAL_USER_DATA)
-		# update local list (including the database)
-		# call list display actualization afterwards
-		pass
-
+	def on_about(event):
+		widgets['aboutdialog'].show_all()
+	def on_about_close(widget, event):
+		widgets['aboutdialog'].hide_all()
+		return True
+	def on_menuitem_prefs_activate(event):
+		widgets['preferences'].show_all()
+	def on_prefs_close(widget=None, event=None):
+		widgets['preferences'].hide_all()
+		return True
+	def on_playbar_toggled(event):
+		if widgets['statusbar_now_playing'].flags() & gtk.VISIBLE:
+			widgets['statusbar_now_playing'].hide()
+		else:
+			widgets['statusbar_now_playing'].show()
 
 class widget_wrapper(object):
 	"""
@@ -107,6 +111,7 @@ def populate_tree_view(widgets, anime_data):
 		if type == 'text':
 			# set it to expand
 			cell = gtk.CellRendererText()
+			# cell.set_property("expand", True)
 			column.pack_start(cell, True)
 			column.add_attribute(cell, 'text', value_index)
 		elif type == 'spin':
@@ -131,56 +136,39 @@ def populate_tree_view(widgets, anime_data):
 	liststore.append(['title', 'status', 5, 5, 50])
 	liststore.append(['title', 'status', 5, 5, 50])
 	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['uoastuhsotanhu soahsutoahsuhaostitle', 'status', 5, 5, 50])
+	liststore.append(['uoa ut', 'status', 5, 5, 50])
 
 	widgets['treeview_watching'].set_model(liststore)
 
 
-def switch_main_visible(event):
+class gui(object):
 	"""
-	This is the callback for the trayicon, which swiches the interface
-	visibility. It's a bit special because it is not defined in the glade file
-	and therefore located here.
+	Main GUI class and interface.
 	"""
-	if widgets['main_window'].flags() & gtk.VISIBLE:
-		widgets['main_window'].hide()
-	else:
-		widgets['main_window'].show()
 
+	def __init__(self, config, anime_data):
+		"""
+		Load interface and enter main loop.
+		"""
 
-def init_gui():
-	"""
-	Call widget wrapper to load the glade interface, then add a systray and run
-	the main event loop.
-	"""
-	global widgets
-	widgets = widget_wrapper()
+		# Store the references to the config and data instances
+		self.config = config
+		self.anime_data = anime_data
 
-	# display main user interface
-	widgets['main_window'].show_all()
+		# Initialize base widgets from XML and connect signal handlers
+		self.widgets = widget_wrapper()
 
-	# load and display systray icon and connect it to the handler
-	trayicon = gtk.StatusIcon()
-	trayicon.set_from_file(path.join(ac_package_path, 'data', 'ac.ico'))
-	trayicon.connect('activate', switch_main_visible)
+		global widgets
+		widgets = self.widgets
 
-	populate_tree_view(widgets, None)
+		self.widgets['main_window'].show_all()
+		self.widgets['main_window'].connect('delete_event', lambda e,w:
+				gtk.main_quit())
+		widgets['statusbar_now_playing'].hide()
 
-	return trayicon
+		# Display anime data in interface
+		populate_tree_view(self.widgets, self.anime_data)
 
-
-def run():
-	"""
-	Runs the AnimeCollector application.
-	"""
-	global config
-	config = ac_config()
-	global mal_anime_data
-	mal_anime_data = \
-			anime_data(config.mal['username'], config.mal['password'])
-	global trayicon
-	trayicon = init_gui()
-
-	# ready.. steady.. go!
-	gtk.main()
+		# Run main loop
+		gtk.main()
 
