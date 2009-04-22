@@ -83,97 +83,92 @@ class widget_wrapper(object):
 
 
 class list_treeview(gtk.TreeView):
-	def __init__(self, tab_id):
+	def __init__(self, guictl, tab_id):
 
 		gtk.TreeView.__init__(self)
 
+		# Pointer to guictl
+		self.guictlptr = guictl
+
+		# Mal tab type id
 		self.tab_id = tab_id
 
-		for colname in ['Title', 'Episode', 'Status', 'Score', 'Progress']:
-			self.append_column(gtk.TreeViewColumn(colname))
-		
-		self.liststore = gtk.ListStore(str, int, str, int, int)
+		# Some constants
+		( self.NAME, self.EPISODE, self.STATUS, self.SCORE, self.PROGRESS ) = \
+				range (5)
+
+		# Add columns to treeview
+		self.col = dict()
+		for colname in ['Title', 'Episodes', 'Status', 'Score', 'Progress']:
+			self.col[colname] = gtk.TreeViewColumn(colname)
+			self.append_column(self.col[colname])
+
+		# Set up the column schemata
+		titlecell = gtk.CellRendererText()
+		self.col['Title'].pack_start(titlecell, True)
+		self.col['Title'].add_attribute(titlecell, 'text', 0)
+
+		epcell = gtk.CellRendererSpin()
+		epcell.set_property("editable", True)
+		# figure out how to get the max episodes into the adjustment!!
+		adjustment = gtk.Adjustment(0, 0, 999, 1)
+		epcell.set_property("adjustment", adjustment)
+		epcell.connect('edited', self.cell_episode_edited)
+		self.col['Episodes'].pack_start(epcell, False)
+		self.col['Episodes'].add_attribute(epcell, 'text', 1)
+
+
+		# Pulg the model in the treeview
+		self.liststore = gtk.ListStore(str, str, str, int, int)
+		self.liststore.append(['Anime title foo', '12 / 24', 'watching', 5, 80])
+		self.liststore.append(['Anime title bar', '2 / 17', 'watching', 7, 50])
+
 		self.set_model(self.liststore)
-
-
-def populate_tree_view(widgets, anime_data):
-	""" Populate the GTK TreeView interface widget from the anime_data.
-
-	The TreeView uses the gtk.ListStore interface model to display the
-	anime lists. It populates all 4 tabs.
-
-	Input:
-	  widgets -- widget wrapper reference to access the TreeView
-      anime_data -- anime_data instance (myanimelist module)
-	"""
-
-	# note: works on a display basis
-	# needs to get data fed
-
-	liststore = ListStore(str, str, int, int, int)
+		
 	
-	column_schema = []
+	def cell_episode_edited(self, spinr, row, value):
+		""" Handles the modification of the episode number spin button.
 
-	column_schema.append((gtk.TreeViewColumn('Title'), "text"))
-	column_schema.append((gtk.TreeViewColumn('Status'), "combo"))
-	column_schema.append((gtk.TreeViewColumn('Score'), "spin"))
-	column_schema.append((gtk.TreeViewColumn('Episodes'), "spin"))
-	column_schema.append((gtk.TreeViewColumn('Progress'), "progress"))
+		If all a valid new value is entered, the row is updated and parrent
+		update function is called to update the local database.
+		"""
+		
+		# Prepare data set
+		oldstr = self.liststore[row][self.EPISODE]
+		(old, max) = oldstr.split(' / ')
+		oldvalue = int(old)
+		maxvalue = int(max)
+		newvalue = int(value)
+		
+		# Determine if action is required
+		if newvalue != oldvalue and newvalue <= maxvalue:
 
+			if newvalue < maxvalue:
 
-	value_index = 0
-	for column, type in column_schema:
-		if type == 'text':
-			# set it to expand
-			cell = gtk.CellRendererText()
-			# cell.set_property("expand", True)
-			column.pack_start(cell, True)
-			column.add_attribute(cell, 'text', value_index)
+				##
+				## XXX: check if we were completed before, push to watching if
+				##      not
 
-		elif type == 'combo':
+				# Update row episode data
+				newstr = str(newvalue) + ' / ' + str(maxvalue)
+				self.liststore[row][self.EPISODE] = newstr
 
-			#list store for cell renderer
-			m = gtk.ListStore(gobject.TYPE_STRING)
-			for x in range(1, 5):
-					m.append(["sel %d" % x])
+				# Update progress bar
+				if newvalue < maxvalue:
+					self.liststore[row][self.PROGRESS] = \
+							int(float(newvalue) / float(maxvalue) * 100)
 
-			cb = gtk.CellRendererCombo()
-
-			cb.set_property("model",m)
-			cb.set_property("width",100)
-			cb.set_property('text-column', 0)
-			cb.set_property('editable', True)
-			# column = gtk.TreeViewColumn("Test", cb)
-			column.pack_start(cell, True)
-			# column.set_attributes(cb, text = 0)
-			column.add_attribute(cb, 'text', value_index)
-
-
-		elif type == 'spin':
-			# set the right values from data
-			cell = gtk.CellRendererSpin()
-			adjustment = gtk.Adjustment(0, 0, 10, 1)
-			cell.set_property("adjustment", adjustment)
-			cell.set_property("editable", True)
-			column.pack_start(cell, True)
-			column.add_attribute(cell, 'text', value_index)
-
-		elif type == "progress":
-			cell = gtk.CellRendererProgress()
-			column.pack_start(cell, True)
-			column.add_attribute(cell, 'value', value_index)
-
-		widgets['treeview_watching'].append_column(column)
-		value_index += 1
-
-	# add data feeding
-	liststore.append(['title 1', 'sel 1', 5, 5, 50])
-	liststore.append(['title 2', 'sel 2', 5, 5, 50])
-
-	widgets['treeview_watching'].set_model(liststore)
+			
+			#
+			# XXX: insert data update routine using guictlptk.anime_data
+			#
+			
+			# Did we reach treashhold and was not completed?
+			if self.tab_id != data.COMPLETED and newvalue == maxvalue:
+				del self.liststore[row]
 
 
-class gui(object):
+class guictl(object):
 	"""
 	Main GUI class and interface.
 	"""
@@ -194,9 +189,11 @@ class gui(object):
 		widgets = self.widgets
 
 		# Initialize anime data display treeviews
-		for tab_id, name in data.STATUS.items():
-			tv = list_treeview(tab_id)
-			widgets['scrolledwindow_' + name].add(tv)
+		#for tab_id, name in data.STATUS.items():
+		#	tv = list_treeview(tab_id)
+		#	widgets['scrolledwindow_' + name].add(tv)
+		tv = list_treeview(self, 1)
+		widgets['scrolledwindow_watching'].add(tv)
 
 		# Tune initial view
 		self.widgets['main_window'].show_all()

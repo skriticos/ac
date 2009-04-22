@@ -43,5 +43,5 @@ mal_anime_data = anime_data(config.mal['username'], config.mal['password'])
 
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)
-gui = gtkctl.gui(config, mal_anime_data)
+gui = gtkctl.guictl(config, mal_anime_data)
 
