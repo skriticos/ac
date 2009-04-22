@@ -86,11 +86,12 @@ mal_data_schema = {
 
 
 ## These are the status code mappings the mal server is sending in the XML file
-mal_anime_status_codes = [
-	(1,	'Watching'),
-	(2,	'Completed'),
-	(3,	'On Hold'),
-	(4,	'Unknown'), 			#4 appears to be unused - added in case it is.
-	(5,	'Dropped'),
-	(6,	'Plan To Watch')]
+( WATCHING, COMPLETED, ONHOLD, UNKNOWN, DROPPED, PLANTOWATCH ) = range(1, 7)
 
+# Here is the reverse mapping of the above for widget adressing and similar
+STATUS = {	
+	1: 'watching',
+	2: 'completed',
+	3: 'onhold',
+	5: 'dropped',
+	6: 'plantowatch' }

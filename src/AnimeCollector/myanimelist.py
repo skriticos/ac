@@ -87,19 +87,26 @@ class anime_data(object):
 		"""
 		if _login(self.username, self.password):
 			remote_db = _fetch_list(self.username)
-			(remote_updates, local_updates, deleted_entry_keys) = \
-				_filter_sync_changes(remote_db, self.db)
-			_push_list(local_updates)
+			if self.db:
+				# filter changes and push local updates if local database is 
+				# already initialized
+				(remote_updates, local_updates, deleted_entry_keys) = \
+					_filter_sync_changes(remote_db, self.db)
+				_push_list(local_updates)
 
-			# update local anime list with changes
-			for key in deleted_entry_keys:
-				del self.db[deleted_entry_keys]
-			for key, value in remote_updates.items():
-				self.db[key] = value
-			db_handle = open(ac_data_path, 'wb')
-			cPickle.dump(self.db, db_handle)
-			db_handle.close()
-			return (remote_updates, deleted_entry_keys)
+				# update local anime list with changes
+				for key in deleted_entry_keys:
+					del self.db[deleted_entry_keys]
+				for key, value in remote_updates.items():
+					self.db[key] = value
+				db_handle = open(ac_data_path, 'wb')
+				cPickle.dump(self.db, db_handle)
+				db_handle.close()
+				return (remote_updates, deleted_entry_keys)
+			else:
+				# initialize local data, as it was empty before 
+				self.db = remote_db
+				return (self.db, {})
 
 
 def _login(username, password):

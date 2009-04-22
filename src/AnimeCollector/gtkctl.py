@@ -31,6 +31,7 @@ from webbrowser import open as webopen
 from config import ac_config
 from myanimelist import anime_data
 from globs import ac_package_path
+import data
 
 
 class glade_handlers(object):
@@ -81,6 +82,20 @@ class widget_wrapper(object):
 	def __getitem__(self, key): return self.widgets.get_widget(key)
 
 
+class list_treeview(gtk.TreeView):
+	def __init__(self, tab_id):
+
+		gtk.TreeView.__init__(self)
+
+		self.tab_id = tab_id
+
+		for colname in ['Title', 'Episode', 'Status', 'Score', 'Progress']:
+			self.append_column(gtk.TreeViewColumn(colname))
+		
+		self.liststore = gtk.ListStore(str, int, str, int, int)
+		self.set_model(self.liststore)
+
+
 def populate_tree_view(widgets, anime_data):
 	""" Populate the GTK TreeView interface widget from the anime_data.
 
@@ -100,7 +115,7 @@ def populate_tree_view(widgets, anime_data):
 	column_schema = []
 
 	column_schema.append((gtk.TreeViewColumn('Title'), "text"))
-	column_schema.append((gtk.TreeViewColumn('Status'), "text"))
+	column_schema.append((gtk.TreeViewColumn('Status'), "combo"))
 	column_schema.append((gtk.TreeViewColumn('Score'), "spin"))
 	column_schema.append((gtk.TreeViewColumn('Episodes'), "spin"))
 	column_schema.append((gtk.TreeViewColumn('Progress'), "progress"))
@@ -114,6 +129,26 @@ def populate_tree_view(widgets, anime_data):
 			# cell.set_property("expand", True)
 			column.pack_start(cell, True)
 			column.add_attribute(cell, 'text', value_index)
+
+		elif type == 'combo':
+
+			#list store for cell renderer
+			m = gtk.ListStore(gobject.TYPE_STRING)
+			for x in range(1, 5):
+					m.append(["sel %d" % x])
+
+			cb = gtk.CellRendererCombo()
+
+			cb.set_property("model",m)
+			cb.set_property("width",100)
+			cb.set_property('text-column', 0)
+			cb.set_property('editable', True)
+			# column = gtk.TreeViewColumn("Test", cb)
+			column.pack_start(cell, True)
+			# column.set_attributes(cb, text = 0)
+			column.add_attribute(cb, 'text', value_index)
+
+
 		elif type == 'spin':
 			# set the right values from data
 			cell = gtk.CellRendererSpin()
@@ -122,6 +157,7 @@ def populate_tree_view(widgets, anime_data):
 			cell.set_property("editable", True)
 			column.pack_start(cell, True)
 			column.add_attribute(cell, 'text', value_index)
+
 		elif type == "progress":
 			cell = gtk.CellRendererProgress()
 			column.pack_start(cell, True)
@@ -131,12 +167,8 @@ def populate_tree_view(widgets, anime_data):
 		value_index += 1
 
 	# add data feeding
-	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['title', 'status', 5, 5, 50])
-	liststore.append(['uoa ut', 'status', 5, 5, 50])
+	liststore.append(['title 1', 'sel 1', 5, 5, 50])
+	liststore.append(['title 2', 'sel 2', 5, 5, 50])
 
 	widgets['treeview_watching'].set_model(liststore)
 
@@ -161,13 +193,16 @@ class gui(object):
 		global widgets
 		widgets = self.widgets
 
+		# Initialize anime data display treeviews
+		for tab_id, name in data.STATUS.items():
+			tv = list_treeview(tab_id)
+			widgets['scrolledwindow_' + name].add(tv)
+
+		# Tune initial view
 		self.widgets['main_window'].show_all()
 		self.widgets['main_window'].connect('delete_event', lambda e,w:
 				gtk.main_quit())
 		widgets['statusbar_now_playing'].hide()
-
-		# Display anime data in interface
-		populate_tree_view(self.widgets, self.anime_data)
 
 		# Run main loop
 		gtk.main()

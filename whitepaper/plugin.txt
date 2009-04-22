@@ -104,6 +104,8 @@ plugin_name.override = [<stages>]   # This list specifies if the plug-in should
                                     # if so, which ones. Possible values are:
                                     # 'data' 'gui' 'tracker'
                                     # Others may come later.
+plugin_name.depends = [<depending plugins>]
+plugin_name.conflicts = [<conflickting plugin names>]
 plugin_name.run()  # This is the function/class that is called to actually run
                    # the plug-in.
                    # Depending on the stage the plug-in is loaded it gets 
