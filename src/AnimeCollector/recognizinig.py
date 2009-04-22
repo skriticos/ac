@@ -54,7 +54,7 @@ class engine:
     
     Public methods:    
         match: main method
-            returns: # TODO: Find a good return
+            returns: on success the anime key, on failure false
     """
     
     def __init__(self, filename):
@@ -82,37 +82,36 @@ class engine:
     def __filter(self):
         """Get rid of hashtags, subgroup, codec and such"""
          
-        # Second version of the RegEx. 
-        # matches all charactes between "[" and "]"
-        reg = re.compile("([[a-zA-Z0-9\-]*])")
+        # Should match all between [ , ], (, ) and gets rid of the file extension.
+        # Monser RegEx ftw! :D
+        reg = re.compile(" \
+        ((\[[\w\s,.&\$_+-]*\]*)|(\([\w\s,.&\$_+-]*\)*)|(.mkv)|(.mp4)|(.avi))")
+        
         anime_raw = reg.sub("", self.filename)
          
-        # get rid of underscores
+        # get rid of underscores and replace them
         anime_raw = anime_raw.replace("_"," ")
          
-        # get rid of the file extension, currently just .mkv, .mp4 and .avi
-        anime_raw = re.sub("((.mkv)|(.mp4)|(.avi))$","",anime_raw)
-          
         return anime_raw.strip()
     
     def _getName(self):
         """getting and returning anime name"""
 
         # get rid of the Episode 
-        animeName = re.sub("[0-9\s]{1,}", "", __filter())
+        animeName = re.sub("[\d\s]{1,}", "", __filter())
 
         # get rid of scores
         animeName = animeName.replace("-","")
+        
+        #TODO: If theres a phrase like "ep", "EP" or "Ep" filter it out
 
         return animeName.strip()
     
     def _getEpisode(self):
         """getting and returning anime episode"""
-        animeEpisode = re.sub("[a-zA-Z\-~\s]{1,}", "", \
+        animeEpisode = re.sub("[\w\s]{1,}", "", \
             __filter())
-            
-        # TODO: Add a RegEx for matching out the Season Number
-        
+                    
         return animeEpisode.strip()
    
     def _getSeason(self):
@@ -120,6 +119,7 @@ class engine:
           Check if there are more than one and return
           the season of the current watched. Future feature. ^^
           """
+            # TODO: Add a RegEx for matching out the Season Number
           pass
 
     ##########
@@ -130,22 +130,18 @@ class engine:
         """ 
         Evaluates a ratio of probable equally and returns the most likely Anime
         """
-        currentDB = dict()
-        matching = dict()
 
-        # Fill a dict with the 
-        for anime in self.db[key]:
-            currentDB[anime].append(0)
-        
+        matching = dict()
+      
         # The essence machting algorithm
-        for anime in currentDB[key]:
+        for anime in self.db:
             ratio = difflib.SequenceMatcher(None, anime, \
-                self._getName())
+                _getName())
             matching[anime] = ratio
         
         # Sorting self.matching and retrun it...
         # Well, this is a bit of a hack since you can't really sort dicts
-        # TODO: Should be tested :D
+        # Works flawlessly :D
         rLst = matching.items()
         rSort = [ [v[1],v[0]] for v in rLst]
         rSort.sort()
@@ -154,6 +150,7 @@ class engine:
         # check if there is a ratio over 0.8
         if matching[0] < 0.8:
             # if not return false
+            #Todo: If there is no match try the series synonyms
             return False
         
         # return the most likely animename
@@ -170,13 +167,25 @@ class engine:
         for k in self.db:
             if k == dictMatch[0]:
                 self.db[k]['my_watched_episodes'] = \
-                    self._getEpisode()
+                    _getEpisode()
         
         # Write changes to locale db
-        dbhandle = open(ac_data_path, "rb")
+        dbhandle = open(ac_data_path, "wb")
         cPickle.dump(self.db, dbhandle)
         dbhandle.close()
         return True
     
     def match(self):
-        pass
+        """
+        Main method, should be the only one which gets called.
+        """
+        # If no entry is found return false
+        t = __update()
+        if not t:
+            return False
+        
+        t = __update()
+        
+        # return Animename
+        return __matching()
+        
