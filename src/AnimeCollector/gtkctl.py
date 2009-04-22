@@ -58,11 +58,6 @@ class glade_handlers(object):
 	def on_prefs_close(widget=None, event=None):
 		widgets['preferences'].hide_all()
 		return True
-	def on_playbar_toggled(event):
-		if widgets['statusbar_now_playing'].flags() & gtk.VISIBLE:
-			widgets['statusbar_now_playing'].hide()
-		else:
-			widgets['statusbar_now_playing'].show()
 
 class widget_wrapper(object):
 	"""
@@ -93,7 +88,7 @@ class list_treeview(gtk.TreeView):
 		# Mal tab type id
 		self.tab_id = tab_id
 
-		# Some constants
+		# Some treeview specific constants (column id's)
 		( self.NAME, self.EPISODE, self.STATUS, self.SCORE, self.PROGRESS ) = \
 				range (5)
 
@@ -103,29 +98,83 @@ class list_treeview(gtk.TreeView):
 			self.col[colname] = gtk.TreeViewColumn(colname)
 			self.append_column(self.col[colname])
 
-		# Set up the column schemata
+
+		## Set up the column schemata
+		
+		# Title column schema
 		titlecell = gtk.CellRendererText()
 		self.col['Title'].pack_start(titlecell, True)
 		self.col['Title'].add_attribute(titlecell, 'text', 0)
 
+		# Episode column schema
 		epcell = gtk.CellRendererSpin()
 		epcell.set_property("editable", True)
-		# figure out how to get the max episodes into the adjustment!!
 		adjustment = gtk.Adjustment(0, 0, 999, 1)
 		epcell.set_property("adjustment", adjustment)
 		epcell.connect('edited', self.cell_episode_edited)
 		self.col['Episodes'].pack_start(epcell, False)
 		self.col['Episodes'].add_attribute(epcell, 'text', 1)
 
+		# Status column schema
+		combomodel = gtk.ListStore(str)
+		combomodel.append(['Watching'])
+		combomodel.append(['On Hold'])
+		combomodel.append(['Completed'])
+		combomodel.append(['Plan to Watch'])
+		combomodel.append(['Dropped'])
 
-		# Pulg the model in the treeview
-		self.liststore = gtk.ListStore(str, str, str, int, int)
-		self.liststore.append(['Anime title foo', '12 / 24', 'watching', 5, 80])
-		self.liststore.append(['Anime title bar', '2 / 17', 'watching', 7, 50])
+		statuscell = gtk.CellRendererCombo()
+		statuscell.set_property('model', combomodel)
+		statuscell.set_property('has-entry', False)
+		statuscell.set_property('editable', True)
+		statuscell.set_property('text-column', 0)
+		statuscell.connect('edited', self.cell_status_edited)
+		self.col['Status'].pack_start(statuscell, False)
+		self.col['Status'].add_attribute(statuscell, 'text', 2)
 
-		self.set_model(self.liststore)
+		# Score column schema
+		scorecell = gtk.CellRendererSpin()
+		scorecell.set_property("editable", True)
+		adjustment = gtk.Adjustment(0, 0, 10, 1)
+		scorecell.set_property("adjustment", adjustment)
+		scorecell.connect('edited', self.cell_score_edited)
+		self.col['Score'].pack_start(scorecell, False)
+		self.col['Score'].add_attribute(scorecell, 'text', 3)
+
+		# Progress column schema
+		progresscell = gtk.CellRendererProgress()
+		self.col['Progress'].pack_start(progresscell, True)
+		self.col['Progress'].add_attribute(progresscell, 'value', 4)
+
 		
+		## Pulg the model in the treeview
+		self.liststore = gtk.ListStore(str, str, str, int, int)
+		self.set_model(self.liststore)
 	
+
+	def cell_score_edited(self, *args):
+		""" Handles editing / change of score cells.
+
+		Not too much here, only database update.
+		"""
+		print args
+		pass
+
+
+	def cell_status_edited(self, *args):
+		""" Handles selection of status combo cells.
+		
+		Pushes the entry in other categories and eventually updates the episode
+		number (from non-complete to complete -> maximize my_episodes)
+		"""
+
+		##
+		## XXX: todo: add combo switch logic
+		##
+
+		pass
+	
+
 	def cell_episode_edited(self, spinr, row, value):
 		""" Handles the modification of the episode number spin button.
 
@@ -188,12 +237,18 @@ class guictl(object):
 		global widgets
 		widgets = self.widgets
 
+		self.tv = dict()
 		# Initialize anime data display treeviews
-		#for tab_id, name in data.STATUS.items():
-		#	tv = list_treeview(tab_id)
-		#	widgets['scrolledwindow_' + name].add(tv)
-		tv = list_treeview(self, 1)
-		widgets['scrolledwindow_watching'].add(tv)
+		for tab_id, name in data.STATUS.items():
+			tv = list_treeview(self, tab_id)
+			self.tv[tab_id] = tv
+			widgets['scrolledwindow_' + name].add(tv)
+
+		## XXX: testdata
+		self.tv[data.WATCHING].liststore.append(
+				['Anime title foo', '12 / 24', 'Watching', 5, 80])
+		self.tv[data.WATCHING].liststore.append(
+				['Anime title bar', '2 / 17', 'On Hold', 7, 50])
 
 		# Tune initial view
 		self.widgets['main_window'].show_all()
