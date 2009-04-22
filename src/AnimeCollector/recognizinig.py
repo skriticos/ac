@@ -85,7 +85,7 @@ class engine:
         # Should match all between [ , ], (, ) and gets rid of the file extension.
         # Monser RegEx ftw! :D
         reg = re.compile(" \
-        ((\[[\w\s,.&\$_+-]*\]*)|(\([\w\s,.&\$_+-]*\)*)|((.mkv)|(.mp4)|(.avi))$)")
+        ((\[[\w\s,.&\$_+-]*\]*)|(\([\w\s,.&\$_+-]*\)*)|(.mkv)|(.mp4)|(.avi))")
         
         anime_raw = reg.sub("", self.filename)
          
