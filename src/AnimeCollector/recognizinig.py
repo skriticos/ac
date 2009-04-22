@@ -82,10 +82,10 @@ class engine:
     def __filter(self):
         """Get rid of hashtags, subgroup, codec and such"""
          
-        # Well, this RegEx is in my opinion final. Should match all between
-        # [ , ], (, ) and gets rid of the file extension.
+        # Should match all between [ , ], (, ) and gets rid of the file extension.
+        # Monser RegEx ftw! :D
         reg = re.compile(" \
-            (([[\w\s,.&$_-]*])|\([\w\s,.&$_-]*\)|((.mkv)|(.mp4)|(.avi))$)")
+        ((\[[\w\s,.&\$_+-]*\]*)|(\([\w\s,.&\$_+-]*\)*)|((.mkv)|(.mp4)|(.avi))$)")
         
         anime_raw = reg.sub("", self.filename)
          
@@ -102,6 +102,8 @@ class engine:
 
         # get rid of scores
         animeName = animeName.replace("-","")
+        
+        #TODO: If theres a phrase like "ep", "EP" or "Ep" filter it out
 
         return animeName.strip()
     
@@ -128,23 +130,18 @@ class engine:
         """ 
         Evaluates a ratio of probable equally and returns the most likely Anime
         """
-        
-        currentDB = dict()
-        matching = dict()
 
-        # Fill a dict with the 
-        for anime in self.db[key]:
-            currentDB[anime].append(0)
-        
+        matching = dict()
+      
         # The essence machting algorithm
-        for anime in currentDB[key]:
+        for anime in self.db:
             ratio = difflib.SequenceMatcher(None, anime, \
                 _getName())
             matching[anime] = ratio
         
         # Sorting self.matching and retrun it...
         # Well, this is a bit of a hack since you can't really sort dicts
-        # TODO: Should be tested :D
+        # Works flawlessly :D
         rLst = matching.items()
         rSort = [ [v[1],v[0]] for v in rLst]
         rSort.sort()
@@ -182,7 +179,13 @@ class engine:
         """
         Main method, should be the only one which gets called.
         """
-        # If on entry is found return false
-        if not __update:
+        # If no entry is found return false
+        t = __update()
+        if not t:
             return False
+        
+        t = __update()
+        
+        # return Animename
+        return __matching()
         
