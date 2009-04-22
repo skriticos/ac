@@ -84,8 +84,8 @@ class engine:
          
         # Should match all between [ , ], (, ) and gets rid of the file extension.
         # Monser RegEx ftw! :D
-        reg = re.compile(" \
-        ((\[[\w\s,.&\$_+-]*\]*)|(\([\w\s,.&\$_+-]*\)*)|(.mkv)|(.mp4)|(.avi))")
+        reg = re.compile( \
+            "((\[[\w\s&\$_.,+\!-]*\]*)|(\([\w\s&\$_.,+\!-]*\)*)|(.mkv)|(.mp4)|(.avi))")
         
         anime_raw = reg.sub("", self.filename)
          
@@ -98,7 +98,7 @@ class engine:
         """getting and returning anime name"""
 
         # get rid of the Episode 
-        animeName = re.sub("[\d\s]{1,}", "", __filter())
+        animeName = re.sub("[\d\s]{1,}", "", self.__filter())
 
         # get rid of scores
         animeName = animeName.replace("-","")
@@ -109,8 +109,8 @@ class engine:
     
     def _getEpisode(self):
         """getting and returning anime episode"""
-        animeEpisode = re.sub("[\w\s]{1,}", "", \
-            __filter())
+        animeEpisode = re.sub("[a-zA-Z-+._&\s]{1,}", "", \
+            self.__filter())
                     
         return animeEpisode.strip()
    
@@ -136,8 +136,16 @@ class engine:
         # The essence machting algorithm
         for anime in self.db:
             ratio = difflib.SequenceMatcher(None, anime, \
-                _getName())
-            matching[anime] = ratio
+                self._getName())
+            ratio = ratio.ratio()
+            
+            matching[anime] = [ratio]
+
+        # check if there is a ratio over 0.3
+       # if matching[0].items() < 0.3:
+            # if not return false
+            #Todo: If there is no match try the series synonyms
+           # return False
         
         # Sorting self.matching and retrun it...
         # Well, this is a bit of a hack since you can't really sort dicts
@@ -147,27 +155,21 @@ class engine:
         rSort.sort()
         matching = [rSort[i][1] for i in range(0,len(rSort))]
         
-        # check if there is a ratio over 0.8
-        if matching[0] < 0.8:
-            # if not return false
-            #Todo: If there is no match try the series synonyms
-            return False
-        
         # return the most likely animename
-        return matching[0]
+        return matching[len(matching) - 1]
 
     def __update(self):
         
-        if not __matching():
+        dictMatch = self.__matching()
+        
+        if not dictMatch:
             return False
-        
-        dictMatch = __matching()
-        
+                
         # Update self.db
         for k in self.db:
-            if k == dictMatch[0]:
+            if k == dictMatch:
                 self.db[k]['my_watched_episodes'] = \
-                    _getEpisode()
+                    self._getEpisode()
         
         # Write changes to locale db
         dbhandle = open(ac_data_path, "wb")
@@ -180,12 +182,11 @@ class engine:
         Main method, should be the only one which gets called.
         """
         # If no entry is found return false
-        t = __update()
+        t = self.__update()
+        
         if not t:
             return False
         
-        t = __update()
-        
         # return Animename
-        return __matching()
+        return self.__matching()
         
