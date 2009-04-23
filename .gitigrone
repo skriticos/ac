@@ -3,3 +3,5 @@
 mal.pkl
 *.swp
 *._swp
+*.bak
+*~

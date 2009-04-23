@@ -17,10 +17,14 @@ class engine:
         
     When creating a instance of this class, the filename musst
     be overhanded.
-    E.g. engine = regognizing.engine("filename.avi")
+    E.g. engine = regognizing.engine("filename.avi").
+    
+    The main method ("match") returns on success the Animekey on failure false.
     
     Filename processing:
+    ----------------------
     This methodes filter the provided filename.
+    
     Protected methods:
         __filter: removes hashtags, subgroup and codecs
             Returns: the filterd anime name
@@ -36,8 +40,10 @@ class engine:
         Not implemented yet:
         _getSeason: checks if there a more then one season
             Returns: current series season
-    
+    ------------------------------------------------------------
+
     Regogniziging engine:
+    ---------------------
     These methodes provides functions to recognize the
     current watched series and change the episode in the
     local database.
@@ -68,12 +74,6 @@ class engine:
             dbhandle.close()
         else:
             return False
-          
-    def __del__(self):
-        """ Maybe needed to close a opened file/DB"""
-        #TODO: Find a OS undependend way for checking if a
-        # file is open.
-        pass
         
     #####################
     # Filename Processing
@@ -89,15 +89,15 @@ class engine:
         
         anime_raw = reg.sub("", self.filename)
          
-        # get rid of underscores and replace them
+        # replace underscores
         anime_raw = anime_raw.replace("_"," ")
          
         return anime_raw.strip()
     
     def _getName(self):
-        """getting and returning anime name"""
+        """Getting and returning animename"""
 
-        # get rid of the Episode 
+        # remove all digits
         animeName = re.sub("[\d\s]{1,}", "", self.__filter())
 
         # get rid of scores
@@ -108,7 +108,9 @@ class engine:
         return animeName.strip()
     
     def _getEpisode(self):
-        """getting and returning anime episode"""
+        """Getting and returning anime episode."""
+        
+        # Remove all but Numbers, witch must be at least a pair of two
         animeEpisode = re.sub("[a-zA-Z-+._&\s]{1,}", "", \
             self.__filter())
                     
@@ -130,7 +132,6 @@ class engine:
         """ 
         Evaluates a ratio of probable equally and returns the most likely Anime
         """
-
         matching = dict()
       
         # The essence machting algorithm
@@ -140,24 +141,18 @@ class engine:
             ratio = ratio.ratio()
             
             matching[anime] = [ratio]
-
-        # check if there is a ratio over 0.3
-       # if matching[0].items() < 0.3:
-            # if not return false
-            #Todo: If there is no match try the series synonyms
-           # return False
-        
-        # Sorting self.matching and retrun it...
-        # Well, this is a bit of a hack since you can't really sort dicts
-        # Works flawlessly :D
+            
+        # Sorting matching. 
+        # As a result of the sorting matching returns as a list!
         rLst = matching.items()
         rSort = [ [v[1],v[0]] for v in rLst]
         rSort.sort()
         matching = [rSort[i][1] for i in range(0,len(rSort))]
         
-        # return the most likely animename
+        # 'couse of the bit weird sorting I can't easily reverse the list.
+        # So I just return the last entry which is the key with the highest ratio
         return matching[len(matching) - 1]
-
+        
     def __update(self):
         
         dictMatch = self.__matching()
@@ -181,10 +176,8 @@ class engine:
         """
         Main method, should be the only one which gets called.
         """
-        # If no entry is found return false
-        t = self.__update()
         
-        if not t:
+        if not self.__update():
             return False
         
         # return Animename
