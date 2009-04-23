@@ -4,39 +4,25 @@
 # See COPYING for details
 
 """
----- TODO ----
-Create clear data interfaces with the gui.
-Eliminate magic and clean up code.
---------------
+This module contains the GTK+ GUI subsystem of AnimeCollector. It sets up the
+user interface and enters the main event loop.
 
+MODULE GLOBALS
+==============
+They are not nice, but the best in this situation. This file has two globals
+defined in the gtkctl class constructor:
 
-This file contains the classes and methods for setting up the AnimeCollector
-application. I does the following things:
-   - Load the configuration file
-   - Load the stored data file
-   - Set up the user interface and connect the signal handlers and enter the
-	 main loop
-
-This module also has important global class instances:
-	- config: ac_config instance (configuration file)
-	- widgets: widget_wrapper for the interfoce
+ - MODCTL: pointer to the gtkctl class instance.
+ - WIDGETS: pointer to the widgets wrapper.
 """
 
-import gtk, pango
-from gtk import glade, TreeView, ListStore
-import gobject
-from os import path
-from webbrowser import open as webopen
-
-from config import ac_config
-from myanimelist import anime_data
-from globs import ac_package_path
-import data
+import os, gtk, gtk.glade, gobject, webbrowser
+import globs, data
 
 
 class glade_handlers(object):
 	"""
-	We put almost all of our gtk signal handlers into this class.
+	We put all of our glade gtk signal handlers into this class.
 	This lets us bind all of them at once, because their names are in the class
 	dict. If you want to know where these signals are assigned, then take a look
 	at the data/ui.glade file (glade XML).
@@ -45,45 +31,86 @@ class glade_handlers(object):
 	def gtk_main_quit(event):
 		gtk.main_quit()
 	def on_button_ac_clicked(event):
-		webopen('http://myanimelist.net/clubs.php?cid=10642', 2)
+		webbrowser.open('http://myanimelist.net/clubs.php?cid=10642', 2)
 	def on_button_mal_clicked(event):
-		webopen('http://myanimelist.net', 2)
+		webbroweser.open('http://myanimelist.net', 2)
 	def on_about(event):
-		widgets['aboutdialog'].show_all()
+		WIDGETS['aboutdialog'].show_all()
 	def on_about_close(widget, event):
-		widgets['aboutdialog'].hide_all()
+		WIDGETS['aboutdialog'].hide_all()
 		return True
 	def on_menuitem_prefs_activate(event):
-		widgets['preferences'].show_all()
+		WIDGETS['preferences'].show_all()
 	def on_prefs_close(widget=None, event=None):
-		widgets['preferences'].hide_all()
+		WIDGETS['preferences'].hide_all()
 		return True
 
 class widget_wrapper(object):
 	"""
 	Load and set up the glade user interface and connect the signal hanlers.
 	Provide a convenient way to access the glade widgets.
-
-	To set up the class call: widgets = widget_wrapper()
-	To access widgets by name call: widgets['widget_name'].action()
 	"""
 
 	def __init__(self):
-		# load user interface
+		""" Load user interface and connect signal handlers. """
 		self.widgets = \
-			glade.XML(path.join(ac_package_path, 'data', 'ui.glade'))
+				gtk.glade.XML(
+				os.path.join(globs.ac_package_path, 'data', 'ui.glade'))
 		self.widgets.signal_autoconnect(glade_handlers.__dict__)
 
-	def __getitem__(self, key): return self.widgets.get_widget(key)
+	def __getitem__(self, key):
+		""" Make widgets accessable by name.
+
+		It's simply done by overriding the aquisiton default of the class. Makes
+		referencing widgets by name much more convinient:
+	
+		EXAMPLE
+		=======
+		To reference a widget by name (based on the glade file) and perform a
+		GTK action with it you use:
+		   
+		   widgets['widget_name'].action()
+		"""
+		return self.widgets.get_widget(key)
 
 
 class list_treeview(gtk.TreeView):
-	def __init__(self, guictl, tab_id):
+	""" This is one of the two more interesting classes in the GUI subsystem.
+	
+	It is used to create and control the anime list treeview's (the big table in
+	the middle that shows anime enries). It also handles manual editing on the
+	table via callbacks, which are called when an episode, status or score entry
+	is edited (slow double click on one of these enries).
+	"""
 
+	def __init__(self, tab_id, tv_data):
+		""" Initialize the treeview.
+
+		Call the parent constructor, store some references, define some class
+		constants, add columns to the treeview and glue this together.
+
+		The exciting part is the clomuns schemata setup, which tells the columns
+		how they look like and what they should do when edited (connect 
+		callbacks).
+
+		ARGUMENTS
+		=========
+		- tab_id: MAL schema based (data.STATUS) tab id (watching, etc..)
+		- tv_data: collection AC conform dictionary data which is used to
+		  populate the treeview with enries
+
+		PROPERTIES
+		==========
+		- liststore: probably the most interseting property, as it stores the
+		  data of the table. It can be accessed by index, like
+		  liststore[row][column], both starting with 0.
+		- col: reference to the tree view columns the class has. Not really
+		  interesting outside init, but may come in handy for plugin
+		  development.
+		"""
+
+		# Call parrent constructor
 		gtk.TreeView.__init__(self)
-
-		# Pointer to guictl
-		self.guictlptr = guictl
 
 		# Mal tab type id
 		self.tab_id = tab_id
@@ -92,7 +119,7 @@ class list_treeview(gtk.TreeView):
 		( self.NAME, self.EPISODE, self.STATUS, self.SCORE, self.PROGRESS ) = \
 				range (5)
 
-		# Add columns to treeview
+		# Add columns to self and store references by name
 		self.col = dict()
 		for colname in ['Title', 'Episodes', 'Status', 'Score', 'Progress']:
 			self.col[colname] = gtk.TreeViewColumn(colname)
@@ -107,6 +134,7 @@ class list_treeview(gtk.TreeView):
 		self.col['Title'].add_attribute(titlecell, 'text', 0)
 
 		# Episode column schema
+		# Editable spin column that is connected with a callback
 		epcell = gtk.CellRendererSpin()
 		epcell.set_property("editable", True)
 		adjustment = gtk.Adjustment(0, 0, 999, 1)
@@ -116,6 +144,8 @@ class list_treeview(gtk.TreeView):
 		self.col['Episodes'].add_attribute(epcell, 'text', 1)
 
 		# Status column schema
+		# Combo box column with selectable status
+		# The first part contains the choices
 		combomodel = gtk.ListStore(str)
 		combomodel.append(['Watching'])
 		combomodel.append(['On Hold'])
@@ -133,6 +163,7 @@ class list_treeview(gtk.TreeView):
 		self.col['Status'].add_attribute(statuscell, 'text', 2)
 
 		# Score column schema
+		# Basically the same as the episodes one.
 		scorecell = gtk.CellRendererSpin()
 		scorecell.set_property("editable", True)
 		adjustment = gtk.Adjustment(0, 0, 10, 1)
@@ -142,15 +173,25 @@ class list_treeview(gtk.TreeView):
 		self.col['Score'].add_attribute(scorecell, 'text', 3)
 
 		# Progress column schema
+		# Progress bar, nothing fancy
 		progresscell = gtk.CellRendererProgress()
 		self.col['Progress'].pack_start(progresscell, True)
 		self.col['Progress'].add_attribute(progresscell, 'value', 4)
 
-		
-		## Pulg the model in the treeview
+
+		## Create liststore model (table containing the treeview data) and hook
+		# it up to the treeview (self).
 		self.liststore = gtk.ListStore(str, str, str, int, int)
 		self.set_model(self.liststore)
 	
+		self.populate(tv_data)
+
+
+	def populate(self, tv_data):
+		""" Add data to liststore (data table) """
+
+		pass
+
 
 	def cell_score_edited(self, *args):
 		""" Handles editing / change of score cells.
@@ -218,31 +259,51 @@ class list_treeview(gtk.TreeView):
 
 
 class guictl(object):
-	"""
-	Main GUI class and interface.
+	""" GUI control interface class.
+	
+	This class starts up and controls the general user interface. Simply
+	initialize it with a config and anime_data reference pointer and a shiny GTK
+	GUI will pop up in the middle of your screen (if all goes well).
 	"""
 
 	def __init__(self, config, anime_data):
 		"""
 		Load interface and enter main loop.
+
+		ARGUMENTS
+		=========
+		- config: reference to config.ac_config instance
+		- anime_data: reference to myanimelist.anime_data instance
 		"""
+
+		# Hook to make the conrol module reachable from all over the
+		# file, especially from the autoconnect handlers.
+		# Hey, it's still less ugly than loading it on import!
+		global MODCTL
+		MODCTL = self
 
 		# Store the references to the config and data instances
 		self.config = config
 		self.anime_data = anime_data
 
 		# Initialize base widgets from XML and connect signal handlers
-		self.widgets = widget_wrapper()
+		# Hook no. 2 to make the widgets wrapper content reachable from all over
+		# the file. This is the last ugly global, I promise. 
+		# Especially since it wraps the wiget wrapper to a global varable.
+		global WIDGETS
+		WIDGETS = widget_wrapper()
 
-		global widgets
-		widgets = self.widgets
 
+		## XXX: extract different data types from mal database
+		tv_data = dict()
+		tv_data = {1:None, 2:None, 3:None, 5:None, 6:None}
+
+		# Initialize treeviews and populate them with anime data
 		self.tv = dict()
-		# Initialize anime data display treeviews
 		for tab_id, name in data.STATUS.items():
-			tv = list_treeview(self, tab_id)
+			tv = list_treeview(tab_id, tv_data[tab_id])
 			self.tv[tab_id] = tv
-			widgets['scrolledwindow_' + name].add(tv)
+			WIDGETS['scrolledwindow_' + name].add(tv)
 
 		## XXX: testdata
 		self.tv[data.WATCHING].liststore.append(
@@ -250,11 +311,12 @@ class guictl(object):
 		self.tv[data.WATCHING].liststore.append(
 				['Anime title bar', '2 / 17', 'On Hold', 7, 50])
 
-		# Tune initial view
-		self.widgets['main_window'].show_all()
-		self.widgets['main_window'].connect('delete_event', lambda e,w:
+		## Show main window, connect the quit signal handler and hide the
+		# now_playing statusbar
+		WIDGETS['main_window'].show_all()
+		WIDGETS['main_window'].connect('delete_event', lambda e,w:
 				gtk.main_quit())
-		widgets['statusbar_now_playing'].hide()
+		WIDGETS['statusbar_now_playing'].hide()
 
 		# Run main loop
 		gtk.main()
