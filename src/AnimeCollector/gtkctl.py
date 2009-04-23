@@ -244,18 +244,34 @@ class list_treeview(gtk.TreeView):
 			self.push_change_to_db(row, {'my_score': int(value)})
 
 
-	def cell_status_edited(self, *args):
+	def cell_status_edited(self, combr, row, value):
 		""" Handles selection of status combo cells.
 		
 		Pushes the entry in other categories and eventually updates the episode
 		number (from non-complete to complete -> maximize my_episodes)
 		"""
+		# We don't move to self?
+		if value != self.liststore[row][self.STATUS]:
+			# Prepare data
+			maxepisodes = self.liststore[row][self.EPISODE].split(' / ')[1]
+			self.liststore[row][self.STATUS] = value
+			if value == data.STATUSB[data.COMPLETED]:
+				# We move to the comleted tab?
+				self.liststore[row][self.PROGRESS] = 100
+				self.liststore[row][self.EPISODE] = \
+						maxepisodes + ' / ' + maxepisodes
+				self.push_change_to_db(row, {
+						'my_watched_episodes': int(maxepisodes), 
+						'my_status': data.COMPLETED })
+			else:
+				# we move to another tab?
+				self.push_change_to_db(row, {
+						'my_status': data.STATUS_REV[value] })
+			# Move row
+			MODCTL.tv[data.STATUS_REV[value]].liststore.append(
+					self.liststore[row])
+			del self.liststore[row]
 
-		##
-		## XXX: todo: add combo switch logic
-		##
-
-		pass
 	
 
 	def cell_episode_edited(self, spinr, row, value):
@@ -263,6 +279,14 @@ class list_treeview(gtk.TreeView):
 
 		If all a valid new value is entered, the row is updated and parrent
 		update function is called to update the local database.
+
+		If maximal episode is entered as new value, the enry is pushed to the
+		completed table.
+
+		If entry is in the completed table and the ep count is lowered, it is
+		pushed in the watching table.
+
+		Note: I'm not exactly contet with it's looks, but it works.
 		"""
 		
 		# Prepare data set
@@ -274,32 +298,39 @@ class list_treeview(gtk.TreeView):
 		
 		# Determine if action is required
 		if newvalue != oldvalue and newvalue <= maxvalue:
-
+			# Compute new common row data
+			newstr = str(newvalue) + ' / ' + str(maxvalue)
+			self.liststore[row][self.EPISODE] = newstr
+			self.liststore[row][self.PROGRESS] = \
+					int(float(newvalue) / float(maxvalue) * 100)
+			# Stuff to be done with smaller than max ep count
 			if newvalue < maxvalue:
-
-				##
-				## XXX: check if we were completed before, push to watching if
-				##      not
-
-				# Update row episode data
-				newstr = str(newvalue) + ' / ' + str(maxvalue)
-				self.liststore[row][self.EPISODE] = newstr
-
-				# Update progress bar
-				if newvalue < maxvalue:
-					self.liststore[row][self.PROGRESS] = \
-							int(float(newvalue) / float(maxvalue) * 100)
-
-				self.push_change_to_db(row, {'my_watched_episodes': newvalue})
-
-			
-			#
-			# XXX: insert data update routine using guictlptk.anime_data
-			#
-			
+				# In the completd table
+				if self.tab_id == data.COMPLETED:
+					self.push_change_to_db(row, 
+							{'my_watched_episodes': newvalue, 
+							 'my_status': data.WATCHING })
+					self.liststore[row][self.STATUS] = \
+							data.STATUSB[data.WATCHING]
+					MODCTL.tv[data.WATCHING].liststore.append(
+							self.liststore[row])
+					del self.liststore[row]
+				# In all other tables that are not complete
+				else:
+					self.push_change_to_db(row, 
+							{'my_watched_episodes': newvalue})
 			# Did we reach treashhold and was not completed?
 			if self.tab_id != data.COMPLETED and newvalue == maxvalue:
+				# Send to compted
+				self.push_change_to_db(row, 
+						{'my_watched_episodes': newvalue,
+							'my_status': data.COMPLETED})
+				self.liststore[row][self.STATUS] = \
+						data.STATUSB[data.COMPLETED]
+				MODCTL.tv[data.COMPLETED].liststore.append(
+						self.liststore[row])
 				del self.liststore[row]
+
 
 	def push_change_to_db(self, row, changes):
 		""" Shorthand for pusing changes to the anime database
