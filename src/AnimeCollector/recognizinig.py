@@ -1,3 +1,4 @@
+ # -*- coding: utf8 -*
 # recognizing.py - Recognizing engine 
 # Copyright (c) 2009 Andre 'Necrotex' Peiffer
 # See COPYING for details
@@ -98,7 +99,7 @@ class engine:
         """Getting and returning animename"""
 
         # remove all digits
-        animeName = re.sub("[\d\s]{1,}", "", self.__filter())
+        animeName = re.sub("[\d._]{1,}", "", self.__filter())
 
         # get rid of scores
         animeName = animeName.replace("-","")
@@ -111,7 +112,7 @@ class engine:
         """Getting and returning anime episode."""
         
         # Remove all but Numbers, witch must be at least a pair of two
-        animeEpisode = re.sub("[a-zA-Z-+._&\s]{1,}", "", \
+        animeEpisode = re.sub("[a-zA-Z-+._&\s\!]{1,}", "", \
             self.__filter())
                     
         return animeEpisode.strip()
@@ -139,8 +140,8 @@ class engine:
             ratio = difflib.SequenceMatcher(None, anime, \
                 self._getName())
             ratio = ratio.ratio()
-            
             matching[anime] = [ratio]
+            
             
         # Sorting matching. 
         # As a result of the sorting matching returns as a list!
@@ -151,7 +152,15 @@ class engine:
         
         # 'couse of the bit weird sorting I can't easily reverse the list.
         # So I just return the last entry which is the key with the highest ratio
-        return matching[len(matching) - 1]
+        
+        # A quick hack, to find out if the ratio is to low
+        r = difflib.SequenceMatcher(None, matching[len(matching) - 1], \
+                self._getName())
+                
+        if r.ratio() < 0.3:
+            return False
+        else:        
+            return matching[len(matching) - 1]
         
     def __update(self):
         
