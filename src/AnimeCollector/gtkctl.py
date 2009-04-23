@@ -16,7 +16,7 @@ defined in the gtkctl class constructor:
  - WIDGETS: pointer to the widgets wrapper.
 """
 
-import os, gtk, gtk.glade, gobject, webbrowser
+import os, gtk, gtk.glade, gobject, webbrowser, datetime
 import globs, data
 
 
@@ -117,6 +117,8 @@ class list_treeview(gtk.TreeView):
 		# Mal tab type id
 		self.tab_id = tab_id
 		self.data = {}
+		# This one is used to keep the db keys addresseble with the row indices
+		self.keylist = list()
 
 		# Some treeview specific constants (column id's)
 		( self.NAME, self.EPISODE, self.STATUS, self.SCORE, self.PROGRESS ) = \
@@ -189,10 +191,8 @@ class list_treeview(gtk.TreeView):
 	
 	
 	def repopulate(self):
-		""" Add data to liststore (data table)
+		""" Resets/Initializes data to liststore (data table)
 		
-		Constructs display data for the tree view for all the values in tv_data.
-
 		INPUT
 		=====
 		- self.tv_data: the update is performed with this data
@@ -201,8 +201,8 @@ class list_treeview(gtk.TreeView):
 		# clear previous data
 		self.liststore.clear()
 
-		# comupte and add new data based on self.tv_data
-		for anime in self.data.values():
+		# comupte and add new data based on self.data
+		for key, anime in self.data.items():
 			
 			# Extract series title
 			name = anime['series_title']
@@ -228,14 +228,20 @@ class list_treeview(gtk.TreeView):
 			row = [name, epstr, data.STATUSB[self.tab_id], score, progress]
 			self.liststore.append(row)
 
+			# Store key in row position
+			self.keylist.append(key)
 
-	def cell_score_edited(self, *args):
+
+	def cell_score_edited(self, spinr, row, value):
 		""" Handles editing / change of score cells.
 
 		Not too much here, only database update.
 		"""
-		print args
-		pass
+		maxvalue = 10
+		if int(value) <= maxvalue and \
+				int(value) != self.liststore[row][self.SCORE]:
+			self.liststore[row][self.SCORE] = int(value)
+			self.push_change_to_db(row, {'my_score': int(value)})
 
 
 	def cell_status_edited(self, *args):
@@ -284,6 +290,8 @@ class list_treeview(gtk.TreeView):
 					self.liststore[row][self.PROGRESS] = \
 							int(float(newvalue) / float(maxvalue) * 100)
 
+				self.push_change_to_db(row, {'my_watched_episodes': newvalue})
+
 			
 			#
 			# XXX: insert data update routine using guictlptk.anime_data
@@ -292,6 +300,29 @@ class list_treeview(gtk.TreeView):
 			# Did we reach treashhold and was not completed?
 			if self.tab_id != data.COMPLETED and newvalue == maxvalue:
 				del self.liststore[row]
+
+	def push_change_to_db(self, row, changes):
+		""" Shorthand for pusing changes to the anime database
+
+		It's called from the treeview callbacks to commit a local change to the
+		local anime database.
+
+		ARGUMENTS
+		=========
+		- row: the row we are in, which is used to look up the keyname we want
+		       to change 
+		- changes: dict with changes that have to be done
+		"""
+		# set new values in database
+		for key, value in changes.items():
+			MODCTL.anime_data.db[self.keylist[int(row)]][key] = value
+
+		# set update timestamp
+		MODCTL.anime_data.db[self.keylist[int(row)]]\
+				['my_last_updated']	= datetime.datetime.now()
+		
+		# save changes in local database
+		MODCTL.anime_data.save()
 
 
 class guictl(object):
@@ -363,5 +394,4 @@ class guictl(object):
 		# Populate tree views
 		for tab in self.tv.values():
 			tab.repopulate()
-
 
