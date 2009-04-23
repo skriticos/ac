@@ -34,6 +34,10 @@ class glade_handlers(object):
 		webbrowser.open('http://myanimelist.net/clubs.php?cid=10642', 2)
 	def on_button_mal_clicked(event):
 		webbroweser.open('http://myanimelist.net', 2)
+	def on_button_sync_clicked(event):
+		# Syncronize with mal server when sync button is pressed
+		MODCTL.anime_data.sync()
+		MODCTL.update_form_db_all()
 	def on_about(event):
 		WIDGETS['aboutdialog'].show_all()
 	def on_about_close(widget, event):
@@ -83,7 +87,7 @@ class list_treeview(gtk.TreeView):
 	is edited (slow double click on one of these enries).
 	"""
 
-	def __init__(self, tab_id, tv_data):
+	def __init__(self, tab_id):
 		""" Initialize the treeview.
 
 		Call the parent constructor, store some references, define some class
@@ -96,8 +100,6 @@ class list_treeview(gtk.TreeView):
 		ARGUMENTS
 		=========
 		- tab_id: MAL schema based (data.STATUS) tab id (watching, etc..)
-		- tv_data: collection AC conform dictionary data which is used to
-		  populate the treeview with enries
 
 		PROPERTIES
 		==========
@@ -114,6 +116,7 @@ class list_treeview(gtk.TreeView):
 
 		# Mal tab type id
 		self.tab_id = tab_id
+		self.data = {}
 
 		# Some treeview specific constants (column id's)
 		( self.NAME, self.EPISODE, self.STATUS, self.SCORE, self.PROGRESS ) = \
@@ -184,21 +187,22 @@ class list_treeview(gtk.TreeView):
 		self.liststore = gtk.ListStore(str, str, str, int, int)
 		self.set_model(self.liststore)
 	
-		self.populate(tv_data)
-
-
-	def populate(self, tv_data):
+	
+	def repopulate(self):
 		""" Add data to liststore (data table)
 		
 		Constructs display data for the tree view for all the values in tv_data.
 
-		ARGUMENTNS
-		==========
-		- tv_data: core AC anime data dictionary with enries for the animes that
-		           are to be listed on this treeview.
+		INPUT
+		=====
+		- self.tv_data: the update is performed with this data
 		"""
 		
-		for anime in tv_data.values():
+		# clear previous data
+		self.liststore.clear()
+
+		# comupte and add new data based on self.tv_data
+		for anime in self.data.values():
 			
 			# Extract series title
 			name = anime['series_title']
@@ -325,34 +329,14 @@ class guictl(object):
 		global WIDGETS
 		WIDGETS = widget_wrapper()
 
-		# Setup treeview data dictionary
-		# Note: this is a nested dictionary:
-		# {status=tab_id : { anime-name: anime-data }}
-		self.tv_data = {
-				data.WATCHING: {},
-				data.COMPLETED: {},
-				data.ONHOLD: {},
-				data.DROPPED: {},
-				data.UNKNOWN: {},
-				data.PLANTOWATCH: {} }
-
-		# Separate anime data according to their status
-		for key, value in anime_data.db.items():
-			status = value['my_status']
-			self.tv_data[status][key] = value
-
-		# Initialize treeviews and populate them with anime data
+		# Initialize treeviews
 		self.tv = dict()
 		for tab_id, name in data.STATUS.items():
-			tv = list_treeview(tab_id, self.tv_data[tab_id])
+			tv = list_treeview(tab_id)
 			self.tv[tab_id] = tv
 			WIDGETS['scrolledwindow_' + name].add(tv)
 
-		## XXX: testdata
-		#self.tv[data.WATCHING].liststore.append(
-		#		['Anime title foo', '12 / 24', 'Watching', 5, 80])
-		#self.tv[data.WATCHING].liststore.append(
-		#		['Anime title bar', '2 / 17', 'On Hold', 7, 50])
+		self.update_form_db_all()
 
 		## Show main window, connect the quit signal handler and hide the
 		# now_playing statusbar
@@ -363,4 +347,21 @@ class guictl(object):
 
 		# Run main loop
 		gtk.main()
+
+
+	def update_form_db_all(self):
+		""" Update all anime tables views form database.
+
+		This is used on initialization and after syncronization.
+		"""
+
+		# Separate anime data according to their status
+		for key, value in self.anime_data.db.items():
+			status = value['my_status']
+			self.tv[status].data[key] = value
+		
+		# Populate tree views
+		for tab in self.tv.values():
+			tab.repopulate()
+
 
