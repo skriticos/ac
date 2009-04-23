@@ -296,7 +296,7 @@ def _push_list(local_updates):
 		# push update request
 		try:
 			response = urlopen(push_request)
-			# print response.read()  -- for testing
+			# print response.read() #  -- for testing
 		except URLError, e:
 			if hasattr(e, 'reason'):
 				print 'We failed to reach a server.'

@@ -86,7 +86,7 @@ mal_data_schema = {
 
 
 ## These are the status code mappings the mal server is sending in the XML file
-( WATCHING, COMPLETED, ONHOLD, UNKNOWN, DROPPED, PLANTOWATCH ) = range(1, 7)
+( WATCHING, COMPLETED, ONHOLD, DROPPED, UNKNOWN, PLANTOWATCH ) = range(1, 7)
 
 # Here is the reverse mapping of the above for widget adressing and similar
 STATUS = {	
@@ -103,3 +103,10 @@ STATUSB = {
 	3: 'On Hold',
 	4: 'Dropped',
 	6: 'Plan To Watch' }
+
+STATUS_REV = {
+	'Watching': 1,
+	'Completed': 2,
+	'On Hold': 3,
+	'Dropped': 4,
+	'Plan To Watch': 6 }
