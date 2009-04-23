@@ -93,5 +93,13 @@ STATUS = {
 	1: 'watching',
 	2: 'completed',
 	3: 'onhold',
-	5: 'dropped',
+	4: 'dropped',
 	6: 'plantowatch' }
+
+# This is the same as above but with capitals and spaces for display purposes
+STATUSB = {
+	1: 'Watching',
+	2: 'Completed',
+	3: 'On Hold',
+	4: 'Dropped',
+	6: 'Plan To Watch' }

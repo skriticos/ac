@@ -188,9 +188,41 @@ class list_treeview(gtk.TreeView):
 
 
 	def populate(self, tv_data):
-		""" Add data to liststore (data table) """
+		""" Add data to liststore (data table)
+		
+		Constructs display data for the tree view for all the values in tv_data.
 
-		pass
+		ARGUMENTNS
+		==========
+		- tv_data: core AC anime data dictionary with enries for the animes that
+		           are to be listed on this treeview.
+		"""
+		
+		for anime in tv_data.values():
+			
+			# Extract series title
+			name = anime['series_title']
+			
+			# Extract episodes/max and construct display string
+			if anime['series_episodes']:
+				max_episodes = anime['series_episodes']
+			else:
+				max_episodes = '-'
+			current_episode = anime['my_watched_episodes']
+			epstr = str(current_episode) + ' / ' + str(max_episodes)
+		
+			# Calculate progress bar
+			progress = 0
+			if isinstance(max_episodes, int):
+				progress = \
+						int(float(current_episode) / float(max_episodes) * 100)
+
+			# Extract score
+			score = anime['my_score']
+
+			# Construct row list and add it to the liststore
+			row = [name, epstr, data.STATUSB[self.tab_id], score, progress]
+			self.liststore.append(row)
 
 
 	def cell_score_edited(self, *args):
@@ -293,23 +325,34 @@ class guictl(object):
 		global WIDGETS
 		WIDGETS = widget_wrapper()
 
+		# Setup treeview data dictionary
+		# Note: this is a nested dictionary:
+		# {status=tab_id : { anime-name: anime-data }}
+		self.tv_data = {
+				data.WATCHING: {},
+				data.COMPLETED: {},
+				data.ONHOLD: {},
+				data.DROPPED: {},
+				data.UNKNOWN: {},
+				data.PLANTOWATCH: {} }
 
-		## XXX: extract different data types from mal database
-		tv_data = dict()
-		tv_data = {1:None, 2:None, 3:None, 5:None, 6:None}
+		# Separate anime data according to their status
+		for key, value in anime_data.db.items():
+			status = value['my_status']
+			self.tv_data[status][key] = value
 
 		# Initialize treeviews and populate them with anime data
 		self.tv = dict()
 		for tab_id, name in data.STATUS.items():
-			tv = list_treeview(tab_id, tv_data[tab_id])
+			tv = list_treeview(tab_id, self.tv_data[tab_id])
 			self.tv[tab_id] = tv
 			WIDGETS['scrolledwindow_' + name].add(tv)
 
 		## XXX: testdata
-		self.tv[data.WATCHING].liststore.append(
-				['Anime title foo', '12 / 24', 'Watching', 5, 80])
-		self.tv[data.WATCHING].liststore.append(
-				['Anime title bar', '2 / 17', 'On Hold', 7, 50])
+		#self.tv[data.WATCHING].liststore.append(
+		#		['Anime title foo', '12 / 24', 'Watching', 5, 80])
+		#self.tv[data.WATCHING].liststore.append(
+		#		['Anime title bar', '2 / 17', 'On Hold', 7, 50])
 
 		## Show main window, connect the quit signal handler and hide the
 		# now_playing statusbar
