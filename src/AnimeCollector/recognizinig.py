@@ -64,17 +64,16 @@ class engine:
             returns: on success the anime key, on failure false
     """
     
-    def __init__(self, filename):
+    def __init__(self, filename, data):
         
         self.filename = filename
+        self.db = data
 
         # Read database, if it can't be read return false
-        if path.exists(ac_data_path):
-            dbhandle = open(ac_data_path, "rb")
-            self.db  = cPickle.load(dbhandle)
-            dbhandle.close()
-        else:
-            return False
+        #if path.exists(ac_data_path):
+        #    dbhandle = open(ac_data_path, "rb")
+        #    self.db  = cPickle.load(dbhandle)
+        #    dbhandle.close()
         
     #####################
     # Filename Processing
@@ -163,7 +162,8 @@ class engine:
             return matching[len(matching) - 1]
         
     def __update(self):
-        
+       	return False
+
         dictMatch = self.__matching()
         
         if not dictMatch:
@@ -177,7 +177,7 @@ class engine:
         
         # Write changes to locale db
         dbhandle = open(ac_data_path, "wb")
-        cPickle.dump(self.db, dbhandle)
+        # cPickle.dump(self.db, dbhandle)
         dbhandle.close()
         return True
     
@@ -186,8 +186,8 @@ class engine:
         Main method, should be the only one which gets called.
         """
         
-        if not self.__update():
-            return False
+        #if not self.__update():
+        #    return False
         
         # return Animename
         return self.__matching()

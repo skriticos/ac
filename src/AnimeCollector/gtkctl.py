@@ -17,7 +17,7 @@ defined in the gtkctl class constructor:
 """
 
 import os, gtk, gtk.glade, gobject, webbrowser, datetime, time
-import globs, data
+import globs, data, players, recognizinig
 
 def sb_push(msg):
 	WIDGETS['bottom_statusbar'].push(-1, msg)
@@ -25,6 +25,10 @@ def sb_push(msg):
 def sb_clear():
 	time.sleep(5)
 	WIDGETS['bottom_statusbar'].pop(-1)
+	try:
+		WIDGETS['bottom_statusbar'].pop(-1)
+	except:
+		pass
 	return False
 
 class glade_handlers(object):
@@ -265,8 +269,11 @@ class list_treeview(gtk.TreeView):
 			# Calculate progress bar
 			progress = 0
 			if isinstance(max_episodes, int):
-				progress = \
+				try:
+					progress = \
 						int(float(current_episode) / float(max_episodes) * 100)
+				except:
+					progress = 0
 
 			# Extract score
 			score = anime['my_score']
@@ -467,10 +474,53 @@ class guictl(object):
 		else:
 			WIDGETS['menuitem_playbar'].set_active(True)
 
-		INIT = False
+		#gobject.timeout_add(5000, self.idle_cb)
+		gobject.timeout_add(500, self.idle_cb)
 		
+		INIT = False
+	
+
 		# Run main loop
 		gtk.main()
+
+	def idle_cb(self):
+		if WIDGETS['statusbar_now_playing'].flags() & gtk.VISIBLE:
+			track = players.get_playing(
+				['mplayer', 'totem'], [self.cfg.get('search_dir', 'dir1')])
+			for key in track.keys():
+				e = recognizinig.engine(key, self.anime_data.db)
+				m = e.match()
+				try:
+					ep = int(e._getEpisode().strip('/'))
+					if m:
+						#print m, ep
+						if self.anime_data.db[m]['my_watched_episodes'] == \
+								ep - 1 and \
+								self.anime_data.db[m]['my_status'] == \
+								data.WATCHING:
+							msg = 'Playing: ' + m + ' -- Episode: ' + str(ep)
+							WIDGETS['statusbar_now_playing'].push(-1, msg)
+							#print self.anime_data.db[m]['my_watched_episodes']
+							#print self.anime_data.db[m]['series_episodes']
+							if ep < self.anime_data.db[m]['series_episodes']:
+								self.anime_data.db[m]['my_watched_episodes'] = ep
+								MODCTL.anime_data.db[m]\
+										['my_last_updated']	= datetime.datetime.now()
+								MODCTL.anime_data.save()
+								newep = str(ep) + ' / ' + str(self.anime_data.db[m]['series_episodes'])
+								
+								sw = self.tv[1].keylist 
+								i = 0 # row tracker
+								for key in sw:
+									if key == m:
+										break
+									else:
+										i += 1
+
+								self.tv[1].liststore[str(i)][1] = newep
+				except:
+					break
+		return True
 
 
 	def update_form_db_all(self):
