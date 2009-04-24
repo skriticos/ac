@@ -27,11 +27,6 @@ Development principles:
 - Portable source code
 
 
-Note: 
-	This is still alpha software. 99% of features are not yet implemented
-	(see the source code for a detailed explanation). That said, it does work.
-
-
 Installation
 ============
 
@@ -55,7 +50,13 @@ Installation
 
 3. Run program
 
-	$ animecollector
+	$ animecollector.py
+
+
+Data
+====
+Your login credentials (username and password) are stored in the configuration
+file: $HOME/.animecollector/ac.cfg
 
 
 Porting

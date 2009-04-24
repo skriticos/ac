@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Fri Apr 24 00:47:51 2009 -->
+<!--Generated with glade3 3.4.5 on Fri Apr 24 22:22:56 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="main_window">
     <property name="title" translatable="yes">AnimeCollector</property>
@@ -289,7 +289,7 @@
             <child>
               <widget class="GtkLabel" id="label4">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Droped</property>
+                <property name="label" translatable="yes">Dropped</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
@@ -1077,17 +1077,15 @@ Andre Peiffer (Necrotex) &lt;ich@necrotex.de&gt;</property>
                         <property name="n_rows">2</property>
                         <property name="n_columns">2</property>
                         <child>
-                          <widget class="GtkLabel" id="label7">
+                          <widget class="GtkEntry" id="entry_malpasswd">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Username: </property>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="label8">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Password:</property>
+                            <property name="can_focus">True</property>
+                            <property name="visibility">False</property>
+                            <signal name="changed" handler="on_malpass_edit"/>
                           </widget>
                           <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
                           </packing>
@@ -1104,18 +1102,20 @@ Andre Peiffer (Necrotex) &lt;ich@necrotex.de&gt;</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkEntry" id="entry_malpasswd">
+                          <widget class="GtkLabel" id="label8">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="visibility">False</property>
-                            <signal name="changed" handler="on_malpass_edit"/>
+                            <property name="label" translatable="yes">Password:</property>
                           </widget>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
                           </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="label7">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Username: </property>
+                          </widget>
                         </child>
                       </widget>
                     </child>
