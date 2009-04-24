@@ -16,9 +16,16 @@ defined in the gtkctl class constructor:
  - WIDGETS: pointer to the widgets wrapper.
 """
 
-import os, gtk, gtk.glade, gobject, webbrowser, datetime
+import os, gtk, gtk.glade, gobject, webbrowser, datetime, time
 import globs, data
 
+def sb_push(msg):
+	WIDGETS['bottom_statusbar'].push(-1, msg)
+
+def sb_clear():
+	time.sleep(5)
+	WIDGETS['bottom_statusbar'].pop(-1)
+	return False
 
 class glade_handlers(object):
 	"""
@@ -35,9 +42,22 @@ class glade_handlers(object):
 	def on_button_mal_clicked(event):
 		webbroweser.open('http://myanimelist.net', 2)
 	def on_button_sync_clicked(event):
-		# Syncronize with mal server when sync button is pressed
-		MODCTL.anime_data.sync()
-		MODCTL.update_form_db_all()
+		sb_push('Syncing with MyAnnimeList server..')
+		gtk.main_iteration()
+		if MODCTL.anime_data.sync():
+			MODCTL.update_form_db_all()
+			WIDGETS['bottom_statusbar'].pop(-1)
+			sb_push('Syncing done..')
+		else:
+			WIDGETS['bottom_statusbar'].pop(-1)
+			sb_push('Sync failed..')
+		gobject.timeout_add(5000, sb_clear)
+	def on_playbar_toggled(event):
+		if not INIT:
+			if WIDGETS['statusbar_now_playing'].flags() & gtk.VISIBLE:
+				WIDGETS['statusbar_now_playing'].hide()
+			else:
+				WIDGETS['statusbar_now_playing'].show()
 	def on_about(event):
 		WIDGETS['aboutdialog'].show_all()
 	def on_about_close(widget, event):
@@ -312,8 +332,6 @@ class list_treeview(gtk.TreeView):
 
 		If entry is in the completed table and the ep count is lowered, it is
 		pushed in the watching table.
-
-		Note: I'm not exactly contet with it's looks, but it works.
 		"""
 		
 		# Prepare data set
@@ -406,7 +424,6 @@ class guictl(object):
 
 		# Hook to make the conrol module reachable from all over the
 		# file, especially from the autoconnect handlers.
-		# Hey, it's still less ugly than loading it on import!
 		global MODCTL
 		MODCTL = self
 
@@ -415,9 +432,7 @@ class guictl(object):
 		self.anime_data = anime_data
 
 		# Initialize base widgets from XML and connect signal handlers
-		# Hook no. 2 to make the widgets wrapper content reachable from all over
-		# the file. This is the last ugly global, I promise. 
-		# Especially since it wraps the wiget wrapper to a global varable.
+		# Set widget hook
 		global WIDGETS
 		WIDGETS = widget_wrapper()
 
@@ -449,6 +464,8 @@ class guictl(object):
 				gtk.main_quit())
 		if not cfg.getboolean('startup', 'tracker'):
 			WIDGETS['statusbar_now_playing'].hide()
+		else:
+			WIDGETS['menuitem_playbar'].set_active(True)
 
 		INIT = False
 		
