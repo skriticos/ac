@@ -257,6 +257,7 @@ class list_treeview(gtk.TreeView):
 			
 			# Extract series title
 			name = anime['series_title']
+			name = name.replace('&apos;', '\'')
 			
 			# Extract episodes/max and construct display string
 			if anime['series_episodes']:
