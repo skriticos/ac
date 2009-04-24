@@ -106,7 +106,13 @@ class anime_data(object):
 			else:
 				# initialize local data, as it was empty before 
 				self.db = remote_db
+				db_handle = open(ac_data_path, 'wb')
+				cPickle.dump(self.db, db_handle)
+				db_handle.close()
 				return (self.db, {})
+		else:
+			print 'Login failed..'
+			return False
 
 
 def _login(username, password):

@@ -19,7 +19,7 @@ Then it runs the main routine.
 from os import path, mkdir
 from AnimeCollector.globs import ac_user_path
 #from AnimeCollector import gtkmain
-from AnimeCollector.config import ac_config
+import AnimeCollector.config
 from AnimeCollector.myanimelist import anime_data
 
 from AnimeCollector import gtkctl
@@ -38,10 +38,12 @@ if not path.isdir(ac_user_path):
 ## IMPORT PLUGIN MODULE
 # - todo
 	
-config = ac_config()
-mal_anime_data = anime_data(config.mal['username'], config.mal['password'])
+cfg = AnimeCollector.config.ac_config()
+username = cfg.get('mal', 'username')
+password = cfg.get('mal', 'password')
+mal_anime_data = anime_data(username, password)
 
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)
-gui = gtkctl.guictl(config, mal_anime_data)
+gui = gtkctl.guictl(cfg, mal_anime_data)
 

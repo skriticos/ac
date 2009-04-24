@@ -47,8 +47,35 @@ class glade_handlers(object):
 		WIDGETS['preferences'].show_all()
 	def on_prefs_close(widget=None, event=None):
 		WIDGETS['preferences'].hide_all()
+
+		new_name = WIDGETS['entry_maluser'].get_text()
+		new_pw = WIDGETS['entry_malpasswd'].get_text()
+		new_path = WIDGETS['entry_searchdir'].get_text()
+
+		MODCTL.cfg.set('mal', 'username', new_name)
+		MODCTL.cfg.set('mal', 'password', new_pw)
+		MODCTL.cfg.set('search_dir', 'dir1', new_path)
+		MODCTL.cfg.write_file()
+		MODCTL.anime_data.username = new_name
+		MODCTL.anime_data.password = new_pw
+
 		return True
 
+	def sync_on_start_toggled(event):
+		if not INIT:
+			old = MODCTL.cfg.getboolean('startup', 'sync')
+			new = not old
+			MODCTL.cfg.set('startup', 'sync', new )
+			WIDGETS['sync_on_start'].set_active(new)
+			MODCTL.cfg.write_file()
+	def tracker_on_start_toggled(event):
+		if not INIT:
+			old = MODCTL.cfg.getboolean('startup', 'tracker')
+			new = not old
+			MODCTL.cfg.set('startup', 'tracker', new )
+			WIDGETS['playtracker_on_start'].set_active(new)
+			MODCTL.cfg.write_file()
+			
 class widget_wrapper(object):
 	"""
 	Load and set up the glade user interface and connect the signal hanlers.
@@ -364,7 +391,7 @@ class guictl(object):
 	GUI will pop up in the middle of your screen (if all goes well).
 	"""
 
-	def __init__(self, config, anime_data):
+	def __init__(self, cfg, anime_data):
 		"""
 		Load interface and enter main loop.
 
@@ -374,6 +401,9 @@ class guictl(object):
 		- anime_data: reference to myanimelist.anime_data instance
 		"""
 
+		global INIT
+		INIT = True
+
 		# Hook to make the conrol module reachable from all over the
 		# file, especially from the autoconnect handlers.
 		# Hey, it's still less ugly than loading it on import!
@@ -381,7 +411,7 @@ class guictl(object):
 		MODCTL = self
 
 		# Store the references to the config and data instances
-		self.config = config
+		self.cfg = cfg
 		self.anime_data = anime_data
 
 		# Initialize base widgets from XML and connect signal handlers
@@ -398,15 +428,30 @@ class guictl(object):
 			self.tv[tab_id] = tv
 			WIDGETS['scrolledwindow_' + name].add(tv)
 
+		# Check if we need to sync, and sync
+		if cfg.getboolean('startup', 'sync'):
+			anime_data.sync()
 		self.update_form_db_all()
+
+		# Set preferences dialog from config
+		WIDGETS['entry_maluser'].set_text(cfg.get('mal','username'))
+		WIDGETS['entry_malpasswd'].set_text(cfg.get('mal','password'))
+		WIDGETS['sync_on_start'].set_active(
+				cfg.getboolean('startup', 'sync'))
+		WIDGETS['playtracker_on_start'].set_active(
+				cfg.getboolean('startup','tracker'))
+		WIDGETS['entry_searchdir'].set_text(cfg.get('search_dir', 'dir1'))
 
 		## Show main window, connect the quit signal handler and hide the
 		# now_playing statusbar
 		WIDGETS['main_window'].show_all()
 		WIDGETS['main_window'].connect('delete_event', lambda e,w:
 				gtk.main_quit())
-		WIDGETS['statusbar_now_playing'].hide()
+		if not cfg.getboolean('startup', 'tracker'):
+			WIDGETS['statusbar_now_playing'].hide()
 
+		INIT = False
+		
 		# Run main loop
 		gtk.main()
 
