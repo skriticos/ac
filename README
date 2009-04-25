@@ -1,6 +1,6 @@
 
 ======================================================
-README -- last update: Sun, 12 Apr 2009 19:04:51 +0200
+README -- last update: Sat, 25 Apr 2009 21:33:11 +0200
 ======================================================
 
 Introduction
@@ -11,20 +11,20 @@ MyAnimeList syncronizing desktop application written in python.
 It uses the GTK+ interface library for the general user interface.
 
 
-The target features are:
+Core target features
+====================
 
-- Optional automatic player tracker which tracks the files you are playing and
-  updates your local anime database
-- Optional automatic file renamer, which renames the files you are playing and
-  puts them in your anime directory
 - MyAnimeList server syncronization with your local database of your anime list
 - Display and editing of your anime entries via the graphical user interface
+- Automatic player tracker which tracks the files you are playing and
+  updates your local anime database.
 
 
-Development principles:
+Design targets
+==============
 
-- Clean, modular and maintainable source code
-- Portable source code
+- Clean, modular and maintainable
+- Portable code
 
 
 Installation
@@ -55,8 +55,9 @@ Installation
 
 Data
 ====
-Your login credentials (username and password) are stored in the configuration
-file: $HOME/.animecollector/ac.cfg
+
+Your login credentials (username and password) are stored (unscrabled)
+in the configuration file: $HOME/.animecollector/ac.cfg
 
 
 Porting
@@ -99,6 +100,11 @@ syncronization) should work fine with no adjustment.
 
 Summary: a MacOS X / UNIX port sholud be quite easy. Windows is on a medium
          porting difficulty level.
+
+We may switch to wx in the future, the identifing of the played files is the
+only major issue, but on most platforms it can be implemented interfacing with
+the system tools or addon progams. Linux and Mac would be fine with lsof,
+windows would need the handle application mentioned before.
 
 		
 Dependencies
