@@ -17,6 +17,8 @@ class ac_config(ConfigParser.ConfigParser):
 
 		ConfigParser.ConfigParser.__init__(self)
 
+		self.ac_sections = ['mal', 'startup', 'search_dir']
+
 		# Check if there is a config file already, cerate one if note
 		if not os.path.isfile(globs.ac_config_path):
 			self.add_section('mal')
@@ -33,6 +35,15 @@ class ac_config(ConfigParser.ConfigParser):
 		else:
 			# Read config file if availible
 			self.read(globs.ac_config_path)
+			loaded_sections = self.sections()
+			loaded_sections.sort()
+			schema_sections = self.ac_sections
+			schema_sections.sort()
+			if loaded_sections != schema_sections:
+				os.remove(globs.ac_config_path)
+				print 'Invalid config found, resetting..'
+				print 'Please start the application again.'
+				os._exit(1)
 
 	def write_file(self):
 		""" Write config file """
