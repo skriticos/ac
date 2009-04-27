@@ -1,7 +1,13 @@
-
+# =========================================================================== #
+# Name:    myanimelist.py
+# Purpose: Provide an interface to anime data; syncronize with the MyAnimeList
+#          server; save and load data to file.
+#
 # Copyright (c) 2008 Gareth Latty
 # Copyright (c) 2009 Sebastian Bartos
-# See COPYING for details
+#
+# License: GPL v3, see COPYING file for details
+# =========================================================================== #
 
 from cookielib import LWPCookieJar
 import cPickle
