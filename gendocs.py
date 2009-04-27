@@ -15,7 +15,7 @@ from os import path, system, mkdir
 
 basedir = path.abspath(path.dirname(__file__))
 srcdir = path.join(basedir, 'src')
-docdir = path.join(basedir, 'doc')
+docdir = path.join(basedir, 'doc', 'api')
 moduledir = path.join(basedir, 'src', 'AnimeCollector')
 
 if not path.isdir(docdir):

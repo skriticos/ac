@@ -1,0 +1,138 @@
+
+========================
+Animecollector Core data
+========================
+
+XXX: Somebody please check the grammar.
+
+Intro
+=====
+One of the keys to create a maintainable and extendable system is to get your
+core data structures right. This means separating logic from data and providing
+clean interfaces.
+
+In AnimeCollector the data modules are managed in the data source modules,
+currently the myanimelist module.
+
+The core class of this module is the data module, called anime_data. It stores
+the data in the db class variable. This class also has a few logic methods to
+connect the funtionality that is created in module functions. This makes it
+quite clear what the individial parts are doing and how it is glued together.
+
+The anime_data class is the interface to the following functionality:
+
+ - Fetch and syncronize data from the myanimelist server
+ - Save and load data to/from disk (this is trivial, just pickling and 
+   unpickling)
+ - Be a reference pointer to the actual anime data with the db variable
+
+Data schematics
+===============
+The core data is based on the XML data we get from the MyAnimeList server. As
+adressing XML data is quite cumbersome, the module maps it to a python diretory.
+The key of this data is the ASCII encoded name of the individual anime and a
+subdict containing the individual attributes that are converted according to the
+data schema in the data.py module.
+
+To make it more understandable, let's see an example data extract of what comes
+in and what goes out.
+
+The data the MyAnimeList server provides looks like this:
+
+...
+<anime>
+	<series_animedb_id>1887</series_animedb_id>
+	<series_title>Lucky ☆ Star</series_title>
+	<series_synonyms>Lucky Star; Raki ☆ Suta</series_synonyms>
+	<series_type>1</series_type>
+	<series_episodes>24</series_episodes>
+	<series_status>2</series_status>
+	<series_start>2007-04-09</series_start>
+	<series_end>2007-09-17</series_end>
+	<series_image>
+		http://cdn.myanimelist.net/images/anime/2/4781.jpg</series_image>
+	<my_id>12345</my_id>
+	<my_watched_episodes>10</my_watched_episodes>
+	<my_start_date>2009-03-25</my_start_date>
+	<my_finish_date>0000-00-00</my_finish_date>
+	<my_score>0</my_score>
+	<my_status>1</my_status>
+	<my_rewatching>0</my_rewatching>
+	<my_rewatching_ep>0</my_rewatching_ep>
+	<my_last_updated>1240436998</my_last_updated>
+	<my_tags/>
+</anime>
+...
+
+Now the fetch routine interprets this according to the data schema and puts out
+this:
+
+{ 'Lucky \xe2\x98\x86 Star': {
+		u'my_id': 12345,
+		u'my_last_updated': datetime.datetime(2009, 3, 26...),
+		u'my_rewatching': 0,
+		u'my_rewatching_ep': 0,
+		u'my_score': 0,
+		u'my_start_date': datetime.date(2009, 3, 25),
+		u'my_status': 1,
+		u'my_watched_episodes': 10,
+		u'series_animedb_id': 1887,
+		u'series_end': datetime.date(2007, 9, 17),
+		u'series_episodes': 24,
+		u'series_image':
+		u'http://cdn.myanimelist.net/images/anime/2/4781.jpg',
+		u'series_start': datetime.date(2007, 4, 9),
+		u'series_status': 2,
+		u'series_synonyms':
+		u'Lucky Star; Raki \u2606 Suta',
+		u'series_title': u'Lucky \u2606 Star',
+		u'series_type': 1}
+		}
+
+So this is one entry in the dictionary. Every anime is another one of this
+(another key/value pair in the anime_data.db variable. Now what are the
+interesitng points? First you can see, that the main key is ascii encoded, and
+different from the series_title field.
+
+This was done, because if a real data base interface will be created, it will
+probably frown uppon non-ASCII keys (shelve does that at least). This was
+basically done to keep options. Using the series_animedb_id as key was deemed
+unpractical for debugging and clarity purposes.
+
+You can also say that the my_start_date key was converted to datetime.date
+format while the my_finish_date was ignored, as it is 0. If new enries come in
+the future on the XML side, they will also apear in the conveter automatically,
+though it will map them as strings unless the schema is extended.
+
+Passing data chunks
+===================
+The application passes a subset of the keys at times between functions. Same as
+the above, just a subset of the keys used.
+
+There are also instances where a further nesting is done to the data, notably in
+the GUI module where data prepared to be passed to the TreeViews. The keys are
+the my_status identifiers here and the whole schematic looks like this:
+
+nested = { 1: {'Lucky ..': { .. }, ..}, 2: ..}
+
+Adressing works like  nested[1]  which gives the unnested data set described
+above.
+
+Referencing data
+================
+This is quite straight forward. The application initializes an instance of
+anmie_data on startup and then passes along a reference pointer to it. So
+adressing a specific data set works like: anime_data_ref.db['keyname']
+In the GUI module this is MODCTL.anime_data.db, so accessing all attributes of
+the the above data set would be MODCTL.anime_data.db['Lucky \xe2\x98\x86 Star'] 
+and accessing a singe one wolub be
+MODCTL.anime_data.db['Lucky \xe2\x98\x86 Star']['my_watched_episods'], which
+would give 10 in this case.
+
+Pushing data
+============
+Last a note on pushing data to the server. It is done through the wesite anime
+edit form. The push function gets a dict like described above and constructs a
+form submit request for every entry, then sends it.
+
+
