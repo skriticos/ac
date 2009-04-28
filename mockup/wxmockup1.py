@@ -57,9 +57,9 @@ class TestListCtrlPanel(wx.Panel, wx.lib.mixins.listctrl.ColumnSorterMixin):
 	def PopulateList(self):
 		# schema: <row no.>: (<name>, <episodes>, <status>, <score>, <progress>)
 		self.list.InsertColumn(0, "Title")
-		self.list.InsertColumn(1, "Episodes")
-		self.list.InsertColumn(2, "Status")
-		self.list.InsertColumn(3, "Score")
+		self.list.InsertColumn(1, "Episodes", wx.LIST_FORMAT_CENTER)
+		self.list.InsertColumn(2, "Status", wx.LIST_FORMAT_CENTER)
+		self.list.InsertColumn(3, "Score", wx.LIST_FORMAT_CENTER)
 		self.list.InsertColumn(4, "Progress")
 	
 		index = 1
@@ -71,10 +71,10 @@ class TestListCtrlPanel(wx.Panel, wx.lib.mixins.listctrl.ColumnSorterMixin):
 			self.list.SetStringItem(index, 4, 'not there yet')
 			self.list.SetItemData(index, key)
 
-		self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-		self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+		self.list.SetColumnWidth(0, 350)#wx.LIST_AUTOSIZE)
+		self.list.SetColumnWidth(1, 100)#wx.LIST_AUTOSIZE)
 		self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
-		self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
+		self.list.SetColumnWidth(3, 75)#wx.LIST_AUTOSIZE)
 		self.list.SetColumnWidth(4, wx.LIST_AUTOSIZE)
 	
 	def GetListCtrl(self):
