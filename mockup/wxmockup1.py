@@ -10,7 +10,7 @@
 # License: GPL v3, see COPYING file for details
 # =========================================================================== #
  
-import wx, sys
+import wx, sys, platform
 import wx.lib.mixins.listctrl
 
 # Some sample data
@@ -202,7 +202,10 @@ class TestApp(wx.App):
 	def OnInit(self):
 		frame = TestFrame(None, -1, "AnimeCollector")
 		self.SetTopWindow(frame)
-		statusBar= FixedStatusBar(frame)
+		if platform.system() == 'Linux':
+			statusBar = FixedStatusBar(frame)
+		else:
+			statusBar = wx.StatusBar(frame)
 		statusBar.SetStatusText("status text..")
 		frame.SetStatusBar(statusBar)
 		frame.Show(True)

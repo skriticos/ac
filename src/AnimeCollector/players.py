@@ -1,53 +1,79 @@
-import os, subprocess
+# =========================================================================== #
+# Name:    players.py
+# Purpose: detect played files given a set of players and serch paths
+#
+# Copyright (c) 2009 Sebastian Bartos
+#
+# Attribution: 'Wile' (nick) contributed to the code for usage with the 
+#                            project license
+#
+# License: GPL v3, see COPYING file for details
+# =========================================================================== #
 
-def get_playing(players, search_dirs):
-	""" Search for currently played files
+import os, lsof, platform
 
-	Parameters:
-		players: 		list of players to search for
-		search_dirs: 	list of directories to be considered for opened files
+## A list if lowercase filename extensions without the leading dot. If it is 
+## empty, all types are accepted.
+wanted_extensions = []
 
-	Returns:
-		Dictionary of played files with players.
-		Example: {'/home/foo': 'mplayer', '/home/bar': 'totem'}
+def filter_paths(prefixes, files):
+	"""Filter list of files.
 
-	Example:
-		files = get_playing(['mplayer', 'totem'], ['/home/foo', '/home/bar'])
+	PARAMETERS
+	==========
+	prefixes --  a list of paths that need not end in slash. If it is empty,
+		         all prefixes are allowed.
 
-	Notes:
-		This module relies on the Linux/*nix command line utitities: ps and ls.
-		It uses procfs to search for opened file descriptors.
+	Returns the items in files that match.
+	
+	Currently checks if prefix and files exist in the file system. Should
+	probably be done by whoever calls us.
 	"""
+	
+	result = []
+
+	for f in files:
+		for p in prefixes:
+			if f[:len(p)] == p and os.path.isdir(p):
+				found_p = True
+				break
+		else:
+			found_p = not prefixes
+
+		root, e = os.path.splitext(f)
+		if e.lstrip('.').lower() in wanted_extensions:
+			found_e = True
+		else:
+			found_e = not wanted_extensions
+
+		if found_p and found_e and os.path.isfile(f):
+			result.append(f)
+			
+	return result
+
+def get_playing_linmac(players, search_dirs):
+	""" This implementation relies on the lsof.OpenFileList interface. """
 
 	played_files = {}
 
-	for player in players:
+	# Hard-code one here!
+	fs = lsof.OpenFileList()
 
-		# Search for player process
-		ps_cmd = ['ps', 'h', '-C', player, '-o', 'pid']
-		rp1 = subprocess.Popen(ps_cmd, stdout=subprocess.PIPE)
-		raw_play_pids = rp1.stdout.readlines()
-		rp1.wait()
-		playing_pids = list()
-		for pid in raw_play_pids:
-			playing_pids.append(pid.strip())
+	# Retrieve files by player.
+	lists = fs.by_process(*players)
 
-		# Search for opened media files
-		if playing_pids:
-			for pid in playing_pids:
-				ls_cmd = ['ls', '-l', '/proc/'+pid+'/fd']
-				rp2 = subprocess.Popen(ls_cmd, stdout=subprocess.PIPE)
-				raw_file_listing = rp2.stdout.readlines()
-				rp2.wait()
-				file_listing = list()
-				for line in raw_file_listing:
-					file_listing.append(line.strip())
-				for file in file_listing:
-					for dir in search_dirs:
-						file = file.split(' -> ',1)[-1].rstrip()
-						if file[:len(dir)] == dir and \
-								os.path.isfile(file) and \
-								os.path.isdir(file[:len(dir)+1]):
-							played_files[file] = player
+	for index, files in enumerate(lists):
+		for f in filter_paths(search_dirs, files):
+			played_files[f] = players[index]
+			
 	return played_files
+
+# Check if playtracker supports the current platoform, and call the appropriate
+# tracker or, print a note if it does not.
+this_platform = platform.system()
+if this_platform == 'Linux' or this_platform == 'darwin':
+	get_playing = globals()['get_playing_linmac']
+else:
+	print 'Playtracking on your platform %s is currently not supported, sorry.'\
+		% this_platform
 
