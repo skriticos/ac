@@ -1,4 +1,3 @@
-
 # Copyright (c) 2008 Gareth Latty
 # Copyright (c) 2009 Sebastian Bartos
 # See COPYING for details
@@ -44,7 +43,7 @@ class glade_handlers(object):
 	def on_button_ac_clicked(event):
 		webbrowser.open('http://myanimelist.net/clubs.php?cid=10642', 2)
 	def on_button_mal_clicked(event):
-		webbroweser.open('http://myanimelist.net', 2)
+		webbrowser.open('http://myanimelist.net', 2)
 	def on_button_sync_clicked(event):
 		sb_push('Syncing with MyAnnimeList server..')
 		gtk.main_iteration()
