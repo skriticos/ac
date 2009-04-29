@@ -1,0 +1,90 @@
+==============
+On how we code
+==============
+
+:author: Sebastian Bartos (skriticos) <seth.kriticos@googlemail.com>
+:update: Thu, 30 Apr 2009 01:40:53 +0200
+:revision: 1
+
+A brief guideline on what you should consider while writing code for the 
+project.
+
+First the obvious: try to write clean, readable, self explaining and
+modular (isolated) code with clean interfaces and logic/data separation. Don't
+use cryptic variable names and document the purpose and usage of your code in 
+module, class and function headers. Write some short comments on various 
+sections on your code detailing what it does. Try not to write overly clever 
+code, keep maintainability in mind.
+
+Get familiar with the code-base
+===============================
+You don't have to know every detail, but it is a good idea to know what modules
+there are and roughly what they are supposed to do. Especially where data comes
+from and where it is going to, and how it is accessed/manipulated.
+
+Clear data interfaces
+=====================
+Data and references to data are passed with constructors and function/method
+parameters. It is important to make the tracking of data transparent my clear
+interfaces, so please don't just access data through some other ways, like
+directly accessing data/config files outside of the modules that are responsible
+for this (e.g. the myanimelist module for anime list data and config module for
+configuration file). Basically try to access data through the runtime data
+reference dict.
+
+Separate data and functionality
+===============================
+If you write a peace of code that stores data and provides manipulation routines
+for it, then please separate them. Best is if you create a module core class, 
+that declares the data, some initialization for it, and provides simple 
+wrapper logic for the actual working functions that get the data through clean 
+interfaces (parameter passing). Greatly improves readability. The myanimelist
+module is a nice example. This module also features separate, outside of class
+functions to do the actual logic, which makes it easier to test the module and
+enables us to omit a zillion self keywords (like self.foo = bar -> foo = bar;
+foo gets obvious through the clean data interface).
+
+Keep your code short
+====================
+Don't be clever, but don't be too verbose either. After you wrote your prototype
+code and confirmed that it worked, review the internal structure and do some
+optimizations in terms of cutting unnecessary/redundant code, grouping things
+that belong together, separating things that don't. Review data interface 
+clarity. There is no recipe for this one, just use some common developer sense.
+
+On variable and class names
+===========================
+We don't have very strict rules for naming variables, but please try to keep
+them short and expressive. You are free to choose between capitalized naming
+MyVariable and non-capitalized naming my_variable. One rule is absolute though:
+if someone starts to use some crap like hungarian notation (encode type into
+name) or similar schemes, then I will personally take away his/her commit rights
+and deny I ever knew him/her.
+
+Write test cases
+================
+We all hate them, I know, but they are great to debug code and also serve as
+good references on how to use a specific peace of code. We don't use automated
+test suits and other fancy testing schemes, but some simple testcode here and
+there, especially for the non-trivial data modules can be a blessing at times
+of tracking and fixing bugs.
+
+Commit - Pull - Push often
+==========================
+We use git because it encourages micro forks and merges. Nothing is more 
+frustrating than writing a peace of code for days and weeks and then realize 
+that the head revision already changed so much that you have to rewrite half of 
+your code. Keep coding modularized (work on one module a time), maybe in a
+separate branch and pull often from the server so you keep merge conflicts to
+a minimum. Get familiar with git, it's a great tool. Also keep the team updated
+on what you are working on, so we don't work on the same thing simultaneously.
+
+Keep in touch with the team
+===========================
+While working on the code, visit the IRC channel and let the team know what you
+are working on, so we can coordinate development. Also don't hesitate to discuss
+coding and design specific issues.
+
+
+So that's it for the time being, happy coding! So say we all..
+
