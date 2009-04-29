@@ -417,7 +417,7 @@ class guictl(object):
 	GUI will pop up in the middle of your screen (if all goes well).
 	"""
 
-	def __init__(self, cfg, anime_data):
+	def __init__(self, rundat):
 		"""
 		Load interface and enter main loop.
 
@@ -436,8 +436,8 @@ class guictl(object):
 		MODCTL = self
 
 		# Store the references to the config and data instances
-		self.cfg = cfg
-		self.anime_data = anime_data
+		self.cfg = rundat['config']
+		self.anime_data = rundat['anime_data']
 
 		# Initialize base widgets from XML and connect signal handlers
 		# Set widget hook
@@ -452,25 +452,32 @@ class guictl(object):
 			WIDGETS['scrolledwindow_' + name].add(tv)
 
 		# Check if we need to sync, and sync
-		if cfg.getboolean('startup', 'sync'):
+		if self.cfg.getboolean('startup', 'sync'):
 			anime_data.sync()
 		self.update_form_db_all()
 
 		# Set preferences dialog from config
-		WIDGETS['entry_maluser'].set_text(cfg.get('mal','username'))
-		WIDGETS['entry_malpasswd'].set_text(cfg.get('mal','password'))
+		WIDGETS['entry_maluser'].set_text(self.cfg.get('mal','username'))
+		WIDGETS['entry_malpasswd'].set_text(self.cfg.get('mal','password'))
+		
 		WIDGETS['sync_on_start'].set_active(
-				cfg.getboolean('startup', 'sync'))
-		WIDGETS['playtracker_on_start'].set_active(
-				cfg.getboolean('startup','tracker'))
-		WIDGETS['entry_searchdir'].set_text(cfg.get('search_dir', 'dir1'))
+				self.cfg.getboolean('startup', 'sync'))
+		
+		if rundat['cmdopts'].values.tracker:
+			WIDGETS['playtracker_on_start'].set_active(True)
+		else:
+			WIDGETS['playtracker_on_start'].set_active(
+					self.cfg.getboolean('startup','tracker'))
+
+		WIDGETS['entry_searchdir'].set_text(self.cfg.get('search_dir', 'dir1'))
 
 		## Show main window, connect the quit signal handler and hide the
 		# now_playing statusbar
 		WIDGETS['main_window'].show_all()
 		WIDGETS['main_window'].connect('delete_event', lambda e,w:
 				gtk.main_quit())
-		if not cfg.getboolean('startup', 'tracker'):
+		if not self.cfg.getboolean('startup', 'tracker') and \
+				not	rundat['cmdopts'].values.tracker:
 			WIDGETS['statusbar_now_playing'].hide()
 		else:
 			WIDGETS['menuitem_playbar'].set_active(True)

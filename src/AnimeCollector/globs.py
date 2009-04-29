@@ -11,6 +11,9 @@ painless as possible we put them in one place. Here.
 
 from os import path
 
+# Current version string
+ac_version = '9.1.3-beta'
+
 # Path to the user directory of animecollector (where data, config and plugins
 # are stored).
 ac_user_path = path.join(path.expanduser('~'), '.animecollector')

@@ -1,49 +1,54 @@
 #!/usr/bin/env python
-
-# Copyright (c) 2008-2009 Sebastian Bartos.
+# =========================================================================== #
+# Name:    animecollector.py
+# Purpose: AnimeCollecor application starup script
+#          Will be installed as executable by the setup script
+#          Loads configuration and runs main routine.
+#
+# Copyright (c) 2009 Sebastian Bartos
 # Copyright (c) 2009 Andre 'Necrotex' Peiffer
-# See COPYING for details.
+#
+# License: GPL v3, see COPYING file for details
+# =========================================================================== #
 
-""" animecollector -- actual application executable
+import os, sys
+import AnimeCollector.cmdoptions, \
+		AnimeCollector.globs, \
+		AnimeCollector.config, \
+		AnimeCollector.myanimelist, \
+		AnimeCollector.gtkctl
 
-Will be installed in your PATH directory. It checks for first run stuff 
-(like if there is already a user directory) and sets up things that are missing.
-
-Loads configuration if existent.
-
-Checks if plugins are enabled and loads them.
-
-Then it runs the main routine.
-"""
-
-from os import path, mkdir
-from AnimeCollector.globs import ac_user_path
-#from AnimeCollector import gtkmain
-import AnimeCollector.config
-from AnimeCollector.myanimelist import anime_data
-
-from AnimeCollector import gtkctl
-
+# Unified runtime data dict -- contains all runtime instance references
+rundat = {}
 
 ## FIRST RUN STUFF
 
 # Check for AnimeCollector home path existence
 # Create it if not existient
-if not path.isdir(ac_user_path):
-	mkdir(ac_user_path)
+if not os.path.isdir(AnimeCollector.globs.ac_user_path):
+	os.mkdir(AnimeCollector.globs.ac_user_path)
 
-## IMPORT CONFIG MODULE (READ CONFIGURATION)
-# - todo
+
+# Run command line option parser
+rundat['cmdopts'] = AnimeCollector.cmdoptions.AcOptParse(sys.argv) 
 
 ## IMPORT PLUGIN MODULE
 # - todo
-	
-cfg = AnimeCollector.config.ac_config()
-username = cfg.get('mal', 'username')
-password = cfg.get('mal', 'password')
-mal_anime_data = anime_data(username, password)
+
+# Run configuration parser
+rundat['config'] = AnimeCollector.config.ac_config()
+
+# Run anime data module
+username = rundat['config'].get('mal', 'username')
+password = rundat['config'].get('mal', 'password')
+rundat['anime_data'] = AnimeCollector.myanimelist.anime_data(username, password)
 
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)
-gui = gtkctl.guictl(cfg, mal_anime_data)
+if rundat['cmdopts'].values.gui:
+	gui = AnimeCollector.gtkctl.guictl(rundat)
+else:
+	print 'no-gui option set'
+
+print 'Shutting down, bye bye..'
 

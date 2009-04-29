@@ -27,7 +27,7 @@ os.environ['PYTHONPATH'] = moduledir
 
 modules = \
 		['gtkctl', 'myanimelist', 'config', 'data', 'players', 'recognizinig',
-		'globs']
+		'globs', 'cmdoptions']
 
 for module in modules:
 	os.system('pydoc -w ' + path.join(moduledir, module + '.py'))
