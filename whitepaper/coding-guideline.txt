@@ -25,12 +25,20 @@ from and where it is going to, and how it is accessed/manipulated.
 Clear data interfaces
 =====================
 Data and references to data are passed with constructors and function/method
-parameters. It is important to make the tracking of data transparent my clear
+parameters. It is important to make the tracking of data transparent by clear
 interfaces, so please don't just access data through some other ways, like
 directly accessing data/config files outside of the modules that are responsible
 for this (e.g. the myanimelist module for anime list data and config module for
 configuration file). Basically try to access data through the runtime data
 reference dict.
+
+Explicit is better than implicit
+================================
+This, a core Python principle, means you shouldn’t do too much coding magic. 
+Magic shouldn’t happen unless there’s a really good reason for it. Magic is 
+worth using only if it creates a huge convenience unattainable in other ways, 
+and it isn’t implemented in a way that confuses developers who are trying to 
+learn how to use the feature.
 
 Separate data and functionality
 ===============================
