@@ -10,7 +10,7 @@
 # =========================================================================== #
 
 from cookielib import LWPCookieJar
-import cPickle
+import cPickle, os, time
 from datetime import date, datetime
 from os import path
 from urllib import urlencode
@@ -22,7 +22,7 @@ from socket import setdefaulttimeout
 from xml.dom.minidom import parseString
 
 from data import mal_data_schema
-from globs import ac_data_path
+from globs import ac_data_path, ac_log_path
 
 class anime_data(object):
 	"""
@@ -98,6 +98,7 @@ class anime_data(object):
 				# already initialized
 				(remote_updates, local_updates, deleted_entry_keys) = \
 					_filter_sync_changes(remote_db, self.db)
+				_logchanges(remote_updates, local_updates, deleted_entry_keys)
 				_push_list(local_updates)
 
 				# update local anime list with changes
@@ -119,6 +120,21 @@ class anime_data(object):
 		else:
 			print 'Login failed..'
 			return False
+
+def _logchanges(remote, local, deleted):
+	""" Writes changes to logfile.
+	"""
+	f = open(ac_log_path, 'a')
+	now = str(int(time.mktime(datetime.now().timetuple())))
+	for key, value in remote.items():
+		f.write(now + ': Fetching "' + key + 
+				'" episode ' + str(value['my_watched_episodes']) + '\n')
+	for key, value in local.items():
+		f.write(now + ': Pushing "' + key + 
+				'" episode ' + str(value['my_watched_episodes']) + '\n')
+	for entry in deleted:
+		f.write(now + ': Deleted "' + entry + '"\n')
+	f.close()
 
 
 def _login(username, password):

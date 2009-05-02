@@ -21,6 +21,9 @@ ac_user_path = path.join(path.expanduser('~'), '.animecollector')
 # Path to the configuration file
 ac_config_path = path.join(ac_user_path, 'ac.cfg')
 
+# Path to log file
+ac_log_path = path.join(ac_user_path, 'ac.log')
+
 # Path to data file
 ac_data_path = path.join(ac_user_path, 'ac.dat')
 
