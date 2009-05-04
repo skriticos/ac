@@ -452,7 +452,7 @@ class guictl(object):
 
 		# Check if we need to sync, and sync
 		if self.cfg.getboolean('startup', 'sync'):
-			anime_data.sync()
+			self.anime_data.sync()
 		self.update_form_db_all()
 
 		# Set preferences dialog from config
