@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='AnimeCollector',
-      version='9.1-unstable',
+      version='9.1.4-beta',
       description='Open source GUI MAL Updater',
       author='AnimeCollector group - see AUTHORS file',
       url='http://myanimelist.net/clubs.php?cid=10642',
