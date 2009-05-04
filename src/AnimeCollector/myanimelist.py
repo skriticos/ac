@@ -1,3 +1,15 @@
+# =========================================================================== #
+# Name:    myanimelist.py
+# Purpose: Provide an interface to anime data; syncronize with the MyAnimeList
+#          server;
+#
+# Copyright (c) 2008 Gareth Latty
+# Copyright (c) 2009 Sebastian Bartos
+# Copyright (c) 2009 Daniel Anderson - dankles/evilsage4
+#
+# License: GPL v3, see COPYING file for details
+# =========================================================================== #
+
 import urllib
 import urllib2
 from cookielib import LWPCookieJar
