@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='AniChou',
-      version='9.1.4-beta',
+      version='9.1.5-beta',
       description='Open anime/manga updater',
       author='AniChou group - see AUTHORS file',
       url='http://myanimelist.net/clubs.php?cid=10642',
