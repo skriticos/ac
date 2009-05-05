@@ -24,7 +24,7 @@ You know that the test was successful if
    The summary will also tell you which entries you have to look for.
 
 If you had a local data file already, then it will be renamed to
-~/.animecollector.dat.bak. You'll have to restore it manually.
+~/.anichou.dat.bak. You'll have to restore it manually.
 
 Editoral note (you can skip this)
 =================================
@@ -70,7 +70,7 @@ password = 'me too!'
 import os, sys
 mbasepath = os.path.split(os.path.abspath(__file__))[0]
 mbasepath2 = os.path.split(mbasepath)[0]
-envpath = os.path.join(mbasepath2, 'src', 'AnimeCollector')
+envpath = os.path.join(mbasepath2, 'src', 'AniChou')
 sys.path.append(envpath)
 
 from myanimelist import \
@@ -243,8 +243,8 @@ def stage5(username, password):
 	print '----------------'
 	
 	# move existing data file to backup (you will have to manually restore it
-	db_path = path.join(path.expanduser("~"), ".animecollector.dat")
-	db_path_bak = path.join(path.expanduser("~"), ".animecollector.dat.bak")
+	db_path = path.join(path.expanduser("~"), ".anichou.dat")
+	db_path_bak = path.join(path.expanduser("~"), ".anichou.dat.bak")
 	if path.isfile(db_path):
 		rename(db_path, db_path_bak)
 

@@ -2,14 +2,14 @@
 
 from distutils.core import setup
 
-setup(name='AnimeCollector',
+setup(name='AniChou',
       version='9.1.4-beta',
-      description='Open source GUI MAL Updater',
-      author='AnimeCollector group - see AUTHORS file',
+      description='Open anime/manga updater',
+      author='AniChou group - see AUTHORS file',
       url='http://myanimelist.net/clubs.php?cid=10642',
-      packages=['AnimeCollector'],
-      package_dir={'AnimeCollector': 'src/AnimeCollector'},
-      package_data={'AnimeCollector': ['data/*']},
-      scripts=['src/animecollector.py']
+      packages=['AniChou'],
+      package_dir={'AniChou': 'src/AniChou'},
+      package_data={'AniChou': ['data/*']},
+      scripts=['src/anichou.py']
       )
 

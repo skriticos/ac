@@ -11,7 +11,7 @@ One of the keys to create a maintainable and extendable system is to get your
 core data structures right. This means separating logic from data and providing
 clean interfaces.
 
-In AnimeCollector the data modules are managed in the data source modules,
+In AniChou the data modules are managed in the data source modules,
 currently the myanimelist module.
 
 The core class of this module is the data module, called anime_data. It stores

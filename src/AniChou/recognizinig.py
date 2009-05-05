@@ -9,7 +9,6 @@ import cPickle
 import difflib
 from os import path
 
-# AnimeCollector 
 from globs import ac_data_path
 
 class engine:

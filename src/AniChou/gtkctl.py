@@ -3,7 +3,7 @@
 # See COPYING for details
 
 """
-This module contains the GTK+ GUI subsystem of AnimeCollector. It sets up the
+This module contains the GTK+ GUI subsystem of AniChou. It sets up the
 user interface and enters the main event loop.
 
 MODULE GLOBALS

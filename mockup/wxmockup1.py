@@ -130,7 +130,7 @@ class TestFrame(wx.Frame):
 		menu_file_export.SetBitmap(wx.Bitmap('export.png'))
 		menu_file.AppendItem(menu_file_export)
 		menu_file_quit = wx.MenuItem(
-				menu_file, wx.ID_ANY, '&Quit\tCtrl+Q', 'Quit AnimeCollector..')
+				menu_file, wx.ID_ANY, '&Quit\tCtrl+Q', 'Quit AniChou..')
 		menu_file_quit.SetBitmap(wx.Bitmap('quit.png'))
 		menu_file.AppendItem(menu_file_quit)
 		
@@ -157,7 +157,7 @@ class TestFrame(wx.Frame):
 		menu_net.AppendItem(menu_net_mal)
 		menu_net_ac = wx.MenuItem(
 				menu_net,
-				wx.ID_ANY, '&AnimeCollector', 'Open club site..')
+				wx.ID_ANY, '&AniChou', 'Open club site..')
 		menu_net_ac.SetBitmap(wx.Bitmap('ac.png'))
 		menu_net.AppendItem(menu_net_ac)
 		
@@ -200,7 +200,7 @@ class TestFrame(wx.Frame):
  
 class TestApp(wx.App):
 	def OnInit(self):
-		frame = TestFrame(None, -1, "AnimeCollector")
+		frame = TestFrame(None, -1, "AniChou")
 		self.SetTopWindow(frame)
 		if platform.system() == 'Linux':
 			statusBar = FixedStatusBar(frame)

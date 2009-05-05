@@ -223,7 +223,7 @@ def _login(username, password):
     login_base_url = 'http://myanimelist.net/login.php'
 
     headers = {
-        'User-Agent': 'animecollector',
+        'User-Agent': 'anichou',
         'Content-Type': 'application/x-www-form-urlencoded'}
 
     login_data = urllib.urlencode({
@@ -313,7 +313,7 @@ def _push_list(local_updates):
     """
 
     headers = {
-        'User-Agent': 'animecollector',
+        'User-Agent': 'anichou',
         'Content-Type': 'application/x-www-form-urlencoded'}
 
     for anime in local_updates.values():

@@ -10,7 +10,7 @@
 import optparse, sys, globs
 
 class AcOptParse(optparse.OptionParser):
-	""" Anime collector option parser class 
+	""" AniChou option parser class 
 
 	Run application with -h flag to get an overview of options.
 	"""

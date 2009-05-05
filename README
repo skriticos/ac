@@ -6,7 +6,7 @@ README -- last update: Sat, 25 Apr 2009 21:33:11 +0200
 Introduction
 ============
 
-AnimeCollector is a lightwight, open source anime player tracking and 
+AniChou is a lightwight, open source anime player tracking and 
 MyAnimeList syncronizing desktop application written in python.
 It uses the GTK+ interface library for the general user interface.
 
@@ -50,20 +50,20 @@ Installation
 
 3. Run program
 
-	$ animecollector.py
+	$ anichou.py
 
 
 Data
 ====
 
 Your login credentials (username and password) are stored (unscrabled)
-in the configuration file: $HOME/.animecollector/ac.cfg
+in the configuration file: $HOME/.anichou/ac.cfg
 
 
 Porting
 =======
 
-AnimeCollector is developed on Linux with GTK and will work on this kind of 
+AniChou is developed on Linux with GTK and will work on this kind of 
 systems out of the box. It would be nice to make it work this way on other 
 systems too.
 

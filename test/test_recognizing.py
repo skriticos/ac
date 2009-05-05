@@ -39,7 +39,7 @@ import difflib
 # taken from test_mal.py
 mbasepath = os.path.split(os.path.abspath(__file__))[0]
 mbasepath2 = os.path.split(mbasepath)[0]
-envpath = os.path.join(mbasepath2, 'src', 'AnimeCollector')
+envpath = os.path.join(mbasepath2, 'src', 'AniChou')
 sys.path.append(envpath)
 
 from recognizinig import engine

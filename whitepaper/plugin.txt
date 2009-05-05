@@ -1,6 +1,6 @@
 
 =========================================
-AnimeCollector plug-in system white-paper
+AniChou plug-in system white-paper
 =========================================
 
 :author: Sebastian Bartos (skriticos) <seth.kriticos@googlemail.com>
@@ -10,7 +10,7 @@ AnimeCollector plug-in system white-paper
 Introduction
 ============
 
-This paper describes the plug-in system planned for AnimeCollector MyAnimeList
+This paper describes the plug-in system planned for AniChou MyAnimeList
 synchronization application. As the application is going to be a no-frills thing
 with simple GTK+ GUI, config, tracker and sync module, we will provide the
 plug-in interface to add additional functionality through a clear plug-in API.
@@ -26,8 +26,8 @@ to easily create launchers (desktop icons for instance) that load plug-ins.
 
 The syntax for this is:
 
-animecollector --load-plugin=<plugin-name1> --load-plugin=<plugin-name2> ..  or 
-animecollector -p <plugin-name1> -p <plugin-name2> ..
+anichou --load-plugin=<plugin-name1> --load-plugin=<plugin-name2> ..  or 
+anichou -p <plugin-name1> -p <plugin-name2> ..
 
 
 Plug-in from configuration
@@ -52,12 +52,12 @@ file.
 Plug-in search path
 ===================
 
-First the application searches for plug-ins in the AnimeCollector python package
+First the application searches for plug-ins in the AniChou python package
 directory ( On Linux this will be something like:
-   /usr/lib/python/site-packages/AnimeCollector/plugin/<plugin-name>
+   /usr/lib/python/site-packages/AniChou/plugin/<plugin-name>
 
 If it does not find it there, it starts looking for plug-ins in the user plug-in 
-directory (most likely this: ~/.animecollector/plugin/<plugin-name>)
+directory (most likely this: ~/.anichou/plugin/<plugin-name>)
 
 
 Security
@@ -85,7 +85,7 @@ on-data: after the data/myanimelist module is loaded
 on-gui: when the general user interface is loaded (inside of the main loop)
 on-quit: when the program is shutting down
 
-Plug-in loading routine is located in the animecollector main script file.
+Plug-in loading routine is located in the anichou main script file.
 
 
 Plug-in API
