@@ -12,7 +12,7 @@ painless as possible we put them in one place. Here.
 from os import path
 
 # Current version string
-ac_version = '9.1.3-beta'
+ac_version = '9.1.4-beta'
 
 # Path to the user directory of anichou (where data, config and plugins
 # are stored).
@@ -25,7 +25,7 @@ ac_config_path = path.join(ac_user_path, 'ac.cfg')
 ac_log_path = path.join(ac_user_path, 'ac.log')
 
 # Path to data file
-ac_data_path = path.join(ac_user_path, 'ac.dat')
+ac_data_path = path.join(ac_user_path, 'anichou.db')
 
 # Plugin path
 ac_plugin_path = path.join(ac_user_path, 'plugins')
