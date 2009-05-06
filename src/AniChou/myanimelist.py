@@ -132,8 +132,10 @@ def _getAnimeList(username):
     fetch_url = fetch_base_url + '?' + fetch_request_data
 
     # read the server xml file and do preliminary spacer sanitation for parsing
-    fetch_response = urllib2.urlopen(fetch_url).read()
-    fetch_response = fetch_response.replace('\n', '').replace('\t', '')
+    fetch_response = \
+          unicode(urllib2.urlopen(fetch_url).read(), 'utf-8', 'replace')
+    fetch_response = fetch_response.strip()
+    # fetch_response = fetch_response.replace(u'\n', '').replace(u'\t', '')
     # phrase data and extract anime entry nodes
     xmldata = parseString(fetch_response)
     anime_nodes = xmldata.getElementsByTagName('anime')
