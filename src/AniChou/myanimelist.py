@@ -14,7 +14,8 @@ import urllib
 import urllib2
 from cookielib import LWPCookieJar
 import socket
-from xml.dom.minidom import parseString
+import BeautifulSoup
+import urlparse
 from datetime import date, datetime
 import os, time
 
@@ -118,54 +119,67 @@ class anime_data(object):
             
             return self.db    
 
+def _appInfoURL(user, status = 'all', typ = None):
+    """
+    Safely generate a URL to get XML.
+    
+    Type may be 'manga'.
+    """
+    # Example taken from the site.
+    template = 'http://myanimelist.net/malappinfo.php?u=Wile&status=all&type=manga'
+    # Make tuple mutable.
+    parts = list(urlparse.urlparse(template))
+    # New parameters.
+    query = {'u': user}
+    if status:
+        query['status'] = status
+    if typ:
+        query['type'] = typ
+    # urlencode would literally output 'None'.
+    parts[4] = urllib.urlencode(query)
+    return urlparse.urlunparse(parts)
+
 def _getAnimeList(username):
     """
-    Retrive Anime XML from MyAnimeList server.
+    Retrieve Anime XML from MyAnimeList server.
     
-    return: dictionary object
+    Returns: dictionary object.
     """
-
-    fetch_base_url = 'http://myanimelist.net/malappinfo.php'
-    fetch_request_data = urllib.urlencode({
-        'status': 'all',
-        'u': username})
-    fetch_url = fetch_base_url + '?' + fetch_request_data
-
-    # read the server xml file and do preliminary spacer sanitation for parsing
-    fetch_response = \
-          unicode(urllib2.urlopen(fetch_url).read(), 'utf-8', 'replace')
-    fetch_response = fetch_response.strip()
-    # phrase data and extract anime entry nodes
-    xmldata = parseString(fetch_response)
-    anime_nodes = xmldata.getElementsByTagName('anime')
-
-    # walk through all the anime nodes and convert the data to a python
-    # dictionary
+    fetch_url = _appInfoURL(username)
+    fetch_response = urllib2.urlopen(fetch_url)
+    # fetch_response = file('/Users/towb/Desktop/Pending/MAL Updaters/crono22.xml')
+    # BS understand file-like objects and takes care of encodings and junk.
+    xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
+    # For unknown reasons it doesn't work without recursive.
+    # Nor does iterating over myanimelist.anime. BS documentation broken?
+    anime_nodes = xmldata.myanimelist.findAll('anime', recursive = True)
+    # Walk through all the anime nodes and convert the data to a python
+    # dictionary.
     ac_remote_anime_dict = dict()
     for anime in anime_nodes:
         ac_node = dict()
-        for node in anime.childNodes:
-            # tags and empty nodes are excluded for the time being
-            if not node.childNodes or node.nodeName == u'my_tags':
-                node.unlink()
-            else:
+        for node, typ in mal_data_schema.iteritems():
+            try:
+                # Abuse strip() to turn NavigableString into unicode().
+                # Otherwise the recursive parse tree crashes cPickle.
+                value = getattr(anime, node).string.strip()
+            except AttributeError:
+                continue
+            if typ is datetime:
                 # process my_last_updated unix timestamp
-                if mal_data_schema[node.nodeName] is datetime:
-                    ac_node[node.nodeName] = \
-                        datetime.fromtimestamp(int(node.firstChild.nodeValue))
+                ac_node[node] = datetime.fromtimestamp(int(value))
+            elif typ is int:
                 # process integer slots
-                elif mal_data_schema[node.nodeName] is int:
-                    ac_node[node.nodeName] = int(node.firstChild.nodeValue)
+                ac_node[node] = int(value)
+            elif typ is date and value != '0000-00-00':
                 # proces date slots
-                elif mal_data_schema[node.nodeName] is date:
-                    if node.firstChild.nodeValue != '0000-00-00':
-                        (y,m,d) = node.firstChild.nodeValue.split('-')
-                        (y,m,d) = int(y), int(m), int(d)
-                        if y and m and d:
-                            ac_node[node.nodeName] = date(y,m,d)
+                (y,m,d) = value.split('-')
+                (y,m,d) = int(y), int(m), int(d)
+                if y and m and d:
+                    ac_node[node] = date(y,m,d)
+            else:
                 # process string slots
-                else:
-                    ac_node[node.nodeName] = node.firstChild.nodeValue
+                ac_node[node] = value
 
         # series titles are used as anime identifiers
         # the keys for the resulting dictionary are encoded to ASCII, so they
@@ -353,4 +367,3 @@ def _push_list(local_updates):
                 print 'Error code: ', e.code
             return False
     return True
-        
