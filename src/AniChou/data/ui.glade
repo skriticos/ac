@@ -1021,7 +1021,10 @@ Public License instead of this License.  But first, please read
     <property name="authors">Gareth Latty &lt;info@lattyware.co.uk&gt;
 Sebastian Bartos (skriticos) &lt;seth.kriticos@googlemail.com&gt;
 Andre Peiffer (Necrotex) &lt;ich@necrotex.de&gt;</property>
-    <property name="logo">ac.ico</property>
+    <property name="logo">logoGlass.png</property>
+    <signal name="close" handler="on_about_close"/>
+    <signal name="delete_event" handler="on_about_close"/>
+    <signal name="response" handler="on_about_close"/>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -1050,6 +1053,7 @@ Andre Peiffer (Necrotex) &lt;ich@necrotex.de&gt;</property>
     <property name="icon">ac.ico</property>
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
+    <signal name="delete_event" handler="on_prefs_close"/>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
         <property name="visible">True</property>
