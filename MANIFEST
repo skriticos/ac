@@ -1,6 +1,7 @@
 README
 AUTHORS
 COPYING
+NEWS
 gendocs.py
 clean.sh
 setup.py
