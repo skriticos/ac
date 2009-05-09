@@ -107,18 +107,18 @@ class anime_data(object):
         
     def fetch(self):
         """
+        UNUSED
         Only fetch anime data from MyAnimeList server (overwrites local data,
         if existent). Useful for initializing and resetting local database.
 
         Returns a copy of the fetched database on success, None on failure.
         """
-        if _login(self.username, self.password):
-            self.db = _getAnimeList(self.username)
-            
-            # write to local DB
-            self.local_db.set_db(self.db)
-            
-            return self.db    
+        self.db = _getAnimeList(self.username)
+
+        # write to local DB
+        self.local_db.set_db(self.db)
+
+        return self.db
 
 def _appInfoURL(user, status = 'all', typ = None):
     """
