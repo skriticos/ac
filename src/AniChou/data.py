@@ -11,7 +11,7 @@ communication with the server.
 
 from datetime import date, datetime
 
-## Schema of the xml data the MyAnimeList server sends
+## ANIME schema of the xml data the MyAnimeList server sends
 mal_anime_data_schema = {
 	'series_animedb_id': int,
 	'series_title': unicode,
