@@ -15,8 +15,8 @@ import os, sys
 import AniChou.cmdoptions, \
 		AniChou.globs, \
 		AniChou.config, \
-		AniChou.myanimelist, \
-		AniChou.gtkctl
+		AniChou.myanimelist
+		
 
 # Unified runtime data dict -- contains all runtime instance references
 rundat = {}
@@ -46,7 +46,9 @@ rundat['anime_data'] = AniChou.myanimelist.anime_data(username, password)
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)
 if rundat['cmdopts'].values.gui:
-	gui = AniChou.gtkctl.guictl(rundat)
+    ## ONLY RUN GUI IF CLI OPTION NOT SET ##
+    import AniChou.gtkctl
+    gui = AniChou.gtkctl.guictl(rundat)
 else:
 	print 'no-gui option set'
 
