@@ -12,7 +12,7 @@ painless as possible we put them in one place. Here.
 from os import path
 
 # Current version string
-ac_version = '9.1.3-beta'
+ac_version = '9.1.6-beta'
 
 # Path to the user directory of anichou (where data, config and plugins
 # are stored).

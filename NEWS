@@ -1,0 +1,7 @@
+NEWS
+====
+
+9.1.6-beta:
+   + Fixed preferences / about dialogue controls that broke with the renaming
+   + First phase of XML sanitaion, list parsing should break less now
+   + Added command line parameter parser
