@@ -84,7 +84,7 @@ class anime_data(object):
 
                 # update local anime list with changes
                 for key in deleted_entry_keys:
-                    del self.db[deleted_entry_keys]
+                    del self.db[key]
                 for key, value in remote_updates.items():
                     self.db[key] = value
                 

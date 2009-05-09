@@ -15,14 +15,20 @@ defined in the gtkctl class constructor:
  - WIDGETS: pointer to the widgets wrapper.
 """
 
-import os, gtk, gtk.glade, gobject, webbrowser, datetime, time
+import os, gtk, gtk.glade, gobject, webbrowser, datetime
 import globs, data, players, recognizinig
 
 def sb_push(msg):
 	WIDGETS['bottom_statusbar'].push(-1, msg)
 
 def sb_clear():
-	time.sleep(5)
+	"""
+	Clear the status bar.
+	
+	This is a callback for glib.timeout_add which is executed until it returns
+	False, the first time after the interval specified.
+	"""
+	# Not necessary to sleep here, in fact that would lock up the GUI.
 	WIDGETS['bottom_statusbar'].pop(-1)
 	try:
 		WIDGETS['bottom_statusbar'].pop(-1)
@@ -48,12 +54,13 @@ class glade_handlers(object):
 		sb_push('Syncing with MyAnimeList server..')
 		gtk.main_iteration()
 		if MODCTL.anime_data.sync():
-			MODCTL.update_form_db_all()
+			MODCTL.update_from_db_all()
 			WIDGETS['bottom_statusbar'].pop(-1)
 			sb_push('Syncing done..')
 		else:
 			WIDGETS['bottom_statusbar'].pop(-1)
 			sb_push('Sync failed..')
+		# Clear the status bar in five seconds.
 		gobject.timeout_add(5000, sb_clear)
 	def on_playbar_toggled(event):
 		if not INIT:
@@ -453,7 +460,7 @@ class guictl(object):
 		# Check if we need to sync, and sync
 		if self.cfg.getboolean('startup', 'sync'):
 			self.anime_data.sync()
-		self.update_form_db_all()
+		self.update_from_db_all()
 
 		# Set preferences dialog from config
 		WIDGETS['entry_maluser'].set_text(self.cfg.get('mal','username'))
@@ -530,18 +537,31 @@ class guictl(object):
 		return True
 
 
-	def update_form_db_all(self):
-		""" Update all anime tables views form database.
+	def update_from_db_all(self):
+		""" Update all anime tables views from database.
 
 		This is used on initialization and after syncronization.
 		"""
 
+        # We copy (references to) data from anime_data.db into
+        # list_treeview.tb and from there into liststore.
+        # Might be better to give anime_data a facade to act
+        # as TreeModel.
+
+		# Remove old data
+		for tab in self.tv.values():
+			tab.data = {}
+
+        # Just changing self.tv[].data is not enough, as after deletion on
+        # the site a sync will remove keys from anime_data.db and we have
+        # to mirror that.
+
 		# Separate anime data according to their status
 		for key, value in self.anime_data.db.items():
 			status = value['my_status']
+			
 			self.tv[status].data[key] = value
 		
 		# Populate tree views
 		for tab in self.tv.values():
 			tab.repopulate()
-
