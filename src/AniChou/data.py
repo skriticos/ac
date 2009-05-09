@@ -12,7 +12,7 @@ communication with the server.
 from datetime import date, datetime
 
 ## Schema of the xml data the MyAnimeList server sends
-mal_data_schema = {
+mal_anime_data_schema = {
 	'series_animedb_id': int,
 	'series_title': unicode,
 	'series_synonyms': unicode,
@@ -83,6 +83,30 @@ mal_data_schema = {
 ##                      u'series_synonyms': u'Macross F',
 ##                      u'series_title': u'Macross Frontier',
 ##                      u'series_type': 1}}
+
+## MANGA schema of the xml data the MyAnimeList server sends
+mal_manga_data_schema = {
+	'series_mangadb_id': int,
+	'series_title': unicode,
+	'series_synonyms': unicode,
+	'series_type': int,
+	'series_chapters': int,
+    'series_volumes': int,
+	'series_status': int,
+	'series_start': date,
+	'series_end': date,
+	'series_image': unicode,
+	'my_id': int,
+	'my_read_chapters': int,   # push argument
+    'my_read_volumes': int,   # push argument
+	'my_start_date': date,
+	'my_finish_date': date,
+	'my_score': int,   # push argument
+	'my_status': int,   # push argument
+	'my_rereadingg': int,
+	'my_rereading_chap': int,
+	'my_last_updated': datetime}   # sync variable
+
 
 
 ## These are the status code mappings the mal server is sending in the XML file

@@ -20,7 +20,7 @@ import urlparse
 from datetime import date, datetime
 import os, time
 
-from data import mal_data_schema
+from data import mal_anime_data_schema, mal_manga_data_schema
 from database import db as local_database
 from globs import ac_log_path, ac_data_path
 
@@ -33,7 +33,7 @@ class anime_data(object):
     password: login password
     db_path: path to database
     db: local anime database that is a nested dict and has ASCII-fied series
-        titles as keys and and fields form mal_data_schema as dict data.
+        titles as keys and and fields form mal_anime_data_schema as dict data.
     """
 
     def __init__(self, username='', password='',initsync=False):
@@ -173,7 +173,7 @@ def _getAnimeList(username):
     ac_remote_anime_dict = dict()
     for anime in anime_nodes:
         ac_node = dict()
-        for node, typ in mal_data_schema.iteritems():
+        for node, typ in mal_anime_data_schema.iteritems():
             try:
                 value = getattr(anime, node).string
                 # This also turns NavigableString into unicode().
@@ -206,28 +206,78 @@ def _getAnimeList(username):
         ac_remote_anime_dict[key] = ac_node
 
     # the resulting dict is like this:
-    # {<ASCII-fied key from title>: {<mal_data_schema-fields>: <values>}, ...}
+    # {<ASCII-fied key from title>: {<mal_anime_data_schema-fields>: <values>}, ...}
     return ac_remote_anime_dict
 
 def _getMangaList(username):
     """
-    UN-USED 
-    Retrive Manga XML from MyAnimeList server.
-    
-    return: Raw XML
+    UNUSED
+    Retrieve Manga XML from MyAnimeList server.
+
+    Returns: dictionary object.
+
+    Ways in which the ouput of malAppInfo is *not* XML:
+
+    Declared as UTF-8 but contains illegal byte sequences (characters)
+
+    Uses entities inside CDATA, which is exactly the wrong way round.
+
+    It further disagrees with the Expat C extension behind minidom:
+
+    Contains tabs and newlines outside of tags.
     """
+    fetch_url = _appInfoURL(username,'all','manga')
+    fetch_response = urllib2.urlopen(fetch_url)
+    # BeautifulSoup could do the read() and unicode-conversion, if it
+    # weren't for the illegal characters, as it internally doesn't
+    # use 'replace'.
+    fetch_response = unicode(fetch_response.read(), 'utf-8', 'replace')
+    xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
+    # For unknown reasons it doesn't work without recursive.
+    # Nor does iterating over myanimelist.anime. BS documentation broken?
+    manga_nodes = xmldata.myanimelist.findAll('manga', recursive = True)
+    # We have to manually convert after getting them out of the CDATA.
+    entity = lambda m: BeautifulSoup.Tag.XML_ENTITIES_TO_SPECIAL_CHARS[m.group(1)]
+    # Walk through all the anime nodes and convert the data to a python
+    # dictionary.
+    ac_remote_manga_dict = dict()
+    for manga in manga_nodes:
+        ac_node = dict()
+        for node, typ in mal_manga_data_schema.iteritems():
+            try:
+                value = getattr(manga, node).string
+                # This also turns NavigableString into unicode().
+                # Otherwise the recursive parse tree crashes cPickle.
+                value = re.sub(r'&(\w+);', entity, value)
+            except AttributeError:
+                continue
+            if typ is datetime:
+                # process my_last_updated unix timestamp
+                ac_node[node] = datetime.fromtimestamp(int(value))
+            elif typ is int:
+                # process integer slots
+                ac_node[node] = int(value)
+            elif typ is date and value != '0000-00-00':
+                # proces date slots
+                (y,m,d) = value.split('-')
+                (y,m,d) = int(y), int(m), int(d)
+                if y and m and d:
+                    ac_node[node] = date(y,m,d)
+            else:
+                # process string slots
+                ac_node[node] = value
 
-    fetch_base_url = 'http://myanimelist.net/malappinfo.php'
-    fetch_request_data = urllib.urlencode({
-        'status': 'all',
-        'u': username,
-        'type': 'manga'})
-    fetch_url = fetch_base_url + '?' + fetch_request_data
+        # series titles are used as anime identifiers
+        # the keys for the resulting dictionary are encoded to ASCII, so they
+        # can be simply put into shelves
+        key = ac_node['series_title'].encode('utf-8')
 
-    # read the server xml file and do preliminary spacer sanitation for parsing
-    fetch_response = urllib2.urlopen(fetch_url).read()
-    fetch_response = fetch_response.replace('\n', '').replace('\t', '')
-    return fetch_response
+        # add node entry to the resulting nodelist
+        ac_remote_manga_dict[key] = ac_node
+
+    # the resulting dict is like this:
+    # {<ASCII-fied key from title>: {<mal_manga_data_schema-fields>: <values>}, ...}
+    return ac_remote_manga_dict
 
 def _logchanges(remote, local, deleted):
     """ Writes changes to logfile.
