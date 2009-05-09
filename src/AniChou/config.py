@@ -33,7 +33,7 @@ class ac_config(ConfigParser.ConfigParser):
 			self.write_file()
 			f.close()
 		else:
-			# Read config file if availible
+			# Read config file if available
 			self.read(globs.ac_config_path)
 			loaded_sections = self.sections()
 			loaded_sections.sort()

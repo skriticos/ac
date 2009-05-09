@@ -45,7 +45,7 @@ class glade_handlers(object):
 	def on_button_mal_clicked(event):
 		webbrowser.open('http://myanimelist.net', 2)
 	def on_button_sync_clicked(event):
-		sb_push('Syncing with MyAnnimeList server..')
+		sb_push('Syncing with MyAnimeList server..')
 		gtk.main_iteration()
 		if MODCTL.anime_data.sync():
 			MODCTL.update_form_db_all()

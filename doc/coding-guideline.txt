@@ -42,8 +42,8 @@ learn how to use the feature.
 
 Separate data and functionality
 ===============================
-If you write a peace of code that stores data and provides manipulation routines
-for it, then please separate them. Best is if you create a module core class, 
+If you write a piece of code that stores data and provides manipulation routines
+for it, then please separate those. Best is if you create a module core class, 
 that declares the data, some initialization for it, and provides simple 
 wrapper logic for the actual working functions that get the data through clean 
 interfaces (parameter passing). Greatly improves readability. The myanimelist
@@ -73,14 +73,14 @@ Write test cases
 ================
 We all hate them, I know, but they are great to debug code and also serve as
 good references on how to use a specific peace of code. We don't use automated
-test suits and other fancy testing schemes, but some simple testcode here and
+test suits and other fancy testing schemes, but some simple test-code here and
 there, especially for the non-trivial data modules can be a blessing at times
 of tracking and fixing bugs.
 
 Commit - Pull - Push often
 ==========================
 We use git because it encourages micro forks and merges. Nothing is more 
-frustrating than writing a peace of code for days and weeks and then realize 
+frustrating than writing a piece of code for days and weeks and then realize 
 that the head revision already changed so much that you have to rewrite half of 
 your code. Keep coding modularized (work on one module a time), maybe in a
 separate branch and pull often from the server so you keep merge conflicts to
@@ -94,5 +94,4 @@ are working on, so we can coordinate development. Also don't hesitate to discuss
 coding and design specific issues.
 
 
-So that's it for the time being, happy coding! So say we all..
-
+So that's it for the time being, happy coding! So say we all...

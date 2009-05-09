@@ -1,4 +1,3 @@
-
 ======================================================
 README -- last update: Sat, 25 Apr 2009 21:33:11 +0200
 ======================================================
@@ -6,15 +5,15 @@ README -- last update: Sat, 25 Apr 2009 21:33:11 +0200
 Introduction
 ============
 
-AniChou is a lightwight, open source anime player tracking and 
-MyAnimeList syncronizing desktop application written in python.
+AniChou is a lightweight, open source anime player tracking and 
+MyAnimeList synchronizing desktop application written in Python.
 It uses the GTK+ interface library for the general user interface.
 
 
 Core target features
 ====================
 
-- MyAnimeList server syncronization with your local database of your anime list
+- MyAnimeList server synchronization with your local database of your anime list
 - Display and editing of your anime entries via the graphical user interface
 - Automatic player tracker which tracks the files you are playing and
   updates your local anime database.
@@ -56,7 +55,7 @@ Installation
 Data
 ====
 
-Your login credentials (username and password) are stored (unscrabled)
+Your login credentials (username and password) are stored (unscrambled)
 in the configuration file: $HOME/.anichou/ac.cfg
 
 
@@ -67,7 +66,7 @@ AniChou is developed on Linux with GTK and will work on this kind of
 systems out of the box. It would be nice to make it work this way on other 
 systems too.
 
-Therefore it is designed in a portable way, but there are some modules wich
+Therefore it is designed in a portable way, but there are some modules which
 do system specific things you will have to port to your platform:
 
 1. The data/configuration is put in the home directory of the user. This should
@@ -75,35 +74,35 @@ do system specific things you will have to port to your platform:
    issues here and there, so you better take a look if it works.
    
 2. The playtracker (players.py) is using procfs to track currently played files.
-   This should work on all UNIXy platforms. MacOS X needs some installation 
+   This should work on all UNIXy platforms. Mac OS X needs some installation 
    effort, but as far as I know it should be not much hassle to make it work 
    there. On windows you are probably out of luck with this module. You 
-   basically have two choices there: implement a windows way or dissable the
+   basically have two choices there: implement a windows way or disable the
    tracker.
    
-   Update: was mesmetizing about this module as it is the main inhibitor for
-           instant crossplatform portability.
+   Update: was thinking hard about this module as it is the main inhibitor for
+           instant cross-platform portability.
            
            What I came up was that the mac port would have a choice to use
-           profs via FUSE and no structural code change or something like
+           procfs via FUSE and no structural code change or something like
            lsof -c <player> -F n | grep <media directory base>
            
-           For the windows folks somehing similar can be achived with the handle
-           program (needs to be externaly downloaded)
+           For the windows folks something similar can be achieved with the handle
+           program (needs to be externally downloaded)
    
 3. The system tray icon and the menu entry are GNOME specific. If you are 
-   porting to non-GNOME environments, you have to reimplement it for your 
+   porting to non-GNOME environments, you have to re-implement it for your 
    desktop environment.
 
 Most of the other things (especially the user interface and server 
-syncronization) should work fine with no adjustment.
+synchronization) should work fine with no adjustment.
 
-Summary: a MacOS X / UNIX port sholud be quite easy. Windows is on a medium
+Summary: a Mac OS X / UNIX port should be quite easy. Windows is on a medium
          porting difficulty level.
 
-We may switch to wx in the future, the identifing of the played files is the
+We may switch to wx in the future, the identifying of the played files is the
 only major issue, but on most platforms it can be implemented interfacing with
-the system tools or addon progams. Linux and Mac would be fine with lsof,
+the system tools or add-on programs. Linux and Mac would be fine with lsof,
 windows would need the handle application mentioned before.
 
 		
@@ -113,4 +112,3 @@ Dependencies
 	Python:			http://python.org/ 
 	GTK+:			http://www.gtk.org/
 	pyGTK:			http://www.pygtk.org/
-

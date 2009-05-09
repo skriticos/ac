@@ -1,9 +1,6 @@
-
 ========================
-Animecollector Core data
+AniChou Core data
 ========================
-
-XXX: Somebody please check the grammar.
 
 Intro
 =====
@@ -15,24 +12,24 @@ In AniChou the data modules are managed in the data source modules,
 currently the myanimelist module.
 
 The core class of this module is the data module, called anime_data. It stores
-the data in the db class variable. This class also has a few logic methods to
-connect the funtionality that is created in module functions. This makes it
-quite clear what the individial parts are doing and how it is glued together.
+the data in the 'db' class variable. This class also has a few logic methods to
+connect the functionality that is provided as module functions. This makes it
+quite clear what the individual parts are doing and how it is glued together.
 
 The anime_data class is the interface to the following functionality:
 
- - Fetch and syncronize data from the myanimelist server
+ - Fetch data from and synchronize it with the myanimelist server
  - Save and load data to/from disk (this is trivial, just pickling and 
    unpickling)
  - Be a reference pointer to the actual anime data with the db variable
 
-Data schematics
+Data structures
 ===============
 The core data is based on the XML data we get from the MyAnimeList server. As
-adressing XML data is quite cumbersome, the module maps it to a python diretory.
+querying XML data is quite cumbersome, the module maps it to a Python dictionary.
 The key of this data is the ASCII encoded name of the individual anime and a
 subdict containing the individual attributes that are converted according to the
-data schema in the data.py module.
+schema in the data.py module.
 
 To make it more understandable, let's see an example data extract of what comes
 in and what goes out.
@@ -89,50 +86,48 @@ this:
 		u'series_type': 1}
 		}
 
-So this is one entry in the dictionary. Every anime is another one of this
-(another key/value pair in the anime_data.db variable. Now what are the
-interesitng points? First you can see, that the main key is ascii encoded, and
+So this is one entry in the dictionary. Every anime one of these
+key/value pairs in the anime_data.db variable. Now what are the
+interesting points? First you can see, that the main key is ascii encoded, and
 different from the series_title field.
 
-This was done, because if a real data base interface will be created, it will
-probably frown uppon non-ASCII keys (shelve does that at least). This was
+This was done, because if a real database interface should be created, it will
+probably frown upon non-ASCII keys (shelve does that at least). This was
 basically done to keep options. Using the series_animedb_id as key was deemed
 unpractical for debugging and clarity purposes.
 
 You can also say that the my_start_date key was converted to datetime.date
-format while the my_finish_date was ignored, as it is 0. If new enries come in
-the future on the XML side, they will also apear in the conveter automatically,
+format while the my_finish_date was ignored, as it is 0. If new entries come in
+the future on the XML side, they will also appear in the converter automatically,
 though it will map them as strings unless the schema is extended.
 
 Passing data chunks
 ===================
-The application passes a subset of the keys at times between functions. Same as
-the above, just a subset of the keys used.
+The application at times passes a subset that dictionary between functions. Same as
+the above, but only a subset of the keys are used.
 
-There are also instances where a further nesting is done to the data, notably in
-the GUI module where data prepared to be passed to the TreeViews. The keys are
-the my_status identifiers here and the whole schematic looks like this:
+There are also instances where further nesting is done to the data, notably in
+the GUI module, for data prepared to be passed to the TreeViews. The keys there are
+the my_status identifiers, and the whole structure looks like this:
 
 nested = { 1: {'Lucky ..': { .. }, ..}, 2: ..}
 
-Adressing works like  nested[1]  which gives the unnested data set described
+Element retrieval is simply nested[1] which gives the un-nested data set described
 above.
 
 Referencing data
 ================
-This is quite straight forward. The application initializes an instance of
-anmie_data on startup and then passes along a reference pointer to it. So
-adressing a specific data set works like: anime_data_ref.db['keyname']
+This is quite straight-forward. The application initializes an instance of
+anime_data on startup and then passes along a pointer to it. So
+addressing a specific data set works like: anime_data_ref.db['keyname']
 In the GUI module this is MODCTL.anime_data.db, so accessing all attributes of
-the the above data set would be MODCTL.anime_data.db['Lucky \xe2\x98\x86 Star'] 
-and accessing a singe one wolub be
+the above data set would be MODCTL.anime_data.db['Lucky \xe2\x98\x86 Star'] 
+and accessing a singe one would be
 MODCTL.anime_data.db['Lucky \xe2\x98\x86 Star']['my_watched_episods'], which
-would give 10 in this case.
+in this case would be 10.
 
 Pushing data
 ============
-Last a note on pushing data to the server. It is done through the wesite anime
-edit form. The push function gets a dict like described above and constructs a
+Lastly a note on pushing data to the server. It is done through the website anime
+edit form. The push function gets a dict like the one described above and constructs a
 form submit request for every entry, then sends it.
-
-

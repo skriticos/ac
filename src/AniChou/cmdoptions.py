@@ -20,7 +20,7 @@ class AcOptParse(optparse.OptionParser):
 
 		optparse.OptionParser.__init__(self, version=version)
 
-		# Define availible options
+		# Define available options
 		self.add_option('-c', '--no-gui',
 				action='store_false', dest='gui', default=True, 
 				help='dissable GUI on startup')
