@@ -15,6 +15,7 @@ import urllib2
 from cookielib import LWPCookieJar
 import socket
 import BeautifulSoup
+import re
 import urlparse
 from datetime import date, datetime
 import os, time
@@ -144,15 +145,29 @@ def _getAnimeList(username):
     Retrieve Anime XML from MyAnimeList server.
     
     Returns: dictionary object.
+
+    Ways in which the ouput of malAppInfo is *not* XML:
+    
+    Declared as UTF-8 but contains illegal byte sequences (characters)
+    
+    Uses entities inside CDATA, which is exactly the wrong way round.
+    
+    It further disagrees with the Expat C extension behind minidom:
+    
+    Contains tabs and newlines outside of tags.
     """
     fetch_url = _appInfoURL(username)
     fetch_response = urllib2.urlopen(fetch_url)
-    # fetch_response = file('/Users/towb/Desktop/Pending/MAL Updaters/crono22.xml')
-    # BS understand file-like objects and takes care of encodings and junk.
+    # BeautifulSoup could do the read() and unicode-conversion, if it
+    # weren't for the illegal characters, as it internally doesn't
+    # use 'replace'.
+    fetch_response = unicode(fetch_response.read(), 'utf-8', 'replace')
     xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
     # For unknown reasons it doesn't work without recursive.
     # Nor does iterating over myanimelist.anime. BS documentation broken?
     anime_nodes = xmldata.myanimelist.findAll('anime', recursive = True)
+    # We have to manually convert after getting them out of the CDATA.
+    entity = lambda m: BeautifulSoup.Tag.XML_ENTITIES_TO_SPECIAL_CHARS[m.group(1)]
     # Walk through all the anime nodes and convert the data to a python
     # dictionary.
     ac_remote_anime_dict = dict()
@@ -160,9 +175,10 @@ def _getAnimeList(username):
         ac_node = dict()
         for node, typ in mal_data_schema.iteritems():
             try:
-                # Abuse strip() to turn NavigableString into unicode().
+                value = getattr(anime, node).string
+                # This also turns NavigableString into unicode().
                 # Otherwise the recursive parse tree crashes cPickle.
-                value = getattr(anime, node).string.strip()
+                value = re.sub(r'&(\w+);', entity, value)
             except AttributeError:
                 continue
             if typ is datetime:
