@@ -32,12 +32,13 @@ mockup/preferences.png
 mockup/ac.ico
 mockup/mal.png
 whitepaper/plugin.txt
-src/AniChou/data/
+src/AniChou/data
 src/AniChou/data/sync.ico
 src/AniChou/data/mal.ico
-src/AniChou/data/anichoubigtrans.png
+src/AniChou/data/logoGlass.png
 src/AniChou/data/ui.glade
 src/AniChou/data/anichou16.png
 src/AniChou/data/ac.ico
+src/AniChou/data/acbt.png
 src/AniChou/data/anichoubig.jpg
 
