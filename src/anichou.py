@@ -31,11 +31,8 @@ config = AniChou.config.ac_config()
 ## IMPORT PLUGIN MODULE
 # - todo
 
-# Run anime data module
-username = config.get('mal', 'username')
-password = config.get('mal', 'password')
 # The whole application uses only this single instance of anime_data.
-data = AniChou.myanimelist.anime_data(username, password)
+data = AniChou.myanimelist.anime_data(config = config)
 
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)

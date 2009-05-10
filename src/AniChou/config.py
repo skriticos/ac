@@ -23,8 +23,11 @@ def usage(prog):
       -d, --no-gui    disable GUI
       -t, --tracker   enable play-tracker
       -c <file>       use an alternative configuration file
-      -a              disable login and site updates
       -r              overwrite config with default values
+
+    Developers only:
+      -a              disable login and site updates
+      -f <file>       load XML from file instead of the server
 
     """ % prog
 
@@ -46,7 +49,7 @@ def options(prog, version, argv):
     # Also optparse doesn't keep information on which options where
     # actually given on the command line versus the hard-coded defaults.
     try:
-        opts, args = getopt.getopt(argv, "hdtc:ar", ["version", "help",
+        opts, args = getopt.getopt(argv, "hdtc:arf:", ["version", "help",
             "no-gui", "tracker", "config=", "anonymous", "reset"])
     except getopt.GetoptError, err:
         print str(err)
@@ -70,6 +73,8 @@ def options(prog, version, argv):
             given.setdefault("mal", {})["login"] = False
         elif o == "-r":
             given.setdefault(None, {})["reset"] = True
+        elif o == "-f":
+            given.setdefault("mal", {})["mirror"] = a
         else:
             assert False, "getopt knew more than if"
     return given
@@ -178,6 +183,8 @@ class ac_config(object):
         The same option given on the command line overrides the configuration
         file. If you need the real values for a preferences dialog, pass
         positional stored = True.
+        
+        When the option isn't found absolutely anywhere, raises KeyError.
         """
         # We have to hard-code defaults here because options() must be
         # faithful to the command line to allow overriding.
