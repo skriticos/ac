@@ -349,14 +349,15 @@ class list_treeview(gtk.TreeView):
 		"""
 		
 		# Prepare data set
-		oldstr = self.liststore[row][self.EPISODE]
+		oldstr = self.liststore[row][self.EPISODE].replace('-','0')
 		(old, max) = oldstr.split(' / ')
 		oldvalue = int(old)
 		maxvalue = int(max)
 		newvalue = int(value)
 		
 		# Determine if action is required
-		if newvalue != oldvalue and newvalue <= maxvalue:
+		if newvalue != oldvalue and \
+				(newvalue <= maxvalue or maxvalue == 0):
 			# Compute new common row data
 			newstr = str(newvalue) + ' / ' + str(maxvalue)
 			self.liststore[row][self.EPISODE] = newstr
