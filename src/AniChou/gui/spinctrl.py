@@ -11,36 +11,58 @@ import wx
 
 # Autohide spin control class declaration =================================== #
 class spin(wx.Window):
+	"""Autohide spin control widget class.
 
-	def __init__(self, parent, data, entry, range=10, width=50, height=25):
+	This widget is a composite of a SpinCtrl and a TextCtrl. The SpinCtrl
+	handles the data manipulation and is shown when the mouse hovers over
+	it or it gets focus. The TextCtrl just show the data when not in
+	interaction mode.
+
+	Manipulated data is set to the external reference (data) list at index
+	(index) position.
+
+	When the conrol changes data, it will add an index to the change
+	stack directory with the object id, a reference to the list and the
+	index to the changed value. This can be used by a periodic scheduler
+	to further update the database.
+	"""
+
+	def __init__(self, parent, data, index, change, range=10, s=(50, 25)):
 		"""Autohide spin control widget constructor.
 
 		@param parent: parent on which this widget should be displayed
 		@param data:   reference to the data list this widget should 
 		               interact with
-		@param entry:  entry in the list the spin should manipulate
+		@param index:  index in the list the spin should manipulate
 		               (has to be done this way to call it by reference)
+		@param change: change stack, where changes are pushed to
 		@param range:  spin max value range
-		@param width:  width of the widget
-		@param height: height of the widget
+		@param s:      size of the widget
 		"""
-		wx.Window.__init__(self, parent, -1, size = (width, height))
+		wx.Window.__init__(self, parent, -1, size = s)
 
+		# setup persistent data
 		self.data = data
-		self.entry = entry
+		self.index = index
 		self.range = range
 		self.selected = False
+		self.change_stack = change
+
+		# tell the sizers how to handle this window
+		self.SetMinSize(s)
+		self.SetMaxSize(s)
 
 		# initialize controls
 		self.spin = spin = \
-			wx.SpinCtrl(parent, -1, size = (width, height))
+			wx.SpinCtrl(parent, -1, size = s)
 		self.txtctl = txtctl = \
-			wx.TextCtrl(parent, -1, size = (width, height))
+			wx.TextCtrl(parent, -1, size = s)
 	
 		spin.SetRange(0, range)
 
 		# bind event handlers
 		self.Bind(wx.EVT_SIZE, self.on_size)
+		self.Bind(wx.EVT_MOVE, self.on_size)
 		self.txtctl.Bind(wx.EVT_ENTER_WINDOW, self.on_mouse_in)
 		self.spin.Bind(wx.EVT_LEAVE_WINDOW, self.on_mouse_out)
 		self.spin.Bind(wx.EVT_TEXT, self.on_spin)
@@ -48,8 +70,8 @@ class spin(wx.Window):
 		self.spin.Bind(wx.EVT_KILL_FOCUS, self.on_kill_focus)
 
 		# setup starting values
-		spin.SetValue(data[entry])
-		txtctl.SetValue(str(data[entry]))
+		spin.SetValue(data[index])
+		txtctl.SetValue(str(data[index]))
 
 	def on_size(self, *args):
 		"""Called when the window changes size/position.
@@ -76,11 +98,14 @@ class spin(wx.Window):
 	def on_spin(self, *args):
 		"""Value is changed.
 
-		This changes the value of the entry in the assosiated list and
+		This changes the value of the index in the associated list and
 		updates the TextCtrl content.
 		"""
-		self.data[self.entry] = self.spin.GetValue()
-		self.txtctl.SetValue(str(self.data[self.entry]))
+		val = self.spin.GetValue()
+		if val != self.data[self.index]:
+			self.data[self.index] = val
+			self.txtctl.SetValue(str(self.data[self.index]))
+			change_stack[id(self)] = [self.data, self.index]
 		self.selected = False
 	
 	def on_focus(self, *args):
@@ -98,23 +123,26 @@ class spin(wx.Window):
 if __name__ == '__main__':
 	"""Create 5 spin controls and place them besides each other.
 	"""
+	# setup data
+	data = [5, 6, 0, 0, 10]
+	change_stack = {}
+	print 'Initial data: ', data
+	
+	# setup controls
 	app = wx.PySimpleApp()
 	frame = wx.Frame(None, -1)
-	data = [5, 6, 4, 0, 10]
-	print 'Initial data: ', data
-	spin1 = spin(frame, data, 0)
-	spin2 = spin(frame, data, 1)
-	spin3 = spin(frame, data, 2)
-	spin4 = spin(frame, data, 3)
-	spin5 = spin(frame, data, 4)
+	spins = []
 	box = wx.BoxSizer(wx.HORIZONTAL)
-	box.Add(spin1)
-	box.Add(spin2)
-	box.Add(spin3)
-	box.Add(spin4)
-	box.Add(spin5)
+	for i in range(5):
+		spins.append(spin(frame, data, i, change_stack))
+		box.Add(spins[i], 0, wx.FIXED_MINSIZE)
 	frame.SetSizer(box)
 	frame.Show()
+	
+	# run app
 	app.MainLoop()
+
+	# print overall data manipulation summary
 	print 'New data: ', data
+	print 'Change stack: ', change_stack
 
