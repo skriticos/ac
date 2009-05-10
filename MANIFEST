@@ -7,7 +7,6 @@ clean.sh
 setup.py
 src/anichou.py
 src/AniChou/__init__.py
-src/AniChou/cmdoptions.py
 src/AniChou/config.py
 src/AniChou/data.py
 src/AniChou/database.py

@@ -85,7 +85,7 @@ class glade_handlers(object):
 		MODCTL.cfg.set('mal', 'username', new_name)
 		MODCTL.cfg.set('mal', 'password', new_pw)
 		MODCTL.cfg.set('search_dir', 'dir1', new_path)
-		MODCTL.cfg.write_file()
+		MODCTL.cfg.save()
 		MODCTL.anime_data.username = new_name
 		MODCTL.anime_data.password = new_pw
 
@@ -93,18 +93,18 @@ class glade_handlers(object):
 
 	def sync_on_start_toggled(event):
 		if not INIT:
-			old = MODCTL.cfg.getboolean('startup', 'sync')
+			old = MODCTL.cfg.get('startup', 'sync', True)
 			new = not old
 			MODCTL.cfg.set('startup', 'sync', new )
 			WIDGETS['sync_on_start'].set_active(new)
-			MODCTL.cfg.write_file()
+			MODCTL.cfg.save()
 	def tracker_on_start_toggled(event):
 		if not INIT:
-			old = MODCTL.cfg.getboolean('startup', 'tracker')
+			old = MODCTL.cfg.get('startup', 'tracker', True)
 			new = not old
 			MODCTL.cfg.set('startup', 'tracker', new )
 			WIDGETS['playtracker_on_start'].set_active(new)
-			MODCTL.cfg.write_file()
+			MODCTL.cfg.save()
 			
 class widget_wrapper(object):
 	"""
@@ -424,14 +424,14 @@ class guictl(object):
 	GUI will pop up in the middle of your screen (if all goes well).
 	"""
 
-	def __init__(self, rundat):
+	def __init__(self, the_data, config):
 		"""
 		Load interface and enter main loop.
 
 		ARGUMENTS
 		=========
 		- config: reference to config.ac_config instance
-		- anime_data: reference to myanimelist.anime_data instance
+		- data: reference to myanimelist.anime_data instance
 		"""
 
 		global INIT
@@ -443,8 +443,8 @@ class guictl(object):
 		MODCTL = self
 
 		# Store the references to the config and data instances
-		self.cfg = rundat['config']
-		self.anime_data = rundat['anime_data']
+		self.cfg = config
+		self.anime_data = the_data
 
 		# Initialize base widgets from XML and connect signal handlers
 		# Set widget hook
@@ -459,22 +459,19 @@ class guictl(object):
 			WIDGETS['scrolledwindow_' + name].add(tv)
 
 		# Check if we need to sync, and sync
-		if self.cfg.getboolean('startup', 'sync'):
+		if self.cfg.get('startup', 'sync'):
 			self.anime_data.sync()
 		self.update_from_db_all()
 
 		# Set preferences dialog from config
-		WIDGETS['entry_maluser'].set_text(self.cfg.get('mal','username'))
-		WIDGETS['entry_malpasswd'].set_text(self.cfg.get('mal','password'))
-		
+		WIDGETS['entry_maluser'].set_text(
+		        self.cfg.get('mal','username', True))
+		WIDGETS['entry_malpasswd'].set_text(
+		        self.cfg.get('mal','password', True))
 		WIDGETS['sync_on_start'].set_active(
-				self.cfg.getboolean('startup', 'sync'))
-		
-		if rundat['cmdopts'].values.tracker:
-			WIDGETS['playtracker_on_start'].set_active(True)
-		else:
-			WIDGETS['playtracker_on_start'].set_active(
-					self.cfg.getboolean('startup','tracker'))
+				self.cfg.get('startup', 'sync', True))
+		WIDGETS['playtracker_on_start'].set_active(
+				self.cfg.get('startup','tracker', True))
 
 		WIDGETS['entry_searchdir'].set_text(self.cfg.get('search_dir', 'dir1'))
 
@@ -483,8 +480,7 @@ class guictl(object):
 		WIDGETS['main_window'].show_all()
 		WIDGETS['main_window'].connect('delete_event', lambda e,w:
 				gtk.main_quit())
-		if not self.cfg.getboolean('startup', 'tracker') and \
-				not	rundat['cmdopts'].values.tracker:
+		if not self.cfg.get('startup', 'tracker'):
 			WIDGETS['statusbar_now_playing'].hide()
 		else:
 			WIDGETS['menuitem_playbar'].set_active(True)
