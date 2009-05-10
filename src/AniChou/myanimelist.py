@@ -14,7 +14,7 @@ import urllib
 import urllib2
 from cookielib import LWPCookieJar
 import socket
-import BeautifulSoup
+from lib.beautifulsoup import BeautifulSoup
 import re
 import urlparse
 from datetime import date, datetime
