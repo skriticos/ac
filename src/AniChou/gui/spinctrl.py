@@ -27,7 +27,7 @@ class spin(wx.Window):
 	to further update the database.
 	"""
 
-	def __init__(self, parent, data, index, change, range=10, s=(50, 25)):
+	def __init__(self, parent, data, index, change, range=10, s=(90, 25)):
 		"""Autohide spin control widget constructor.
 
 		@param parent: parent on which this widget should be displayed
@@ -40,6 +40,17 @@ class spin(wx.Window):
 		@param s:      size of the widget
 		"""
 		wx.Window.__init__(self, parent, -1, size = s)
+		
+		MAX_RANGE = 999
+
+		# check what type of spin we are, adapt if not simple
+		self.simple = True if isinstance(data[index], int) else False
+		if not self.simple:
+			(value, range) = data[index]
+		else:
+			value = data[index]
+			(w,h) = s
+			s = (int(w/1.5), h)
 
 		# setup persistent data
 		self.data = data
@@ -58,7 +69,10 @@ class spin(wx.Window):
 		self.txtctl = txtctl = \
 			wx.TextCtrl(parent, -1, size = s)
 	
-		spin.SetRange(0, range)
+		if range != 0:
+			spin.SetRange(0, range)
+		else:
+			spin.SetRange(0, MAX_RANGE)
 
 		# bind event handlers
 		self.Bind(wx.EVT_SIZE, self.on_size)
@@ -70,8 +84,12 @@ class spin(wx.Window):
 		self.spin.Bind(wx.EVT_KILL_FOCUS, self.on_kill_focus)
 
 		# setup starting values
-		spin.SetValue(data[index])
-		txtctl.SetValue(str(data[index]))
+		spin.SetValue(value)
+		if not self.simple:
+			if range == 0: range = '-'
+			txtctl.SetValue(str(value) + ' / ' + str(range))
+		else:
+			txtctl.SetValue(str(value))
 
 	def on_size(self, *args):
 		"""Called when the window changes size/position.
@@ -102,10 +120,18 @@ class spin(wx.Window):
 		updates the TextCtrl content.
 		"""
 		val = self.spin.GetValue()
-		if val != self.data[self.index]:
+		if val != self.data[self.index] and self.simple:
 			self.data[self.index] = val
 			self.txtctl.SetValue(str(self.data[self.index]))
 			change_stack[id(self)] = [self.data, self.index]
+		elif not self.simple:
+			(value, range) = self.data[self.index]
+			if val != value:
+				self.data[self.index] = (val, range)
+				if range == 0: range = '-'
+				t = str(val) + ' / ' + str(range)
+				self.txtctl.SetValue(t)
+				change_stack[id(self)] = [self.data, self.index]
 		self.selected = False
 	
 	def on_focus(self, *args):
@@ -125,24 +151,29 @@ if __name__ == '__main__':
 	"""
 	# setup data
 	data = [5, 6, 0, 0, 10]
+	data2 = [(5,50), (129,720), (0,12), (0,0), (10,0)]
 	change_stack = {}
-	print 'Initial data: ', data
+	print 'Initial data: ', data, data2
 	
 	# setup controls
 	app = wx.PySimpleApp()
 	frame = wx.Frame(None, -1)
 	spins = []
-	box = wx.BoxSizer(wx.HORIZONTAL)
+	box = wx.GridSizer(rows=2, cols=5, hgap=0, vgap=0)
 	for i in range(5):
 		spins.append(spin(frame, data, i, change_stack))
-		box.Add(spins[i], 0, wx.FIXED_MINSIZE)
+		box.Add(spins[i])
+	for i in range(5):
+		spins.append(spin(frame, data2, i, change_stack))
+		box.Add(spins[5+i])
 	frame.SetSizer(box)
+	frame.Fit()
 	frame.Show()
 	
 	# run app
 	app.MainLoop()
 
 	# print overall data manipulation summary
-	print 'New data: ', data
+	print 'New data: ', data, data2
 	print 'Change stack: ', change_stack
 
