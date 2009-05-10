@@ -172,12 +172,16 @@ def _getAnimeList(username):
     # dictionary.
     ac_remote_anime_dict = dict()
     for anime in anime_nodes:
+        # ac_node builds the output of our function. Everything added to it
+        # must either be made independent of the parse tree by calling
+        # NavigableString.extract() or, preferrably, be turned into a
+        # different type like unicode(). This is a side-effect of using
+        # non-mutators like string.strip() or re.sub().
+        # Failing to do this will crash cPickle.
         ac_node = dict()
         for node, typ in mal_anime_data_schema.iteritems():
             try:
                 value = getattr(anime, node).string
-                # This also turns NavigableString into unicode().
-                # Otherwise the recursive parse tree crashes cPickle.
                 value = re.sub(r'&(\w+);', entity, value)
             except AttributeError:
                 continue
