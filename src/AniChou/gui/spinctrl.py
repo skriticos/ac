@@ -25,6 +25,10 @@ class spin(wx.Window):
 	stack directory with the object id, a reference to the list and the
 	index to the changed value. This can be used by a periodic scheduler
 	to further update the database.
+
+	It has 2 operation modes:
+	  - simple: is used when the data feed is just a simple integer
+	  - composite: when a tupple is fed with value / max value
 	"""
 
 	def __init__(self, parent, data, index, change, range=10, s=(90, 25)):
@@ -39,8 +43,7 @@ class spin(wx.Window):
 		@param range:  spin max value range
 		@param s:      size of the widget
 		"""
-		wx.Window.__init__(self, parent, -1, size = s)
-		
+		# default constants
 		MAX_RANGE = 999
 
 		# check what type of spin we are, adapt if not simple
@@ -52,22 +55,31 @@ class spin(wx.Window):
 			(w,h) = s
 			s = (int(w/1.5), h)
 
+		# call parrent constructor
+		wx.Window.__init__(self, parent, -1, size = s)
+
 		# setup persistent data
 		self.data = data
 		self.index = index
+		self.change_stack = change
 		self.range = range
 		self.selected = False
-		self.change_stack = change
 
 		# tell the sizers how to handle this window
 		self.SetMinSize(s)
 		self.SetMaxSize(s)
 
+		# size computation for TextCtrl
+		(x, y) = s
+		s2 = (x-6, y-6)
+		
 		# initialize controls
 		self.spin = spin = \
 			wx.SpinCtrl(parent, -1, size = s)
 		self.txtctl = txtctl = \
-			wx.TextCtrl(parent, -1, size = s)
+			wx.TextCtrl(parent, -1, size = s2,
+					style = wx.TE_CENTER| wx.NO_BORDER)
+		txtctl.SetBackgroundColour(parent.GetBackgroundColour())
 	
 		if range != 0:
 			spin.SetRange(0, range)
@@ -91,14 +103,20 @@ class spin(wx.Window):
 		else:
 			txtctl.SetValue(str(value))
 
+		# some wx bug workarounds
+		self.SetBackgroundColour(self.GetBackgroundColour())
+		self.spin.Show()
+		self.spin.Hide()
+
 	def on_size(self, *args):
 		"""Called when the window changes size/position.
 
 		This event handler is called when the sizers push around the
 		window. It places the child widgets to the correct position.
 		"""
-		self.txtctl.SetPosition(self.GetPosition())
-		self.spin.SetPosition(self.GetPosition())
+		(x,y) = self.GetPosition()
+		self.txtctl.SetPosition((x+3,y+3))
+		self.spin.SetPosition((x, y))
 
 	def on_mouse_in(self, *args):
 		"""Mouse enters window area.
@@ -120,11 +138,14 @@ class spin(wx.Window):
 		updates the TextCtrl content.
 		"""
 		val = self.spin.GetValue()
+		
+		# simple mode update
 		if val != self.data[self.index] and self.simple:
 			self.data[self.index] = val
 			self.txtctl.SetValue(str(self.data[self.index]))
 			change_stack[id(self)] = [self.data, self.index]
 		elif not self.simple:
+			# composite mode update
 			(value, range) = self.data[self.index]
 			if val != value:
 				self.data[self.index] = (val, range)
@@ -149,31 +170,38 @@ class spin(wx.Window):
 if __name__ == '__main__':
 	"""Create 5 spin controls and place them besides each other.
 	"""
-	# setup data
+	## setup data
 	data = [5, 6, 0, 0, 10]
 	data2 = [(5,50), (129,720), (0,12), (0,0), (10,0)]
 	change_stack = {}
 	print 'Initial data: ', data, data2
 	
-	# setup controls
+	## setup controls
 	app = wx.PySimpleApp()
 	frame = wx.Frame(None, -1)
+	frame.SetBackgroundColour(frame.GetBackgroundColour())
+	
 	spins = []
 	box = wx.GridSizer(rows=2, cols=5, hgap=0, vgap=0)
+	
+	# simple spins
 	for i in range(5):
 		spins.append(spin(frame, data, i, change_stack))
-		box.Add(spins[i])
+		box.Add(spins[i], -1, wx.ALIGN_CENTER)
+	
+	# composite spins
 	for i in range(5):
 		spins.append(spin(frame, data2, i, change_stack))
 		box.Add(spins[5+i])
+
 	frame.SetSizer(box)
 	frame.Fit()
 	frame.Show()
 	
-	# run app
+	## run app
 	app.MainLoop()
 
-	# print overall data manipulation summary
+	## print overall data manipulation summary
 	print 'New data: ', data, data2
 	print 'Change stack: ', change_stack
 
