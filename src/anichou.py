@@ -12,14 +12,10 @@
 # =========================================================================== #
 
 import os, sys
-import AniChou.cmdoptions, \
-		AniChou.globs, \
+import AniChou.globs, \
 		AniChou.config, \
 		AniChou.myanimelist
 		
-
-# Unified runtime data dict -- contains all runtime instance references
-rundat = {}
 
 ## FIRST RUN STUFF
 
@@ -29,28 +25,22 @@ if not os.path.isdir(AniChou.globs.ac_user_path):
 	os.mkdir(AniChou.globs.ac_user_path)
 
 
-# Run command line option parser
-rundat['cmdopts'] = AniChou.cmdoptions.AcOptParse(sys.argv) 
+# Run command line option parser and configuration parser
+config = AniChou.config.ac_config()
 
 ## IMPORT PLUGIN MODULE
 # - todo
 
-# Run configuration parser
-rundat['config'] = AniChou.config.ac_config()
-
-# Run anime data module
-username = rundat['config'].get('mal', 'username')
-password = rundat['config'].get('mal', 'password')
-rundat['anime_data'] = AniChou.myanimelist.anime_data(username, password)
+# The whole application uses only this single instance of anime_data.
+data = AniChou.myanimelist.anime_data(config = config)
 
 ## RUN THE APPLICATION
 # gtkmain.main(config, mal_anime_data)
-if rundat['cmdopts'].values.gui:
+if config.get('startup', 'gui'):
     ## ONLY RUN GUI IF CLI OPTION NOT SET ##
     import AniChou.gtkctl
-    gui = AniChou.gtkctl.guictl(rundat)
+    gui = AniChou.gtkctl.guictl(data, config)
 else:
 	print 'no-gui option set'
 
 print 'Shutting down, bye bye..'
-

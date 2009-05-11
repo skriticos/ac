@@ -20,7 +20,7 @@ import urlparse
 from datetime import date, datetime
 import os, time
 
-from data import mal_anime_data_schema, mal_manga_data_schema
+from data import mal_anime_data_schema
 from database import db as local_database
 from globs import ac_log_path, ac_data_path
 
@@ -36,19 +36,37 @@ class anime_data(object):
         titles as keys and and fields form mal_anime_data_schema as dict data.
     """
 
-    def __init__(self, username='', password='',initsync=False):
+    def __init__(self, **kw):
         """
         Setup credentials, read local data and setup network connection
         environment. Optionally sync with MAL on startup.
-        """
         
+        Does not take positional arguments. Keyword arguments can either be
+        given individually (username, password, initsync) or as an
+        ac_config() instance. This will not be retained.
+        
+        In the latter form we support some additional command line options.
+        """
+        # When the architecture stabilizes, switch to config as the sole
+        # positional argument, and retain it instead of copying parts.
+        # That would also enable reconfiguration at runtime.
+        self.username = kw.get('username', kw['config'].get('mal', 'username'))
+        self.password = kw.get('password', kw['config'].get('mal', 'password'))
+        initsync      = kw.get('initsync', kw['config'].get('startup', 'sync'))
+        try:
+            self.login = kw['config'].get('mal', 'login')
+        except KeyError:
+            # We need a default even if arguments were given individually.
+            self.login = True
+        try:
+            self.mirror = kw['config'].get('mal', 'mirror')
+        except KeyError:
+            self.mirror = None
+            
         # pull the local DB as a dictionary object
         #self.db = {}
         self.local_db = local_database()
         self.db = self.local_db.get_db()
-        
-        self.username = username
-        self.password = password
         
         # setup cookie handler
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(LWPCookieJar()))
@@ -72,38 +90,43 @@ class anime_data(object):
         nested dict of remote updates with ASCII-fied series titles as
         keys and a list of keys that got deleted on the MyAnimeList server.
         """
-        if _login(self.username,self.password):
-            remoteAnime_db = _getAnimeList(self.username)
-            if self.db:
-                # If local DB is already initialized then filter changes 
-                # and push local updates
-                (remote_updates, local_updates, deleted_entry_keys) = \
-                    _filter_sync_changes(remoteAnime_db, self.db)
-                _logchanges(remote_updates, local_updates, deleted_entry_keys)
-                _push_list(local_updates)
+        # Three way switch: login (un)successfull or don't even try.
+        login = _login(self.username,self.password) if self.login else None
 
-                # update local anime list with changes
-                for key in deleted_entry_keys:
-                    del self.db[key]
-                for key, value in remote_updates.items():
-                    self.db[key] = value
-                
-                # write to local DB
-                self.local_db.set_db(self.db)
-                
-                return (remote_updates, deleted_entry_keys)
-            else:
-                # initialize local data, as it was empty before 
-                self.db = remoteAnime_db
-                
-                # write to local DB
-                self.local_db.set_db(self.db)
-                
-                return (self.db, {})
-        else:
+        if login is False:
             print 'Login failed..'
             return False
- 
+
+        remoteAnime_db = _getAnimeList(self.username, self.mirror)
+        if self.db:
+            # If local DB is already initialized then filter changes 
+            # and push local updates
+            (remote_updates, local_updates, deleted_entry_keys) = \
+                _filter_sync_changes(remoteAnime_db, self.db)
+            _logchanges(remote_updates, local_updates, deleted_entry_keys)
+            if login:
+                _push_list(local_updates)
+            else:
+                print 'Warning! Your local data goes ouf of sync'
+
+            # update local anime list with changes
+            for key in deleted_entry_keys:
+                del self.db[key]
+            for key, value in remote_updates.items():
+                self.db[key] = value
+            
+            # write to local DB
+            self.local_db.set_db(self.db)
+            
+            return (remote_updates, deleted_entry_keys)
+        else:
+            # initialize local data, as it was empty before 
+            self.db = remoteAnime_db
+            
+            # write to local DB
+            self.local_db.set_db(self.db)
+            
+            return (self.db, {})
         
     def fetch(self):
         """
@@ -140,7 +163,7 @@ def _appInfoURL(user, status = 'all', typ = None):
     parts[4] = urllib.urlencode(query)
     return urlparse.urlunparse(parts)
 
-def _getAnimeList(username):
+def _getAnimeList(username, mirror):
     """
     Retrieve Anime XML from MyAnimeList server.
     
@@ -156,8 +179,14 @@ def _getAnimeList(username):
     
     Contains tabs and newlines outside of tags.
     """
+    # This function should be broken up and partly refactored into
+    # the class to be better configurable. 
     fetch_url = _appInfoURL(username)
-    fetch_response = urllib2.urlopen(fetch_url)
+    try:
+        fetch_response = open(mirror, 'rb')
+    except:
+        # TODO whatever error open(None) raises.
+        fetch_response = urllib2.urlopen(fetch_url)
     # BeautifulSoup could do the read() and unicode-conversion, if it
     # weren't for the illegal characters, as it internally doesn't
     # use 'replace'.
@@ -176,12 +205,14 @@ def _getAnimeList(username):
         # must either be made independent of the parse tree by calling
         # NavigableString.extract() or, preferrably, be turned into a
         # different type like unicode(). This is a side-effect of using
-        # non-mutators like string.strip() or re.sub().
+        # non-mutators like string.strip()
         # Failing to do this will crash cPickle.
         ac_node = dict()
         for node, typ in mal_anime_data_schema.iteritems():
             try:
-                value = getattr(anime, node).string
+                value = getattr(anime, node).string.strip()
+                # One would think re.sub directly accepts string subclasses
+                # like NavigableString. Raises a TypeError, though.
                 value = re.sub(r'&(\w+);', entity, value)
             except AttributeError:
                 continue
@@ -212,76 +243,6 @@ def _getAnimeList(username):
     # the resulting dict is like this:
     # {<ASCII-fied key from title>: {<mal_anime_data_schema-fields>: <values>}, ...}
     return ac_remote_anime_dict
-
-def _getMangaList(username):
-    """
-    UNUSED
-    Retrieve Manga XML from MyAnimeList server.
-
-    Returns: dictionary object.
-
-    Ways in which the ouput of malAppInfo is *not* XML:
-
-    Declared as UTF-8 but contains illegal byte sequences (characters)
-
-    Uses entities inside CDATA, which is exactly the wrong way round.
-
-    It further disagrees with the Expat C extension behind minidom:
-
-    Contains tabs and newlines outside of tags.
-    """
-    fetch_url = _appInfoURL(username,'all','manga')
-    fetch_response = urllib2.urlopen(fetch_url)
-    # BeautifulSoup could do the read() and unicode-conversion, if it
-    # weren't for the illegal characters, as it internally doesn't
-    # use 'replace'.
-    fetch_response = unicode(fetch_response.read(), 'utf-8', 'replace')
-    xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
-    # For unknown reasons it doesn't work without recursive.
-    # Nor does iterating over myanimelist.anime. BS documentation broken?
-    manga_nodes = xmldata.myanimelist.findAll('manga', recursive = True)
-    # We have to manually convert after getting them out of the CDATA.
-    entity = lambda m: BeautifulSoup.Tag.XML_ENTITIES_TO_SPECIAL_CHARS[m.group(1)]
-    # Walk through all the anime nodes and convert the data to a python
-    # dictionary.
-    ac_remote_manga_dict = dict()
-    for manga in manga_nodes:
-        ac_node = dict()
-        for node, typ in mal_manga_data_schema.iteritems():
-            try:
-                value = getattr(manga, node).string
-                # This also turns NavigableString into unicode().
-                # Otherwise the recursive parse tree crashes cPickle.
-                value = re.sub(r'&(\w+);', entity, value)
-            except AttributeError:
-                continue
-            if typ is datetime:
-                # process my_last_updated unix timestamp
-                ac_node[node] = datetime.fromtimestamp(int(value))
-            elif typ is int:
-                # process integer slots
-                ac_node[node] = int(value)
-            elif typ is date and value != '0000-00-00':
-                # proces date slots
-                (y,m,d) = value.split('-')
-                (y,m,d) = int(y), int(m), int(d)
-                if y and m and d:
-                    ac_node[node] = date(y,m,d)
-            else:
-                # process string slots
-                ac_node[node] = value
-
-        # series titles are used as anime identifiers
-        # the keys for the resulting dictionary are encoded to ASCII, so they
-        # can be simply put into shelves
-        key = ac_node['series_title'].encode('utf-8')
-
-        # add node entry to the resulting nodelist
-        ac_remote_manga_dict[key] = ac_node
-
-    # the resulting dict is like this:
-    # {<ASCII-fied key from title>: {<mal_manga_data_schema-fields>: <values>}, ...}
-    return ac_remote_manga_dict
 
 def _logchanges(remote, local, deleted):
     """ Writes changes to logfile.
