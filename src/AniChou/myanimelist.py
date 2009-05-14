@@ -295,7 +295,7 @@ def _login(username, password):
 
     # check if login was successful
     if not login_response.count('<div class="badresult">'):
-        if fetch_response == "Couldn't open s-database. Please contact Xinil.":
+        if login_response == "Couldn't open s-database. Please contact Xinil.":
             return False
         
         return True
