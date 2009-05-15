@@ -4,6 +4,7 @@ Malcom communicates with MyAnimeList.
 
 import urllib
 import urllib2
+import urlparse
 import re
 
 class MALErrorProcessor(urllib2.BaseHandler):
@@ -74,7 +75,7 @@ class Remote(object):
                 are discarded. Required argument.
         xyz     Everything else is used to build a query string.
         """
-        # Raises IndexError.
+        # Raises KeyError.
         tmpl = kwargs.pop("_url")
     	# Make tuple mutable.
     	tmpl = list(urlparse.urlparse(tmpl))
@@ -94,7 +95,7 @@ class Remote(object):
                 
         Defaults include User-Agent. Referer is recommended.
         """
-        # Raises IndexError.
+        # Raises KeyError.
         tmpl = kwargs.pop("_url")
         head = {"User-Agent": "AniChou"}
         head.update(kwargs)
@@ -109,7 +110,7 @@ class Remote(object):
         xyz         Everything else is added as form-urlencoded data,
                     turning the request from GET into POST.
         """
-        # Raises IndexError.
+        # Raises KeyError.
         req = kwargs.pop("_request")
     	# add_data automatically sets content-type and turns req into POST.
         req.add_data(urllib.urlencode(kwargs))
@@ -125,7 +126,7 @@ class List(Remote):
         type    May be 'manga'. Otherwise seems to list anime.
         """
         if not "u" in kwargs:
-            raise ValueError
+            raise KeyError
         defaults = dict(
             _url = "http://myanimelist.net/malappinfo.php",
             status = "all"
@@ -180,7 +181,7 @@ class Login(Remote):
         sublogin    The submit button used. Should be 'Login' (default)
         """
         if not "username" in kwargs or not "password" in kwargs:
-            raise ValueError
+            raise KeyError
         defaults = dict(
             _request = self.request(_url = self.url()),
             cookie = 1,
@@ -204,7 +205,7 @@ class Panel(Remote):
                     but we default to 'false'.
         """
         if not "id" in kwargs:
-            raise ValueError
+            raise KeyError
         defaults = dict(
             _url = "http://myanimelist.net/panel.php",
             keepThis = "true",
