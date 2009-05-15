@@ -149,7 +149,7 @@ class Search(Remote):
 
     def request(self, **kwargs):
         """
-        Return a request object.
+        Return a modified request object.
         
         _url    Required argument.
         Referer Default.
@@ -162,7 +162,7 @@ class Search(Remote):
 class Login(Remote):
     def url(self, **kwargs):
         """
-        Return login URL.
+        Return a login URL.
         """
         defaults = dict(_url = "http://myanimelist.net/login.php")
         defaults.update(kwargs)
@@ -191,7 +191,7 @@ class Login(Remote):
 class Panel(Remote):
     def url(self, **kwargs):
         """
-        Return panel URL.
+        Return a panel URL.
         
         keepThis    Should be string 'true' (default)
         go          Which dialog to render. Irrelevant to us. Can be
@@ -218,17 +218,32 @@ class Panel(Remote):
         """
         Return a request object.
         
-        _request    Required.
-        username    Required.
-        password    Required.
-        cookie      How to track the session. Should be 1 (default).
-        sublogin    The submit button used. Should be 'Login' (default).
+        _request        Not required!
+        close_on_update Probably sends back JavaScript to remove the panel.
+                        Irrelevant, defaults to 'true'.
+        submitIt        Which submit button was used. Defaults to 2.
+
+        Arguments from the anime_data structure:
+        
+        series_animedb_id   Probably required, but we don't.
+        series_title        For some reason the site sets this to the same
+                            number as series_animedb_id, so if you don't pass
+                            it explicitly we do that as well.
+        completed_eps       Corresponds to my_watched_episodes.
+                            We accept that as well.
+        status              my_status. No shortcut yet.
+        score               my_score
         """
-        if not "username" in kwargs or not "password" in kwargs:
-            raise ValueError
         defaults = dict(
-            cookie = 1,
-            sublogin = "Login"
+            _request = self.request(_url = self.url()),
+            submitIt = 2,
+            close_on_update = "true"
             )
+        if "series_animedb_id" in kwargs:
+            defaults["series_title"] = kwargs["series_animedb_id"]
+        if "my_watched_episodes" in kwargs:
+            # Site doesn't know about our convenience.
+            defaults["completed_eps"] = kwargs.pop("my_watched_episodes")
+        # Overwrite explicit arguments.
         defaults.update(kwargs)
         return Remote.post(self, **defaults)
