@@ -22,23 +22,23 @@ class MALErrorProcessor(urllib2.BaseHandler):
         if html == "Invalid username":
             # Returned by appInfo.
             return self.parent.error(
-                'http', request, response, 404, "Not Found", hdrs)
+                'http', request, response, 404, msg, hdrs)
         match = re.search(
             r'<div.+?class\s*=\s*["\']?badresult.+?>(.+?)</div>', html)
         if not match:
             # All is right.
             return response
-        msg = match.group(1)
+        result = match.group(1)
         for error in ("Could not find that username", "Invalid password",
             "You must first login"):
             # Returned by login and panel, respectively.
-            if error in msg:
+            if error in result:
                 # Let the others guess whether to re-try.
                 return self.parent.error(
-                    'http', request, response, 401, "Unauthorized", hdrs)
+                    'http', request, response, 401, msg, hdrs)
         # We got *something* bad but don't dare put the message in the error.
         return self.parent.error(
-            'http', request, response, 400, "Bad Reuest", hdrs)
+            'http', request, response, 400, msg, hdrs)
 
 class Site(object):
     """
@@ -51,6 +51,7 @@ class Site(object):
         # In-memory only.
         self.cookies = cookielib.CookieJar()
         parser = urllib2.HTTPCookieProcessor(self.cookies)
+        # Constructor does not add default handlers.
         self.opener = urllib2.OpenerDirector()
         self.opener.add_handler(parser)
         
