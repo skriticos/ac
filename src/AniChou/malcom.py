@@ -18,8 +18,10 @@ class MALErrorProcessor(urllib2.BaseHandler):
             # We only handle non-obvious errors.
             return response
         html = response.read().strip()
-        # People expect that.
-        response.seek(0)
+        # People expect that. Only it doesn't work, breaking the whole class.
+        # There is a seek_wrapper in
+        # http://codespeak.net/svn/wwwsearch/ClientCookie/trunk/ClientCookie/_Util.py
+#       response.seek(0)
         if html == "Invalid username":
             # Returned by appInfo.
             return self.parent.error(

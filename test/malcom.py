@@ -45,7 +45,17 @@ class TestList(unittest.TestCase):
             "http://myanimelist.net/malappinfo.php?status=all&u=Wile"
             ))
 
-class MockHTTPHandler(urllib2.BaseHandler):
+class TestErrorAppInfo(unittest.TestCase):
+    def setUp(self):
+        self.director = urllib2.build_opener(
+            MockHTTPHandler(TESTS[2]),
+            AniChou.malcom.MALErrorProcessor
+            )
+
+    def testOpen(self):
+        self.director.open(AniChou.malcom.List().url(u = "nobody"))
+
+class MockHTTPHandler(urllib2.HTTPHandler):
     """
     Has 'server' return contents of local file.
     """
