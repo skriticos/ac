@@ -23,8 +23,6 @@ class TestRemote(unittest.TestCase):
 
     def testRequest(self):
         self.assertRaises(KeyError, lambda: self.rem.request())
-        # Capitalizes.
-        self.assert_(self.req.has_header("User-agent"))
         self.assertEqual("http://www.google.com", self.req.get_full_url())
 
     def testPost(self):
@@ -33,14 +31,22 @@ class TestRemote(unittest.TestCase):
         self.assert_(self.req.has_data())
         self.assertEqual("POST", self.req.get_method())
 
+class TestMAL(unittest.TestCase):
+    def setUp(self):
+        self.rem = AniChou.malcom.MAL()
+        self.req = self.rem.request(_url = "http://www.google.com")
+
+    def testRequest(self):
+        # Capitalizes.
+        self.assert_(self.req.has_header("User-agent"))
+
 class TestList(unittest.TestCase):
     def setUp(self):
-        self.rem = AniChou.malcom.List()
+        self.rem = AniChou.malcom.List(username = "Wile")
 
     def testUrl(self):
-        self.assertRaises(KeyError, lambda: self.rem.url())
         # Dictionaries are unordered.
-        self.assert_(self.rem.url(u = "Wile") in (
+        self.assert_(self.rem.url() in (
             "http://myanimelist.net/malappinfo.php?u=Wile&status=all",
             "http://myanimelist.net/malappinfo.php?status=all&u=Wile"
             ))
@@ -53,7 +59,7 @@ class TestErrorAppInfo(unittest.TestCase):
             )
 
     def testOpen(self):
-        self.director.open(AniChou.malcom.List().url(u = "nobody"))
+        self.director.open(AniChou.malcom.List(username = "nobody").url())
 
 class MockHTTPHandler(urllib2.HTTPHandler):
     """

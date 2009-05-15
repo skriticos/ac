@@ -6,6 +6,7 @@ import urllib
 import urllib2
 import urlparse
 import re
+from cStringIO import StringIO
 
 class MALErrorProcessor(urllib2.BaseHandler):
     """
@@ -76,7 +77,13 @@ class Remote(object):
         _url    A full URL with scheme and path. Query strings, if present,
                 are discarded. Required argument.
         xyz     Everything else is used to build a query string.
+
+        Always returns self._url if set.
         """
+        try:
+            return self._url
+        except AttributeError:
+            pass
         # Raises KeyError.
         tmpl = kwargs.pop("_url")
     	# Make tuple mutable.
@@ -91,18 +98,23 @@ class Remote(object):
         Return a request object.
         
         _url    A full URL which may contain a query string.
-                It won't be touched. Required argument.
+                It won't be touched. Defaults to self.url()
         xyz     Everything else is used as HTTP headers.
                 Those are somewhat case-sensitive.
                 
-        Defaults include User-Agent. Referer is recommended.
+        Referer is recommended.
+
+        Always returns self._request if set.
         """
-        # Raises KeyError.
-        tmpl = kwargs.pop("_url")
-        head = {"User-Agent": "AniChou"}
-        head.update(kwargs)
-    	# BTW has_header is case-sensitive.
-    	return urllib2.Request(tmpl, headers = head)
+        try:
+            return self._request
+        except AttributeError:
+            pass
+        try:
+            tmpl = kwargs.pop("_url")
+        except KeyError:
+            tmpl = self.url()
+    	return urllib2.Request(tmpl, headers = kwargs)
 
     def post(self, **kwargs):
         """
@@ -118,7 +130,60 @@ class Remote(object):
         req.add_data(urllib.urlencode(kwargs))
         return req
         
-class List(Remote):
+    def response(self, opener, reget = False):
+        """
+        Execute request and return result.
+        
+        Use the given OpenDirector, which should contain a (logged in)
+        CookieProcessor, to execute self.request()
+        
+        Also stores the result and will return it immediatly in the future,
+        unless reget is True.
+        
+        Normally the response can only be read() once, as sockets don't know
+        seek(). To get around this we replace it with StringIO. This means
+        the whole body takes up memory.
+        """
+        if reget:
+            del self._response
+        try:
+            return self._response
+        except AttributeError:
+            pass
+        resp = opener.open(self.request())
+        # Construct replacement like in AbstractHTTPHandler.
+        self._response = urllib.addinfourl(
+            # We can use cStringIO because urllib2 doesn't return unicode(),
+            # except encoded. Right?
+            StringIO(resp.read()),
+            resp.headers,
+            resp.url
+            )
+        # Copy attributes. Violates encapsulation.
+        self._response.code = resp.code
+        self._response.msg = resp.msg
+        return self._response
+
+class MAL(Remote):
+    def request(self, **kwargs):
+        head = {"User-Agent": "AniChou"}
+        head.update(kwargs)
+        return Remote.request(self, **head)
+
+    def response(self, opener, reget = False):
+        resp = Remote.response(self, opener, reget)
+        # Code from MALErrorProcessor goes here.
+
+class List(MAL):
+    def __init__(self, username, typ = "anime"):
+        """
+        Type may be anime or manga.
+        """
+        kwargs = dict(u = username)
+        if typ == "manga":
+            kwargs["type"] = typ
+        self._url = self.url(**kwargs)
+
     def url(self, **kwargs):
         """
         Return an appInfo URL.
@@ -134,22 +199,29 @@ class List(Remote):
             status = "all"
             )
         defaults.update(kwargs)
-        return Remote.url(self, **defaults)
+        return MAL.url(self, **defaults)
 
-class Search(Remote):
+class Search(MAL):
+    def __init__(self, query, typ = "anime"):
+        typ = ("anime", "manga", "all").index(typ) + 1
+        self._url = self.url(s = query, type = typ)
+
     def url(self, **kwargs):
         """
         Return search URL.
         
+        s       Search term. Required.
     	type    1 for anime only (default), 2 for manga only, 3 for both.
         """
+        if not "s" in kwargs:
+            raise KeyError
         defaults = dict(
             _url = "http://myanimelist.net/includes/masearch.inc.php",
             # Need not be string.
             type = 1
             )
         defaults.update(kwargs)
-        return Remote.url(self, **defaults)
+        return MAL.url(self, **defaults)
 
     def request(self, **kwargs):
         """
@@ -161,16 +233,19 @@ class Search(Remote):
         # How it is called on the site.
         defaults = {"Referer": "http://myanimelist.net/addtolist.php"}
         defaults.update(kwargs)
-        return Remote.request(self, **defaults)
+        return MAL.request(self, **defaults)
 
-class Login(Remote):
+class Login(MAL):
+    def __init__(self, username, password):
+        self._request = self.post(username = username, password = password)
+        
     def url(self, **kwargs):
         """
         Return a login URL.
         """
         defaults = dict(_url = "http://myanimelist.net/login.php")
         defaults.update(kwargs)
-        return Remote.url(self, **defaults)
+        return MAL.url(self, **defaults)
 
     def post(self, **kwargs):
         """
@@ -190,9 +265,28 @@ class Login(Remote):
             sublogin = "Login"
             )
         defaults.update(kwargs)
-        return Remote.post(self, **defaults)
+        return MAL.post(self, **defaults)
 
-class Panel(Remote):
+class Panel(MAL):
+    def __init__(self, anime):
+        """
+        Argument must conform to mal_anime_data_schema.
+        """
+        data = dict(
+            _request = self.request(_url = self.url(id = anime["my_id"]))
+            )
+        # Map post arguments to input fields.
+        schema = dict(
+            series_animedb_id = "series_animedb_id",
+            series_title = "series_animedb_id",
+            completed_eps = "my_watched_episodes",
+            status = "my_status",
+            score = "my_score"
+            )
+        for to, von in schema.iteritems():
+            data[to] = anime[von]
+        self._request = self.post(**data)
+        
     def url(self, **kwargs):
         """
         Return a panel URL.
@@ -216,13 +310,12 @@ class Panel(Remote):
             TB_iframe = "false"
             )
         defaults.update(kwargs)
-        return Remote.url(self, **defaults)
+        return MAL.url(self, **defaults)
 
     def post(self, **kwargs):
         """
         Return a request object.
         
-        _request        Not required!
         close_on_update Probably sends back JavaScript to remove the panel.
                         Irrelevant, defaults to 'true'.
         submitIt        Which submit button was used. Defaults to 2.
@@ -239,7 +332,6 @@ class Panel(Remote):
         score               my_score
         """
         defaults = dict(
-            _request = self.request(_url = self.url()),
             submitIt = 2,
             close_on_update = "true"
             )
@@ -250,4 +342,4 @@ class Panel(Remote):
             defaults["completed_eps"] = kwargs.pop("my_watched_episodes")
         # Overwrite explicit arguments.
         defaults.update(kwargs)
-        return Remote.post(self, **defaults)
+        return MAL.post(self, **defaults)
