@@ -79,7 +79,7 @@ class spin(wx.Window):
 		self.txtctl = txtctl = \
 			wx.TextCtrl(parent, -1, size = s2,
 					style = wx.TE_CENTER| wx.NO_BORDER)
-		txtctl.SetBackgroundColour(parent.GetBackgroundColour())
+		# txtctl.SetBackgroundColour(parent.GetBackgroundColour())
 	
 		if range != 0:
 			spin.SetRange(0, range)
@@ -104,7 +104,7 @@ class spin(wx.Window):
 			txtctl.SetValue(str(value))
 
 		# some wx bug workarounds
-		self.SetBackgroundColour(self.GetBackgroundColour())
+		self.SetBackgroundColour(txtctl.GetBackgroundColour())
 		self.spin.Show()
 		self.spin.Hide()
 
@@ -179,7 +179,8 @@ if __name__ == '__main__':
 	## setup controls
 	app = wx.PySimpleApp()
 	frame = wx.Frame(None, -1)
-	frame.SetBackgroundColour(frame.GetBackgroundColour())
+	x = wx.TextCtrl(frame, -1, size=(0,0))
+	frame.SetBackgroundColour(x.GetBackgroundColour())
 	
 	spins = []
 	box = wx.GridSizer(rows=2, cols=5, hgap=0, vgap=0)
