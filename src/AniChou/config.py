@@ -85,7 +85,7 @@ class DefaultConfig(ConfigParser.ConfigParser):
     """
     def __init__(self):
         ConfigParser.ConfigParser.__init__(self)
-
+        # ConfigParser cannot handle options without a section.
         ac = dict(
             mal = dict(
                 username = '',
