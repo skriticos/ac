@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Date: Thu, 14 May 2009 21:50:08 GMT
+Server: Apache/2.2.3 (CentOS)
+X-Powered-By: PHP/5.1.6
+Content-Length: 16
+Connection: close
+Content-Type: application/xml; charset=UTF-8
+
+Invalid username

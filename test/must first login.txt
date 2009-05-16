@@ -1,0 +1,104 @@
+HTTP/1.1 200 OK
+Date: Thu, 14 May 2009 21:44:13 GMT
+Server: Apache/2.2.3 (CentOS)
+X-Powered-By: PHP/5.1.6
+Content-Length: 5040
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+	<title>My Panel - MyAnimeList.net</title>
+    <meta name="Description" content="Start cataloging anime you've watched or manga you've read. Browse through our extensive anime and manga database. Get anime or manga suggestions, recommendations and reviews. View top rated anime and manga. Create anime and manga favorites. Tons more too!" />
+    <meta name="Keywords" content="anime, animelist, myanimelist, anime list, log anime seen, catalog anime watched, anime reviews, top anime, anime characters, favorite anime, anime discussion, anime information, manga series, manga information, top manga, mangalist, manga list, manga, manga reviews, voice actors, seiyuu" />
+    <meta name="Author" content="Garrett Gyssler">
+	
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/jquery-compressed.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="http://cdn.myanimelist.net/css/myanimelist.v30.css" />
+		
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/hover.v3.js"></script>
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/detailedanime.v4.js"></script>
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/jquery-calendar.js"></script>
+		<style type="text/css">@import url(http://cdn.myanimelist.net/css/jquery-calendar.css);</style>
+	<script type="text/javascript" src="http://cdn.myanimelist.net/js/myanimelist.v8.js"></script>
+	<script type="text/javascript" src="http://cdn.myanimelist.net/thickbox/thickbox.js"></script>
+	<link rel="stylesheet" href="http://cdn.myanimelist.net/thickbox/thickbox.css" type="text/css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="http://cdn.myanimelist.net/css/dialog.v1.css" />
+	<link rel="search" type="application/opensearchdescription+xml" href="http://cdn.myanimelist.net/plugins/myanimelist.xml" title="MyAnimeList" />
+	
+<link rel="shortcut icon" href="http://cdn.myanimelist.net/images/faviconv5.ico" />
+	
+</head>
+
+<body onload="onLoadAnimeForm();">
+<div id="header">Login</div><div id="rightcontent"><div class="badresult" style="margin-top: 15px;">Error: You must first login to see this page.</div><table id="dialog" cellpadding="0" cellspacing="0" style="width: 500px;"><tr><td>
+	<form name="loginForm" method="post" action="http://myanimelist.net/login.php">
+    <table border="0" cellpadding="6" cellspacing="0" align="center">
+    <tr>
+    <td width="100"><strong>Username:</strong></td>
+    <td><input type="text" class="inputtext" name="username" value="" size="30"></td>
+    </tr>
+    <tr>
+    <td><strong>Password:</strong></td>
+    <td><input type="password" class="inputtext" name="password" size="30"></td>
+    </tr>
+    <tr>
+    <td colspan="2" align="center"><input type="checkbox" name="cookie" value="1"> Always stay logged in? </td>
+    </tr>
+    <tr>
+    <td colspan="2" align="center"><input type="submit" class="inputButton" name="sublogin" value="Login">&nbsp;&nbsp;<input type="button" onclick="document.location='http://myanimelist.net/register.php';" name="register" value="Register" class="inputButton"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><a href="http://myanimelist.net/password.php">Forget Your Password?</a>
+    </tr>
+    </table>
+	
+	</form>
+    </td> </tr></table>
+</div>
+
+<div id="rightcontentunder">
+
+<a href="http://myanimelist.net/modules.php?go=faq">FAQ</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/about.php">About</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/donations.php">Donate</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/about.php?go=contact">Contact</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/tou.php">Terms</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/privacy.php">Privacy</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://myanimelist.net/modules.php?go=affiliates">Affiliates</a>
+	
+<div id="copyright">MyAnimeList.net, a property of CraveOnline Media LLC, a division of AtomicOnline, LLC.<br>
+&copy; 2009 CraveOnline Media, LLC. All Rights Reserved.</div>
+
+	<div id="nav_ad_div"></div>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#nav_ad_div').append('<div id="adNavHide"><iframe src="http://myanimelist.net/includes/ads/nav.html" border="0" height="758" width="160" scrolling="no" frameborder="0" marginheight="0" marginwidth="0"></iframe></div>');
+		$('#adNavHide').appendTo('#adNav');
+	});
+	</script>
+	
+</div>
+</div>
+
+<!-- end rightbody -->
+</div>
+
+</div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-369102-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+
+</body>
+</html>
