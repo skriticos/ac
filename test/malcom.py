@@ -44,6 +44,32 @@ class TestList(unittest.TestCase):
             "http://myanimelist.net/malappinfo.php?status=all&u=Wile"
             ))
 
+class TestSearchBadchar(unittest.TestCase):
+    def setUp(self):
+        self.director = urllib2.build_opener(
+            MockHTTPHandler("search result jungle.txt"))
+        self.request = AniChou.malcom.Search("Jungle")
+
+    def testIter(self):
+        self.request.execute(self.director)
+        kimba = filter(lambda n: n["series_animedb_id"] == 2556,
+            self.request)
+        self.assertEqual(1, len(kimba))
+        self.assert_("series_synonyms" in kimba[0])
+
+class TestSearchUnicode(unittest.TestCase):
+    def setUp(self):
+        self.director = urllib2.build_opener(
+            MockHTTPHandler("search result holic.txt"))
+        self.request = AniChou.malcom.Search("Holic")
+
+    def testIter(self):
+        self.request.execute(self.director)
+        found = filter(lambda n: n["series_animedb_id"] == 5030,
+            self.request)
+        self.assertEqual(1, len(found))
+        self.assertEqual(u'Maria\u2020Holic', found[0]["series_title"])
+
 class TestListParsing(unittest.TestCase):
     def setUp(self):
         self.director = urllib2.build_opener(
@@ -68,7 +94,7 @@ class TestErrorAppInfo(unittest.TestCase):
     def setUp(self):
         self.director = urllib2.build_opener(
             MockHTTPHandler("invalid username.txt"))
-        self.request = AniChou.malcom.List(username = "nobody")
+        self.request = AniChou.malcom.List(username = ">.<")
 
     def testOpen(self):
         self.assertRaises(AniChou.malcom.UsernameError,
@@ -78,7 +104,7 @@ class TestErrorLogin(unittest.TestCase):
     def setUp(self):
         self.director = urllib2.build_opener(
             MockHTTPHandler("bad username.txt"))
-        self.request = AniChou.malcom.Login(username = "Wile",
+        self.request = AniChou.malcom.Login(username = ">.<",
             password = "helo")
 
     def testOpen(self):
@@ -89,7 +115,14 @@ class TestMissingLogin(unittest.TestCase):
     def setUp(self):
         self.director = urllib2.build_opener(
             MockHTTPHandler("must first login.txt"))
-        self.request = AniChou.malcom.Add(0, 0, 0)
+        anime = dict(
+            my_id = 0,
+            series_animedb_id = 0,
+            my_watched_episodes = 0,
+            my_status = 0,
+            my_score = 0
+            )
+        self.request = AniChou.malcom.Panel(anime)
 
     def testOpen(self):
         self.assertRaises(AniChou.malcom.LoginError,
@@ -124,9 +157,15 @@ class MockHTTPHandler(urllib2.HTTPHandler):
         return test.test_urllib2.MockResponse(200, "OK", msg, body,
             req.get_full_url())
 
+# Comment this in to override the mock setup and test against the live site.
+#class MockHTTPHandler(urllib2.HTTPHandler):
+#    pass
+
 if __name__ == '__main__':
     # Python sets cwd to where the module lives.
     sys.path.append(os.path.abspath("../src"))
     # Now we can.
     import AniChou.malcom
+    # Exclude lengthy tests when working on something else.
+#   unittest.main(defaultTest = "TestErrorLogin")
     unittest.main()

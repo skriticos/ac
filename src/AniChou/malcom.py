@@ -1,4 +1,3 @@
-#!/opt/local/bin/python2.5
 """
 Malcom communicates with MyAnimeList.
 """
@@ -13,6 +12,7 @@ import BeautifulSoup
 # Our own.
 import data
 
+# TODO move out of *mal*com.
 class Request(object):
     def __init__(self, url, query, head, data = None):
         """
@@ -180,7 +180,7 @@ class List(MAL):
 
 class Search(MAL):
     def __init__(self, query, typ = "anime"):
-        typ = ("anime", "manga", "all").index(typ) + 1
+        typ = ["anime", "manga", "all"].index(typ) + 1
         url = "http://myanimelist.net/includes/masearch.inc.php"
         query = dict(
             s = query,
@@ -188,6 +188,27 @@ class Search(MAL):
             )
         head = dict(Referer = "http://myanimelist.net/addtolist.php")
         MAL.__init__(self, url, query, head)
+
+    def execute(self, opener):
+        # Super sets attribute.
+        MAL.execute(self, opener)
+        soup = BeautifulSoup.BeautifulSoup(self.content)
+        self.div_nodes = soup.findAll("div", id = True, recursive = True)
+
+    def __iter__(self):
+        for div in self.div_nodes:
+            m = re.match(r'arow(\d+)', div["id"])
+            if not m:
+                continue
+            ac_node = dict(
+                series_animedb_id = int(m.group(1)),
+                series_title = div.find("strong").string
+                )
+            # TODO scrape episode total to compare with other sites.
+            span = div.find("span", title = "Synonyms", recursive = True)
+            if span:
+                ac_node["series_synonyms"] = span.nextSibling.string
+            yield ac_node
 
 class Add(MAL):
     def __init__(self, series_animedb_id, status, completed_eps, score = 0):
@@ -211,7 +232,7 @@ class Add(MAL):
         MAL.execute(self, opener)
         # Super set attribute.
         if self.content.strip() != "maSuccessAdded":
-            raise URLError, "couldn't add"
+            raise urllib2.URLError, "couldn't add"
 
 class Login(MAL):
     def __init__(self, username, password):

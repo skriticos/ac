@@ -1,0 +1,227 @@
+HTTP/1.1 200 OK
+Date: Sat, 16 May 2009 17:44:32 GMT
+Server: Apache/2.2.3 (CentOS)
+X-Powered-By: PHP/5.1.6
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+
+	<div class="normal_header">Anime Results</div>
+	
+			<div id="arow2569"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2569,'52',2,2);"><strong>Jungle Book Shounen Mowgli</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> The Jungle Book<br><span title="Synonyms">Syn:</span> Jungle Book: Boy Mowgli; Jungle Book: Mowgli the Boy<br><span class="lightLink">397 other members</span> - <a href="anime.php?id=2569">Info</a></small></div><div style="display: none;" id="animeTitle2569">Jungle Book Shounen Mowgli</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">52</td>
+			</tr>
+			</table>
+			<div id="animeColumn2569" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow2311"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2311,'1',2,2);"><strong>Jungle Boy</strong></a> <small>Movie </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Jungle Boy<br><span title="Synonyms">Syn:</span> Shounen Keniya<br><span class="lightLink">20 other members</span> - <a href="anime.php?id=2311">Info</a></small></div><div style="display: none;" id="animeTitle2311">Jungle Boy</div></td>
+			  <td class="borderClass" align="center" width="60">Movie</td>
+			  <td class="borderClass" align="center" width="40">1</td>
+			</tr>
+			</table>
+			<div id="animeColumn2311" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow2524"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2524,'3',2,2);"><strong>Jungle de Ikou!</strong></a> <small>OVA </small><div style="margin-top: 3px;"><small><span class="lightLink">555 other members</span> - <a href="anime.php?id=2524">Info</a></small></div><div style="display: none;" id="animeTitle2524">Jungle de Ikou!</div></td>
+			  <td class="borderClass" align="center" width="60">OVA</td>
+			  <td class="borderClass" align="center" width="40">3</td>
+			</tr>
+			</table>
+			<div id="animeColumn2524" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow2556"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2556,'52',2,2);"><strong>Jungle Emperor (1989)</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Bia?y Lew Kimba; Bou Bou; K�nig der Tiere; Kimba - Bia?y Lew; The New Adventures of Kimba the White Lion<br><span class="lightLink">300 other members</span> - <a href="anime.php?id=2556">Info</a></small></div><div style="display: none;" id="animeTitle2556">Jungle Emperor (1989)</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">52</td>
+			</tr>
+			</table>
+			<div id="animeColumn2556" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow2264"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2264,'1',2,2);"><strong>Jungle Emperor Leo: The Movie</strong></a> <small>Movie </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Jungle Taitei Leo<br><span class="lightLink">222 other members</span> - <a href="anime.php?id=2264">Info</a></small></div><div style="display: none;" id="animeTitle2264">Jungle Emperor Leo: The Movie</div></td>
+			  <td class="borderClass" align="center" width="60">Movie</td>
+			  <td class="borderClass" align="center" width="40">1</td>
+			</tr>
+			</table>
+			<div id="animeColumn2264" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow3418"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(3418,'50',2,2);"><strong>Jungle no Ouja Taa-chan</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Jungle King Taa-chan; Jungle no Ohja Ta-chan<br><span class="lightLink">33 other members</span> - <a href="anime.php?id=3418">Info</a></small></div><div style="display: none;" id="animeTitle3418">Jungle no Ouja Taa-chan</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">50</td>
+			</tr>
+			</table>
+			<div id="animeColumn3418" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow1572"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(1572,'52',2,2);"><strong>Jungle Taitei</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Kimba the White Lion<br><span class="lightLink">385 other members</span> - <a href="anime.php?id=1572">Info</a></small></div><div style="display: none;" id="animeTitle1572">Jungle Taitei</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">52</td>
+			</tr>
+			</table>
+			<div id="animeColumn1572" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow2565"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(2565,'26',2,2);"><strong>Jungle Taitei, Susume Leo!</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Jungle Emperor, Onward Leo!<br><span title="Synonyms">Syn:</span> Jungle Taitei Susume Leo; Leo the Lion; New Jungle Emperor; Go Ahead Leo!<br><span class="lightLink">128 other members</span> - <a href="anime.php?id=2565">Info</a></small></div><div style="display: none;" id="animeTitle2565">Jungle Taitei, Susume Leo!</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">26</td>
+			</tr>
+			</table>
+			<div id="animeColumn2565" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow253"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(253,'26',2,2);"><strong>Jungle wa Itsumo Hare nochi Guu</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Jungle Wa Itsumo Hale Nochi Guu; Hare+Guu<br><span class="lightLink">4587 other members</span> - <a href="anime.php?id=253">Info</a></small></div><div style="display: none;" id="animeTitle253">Jungle wa Itsumo Hare nochi Guu</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">26</td>
+			</tr>
+			</table>
+			<div id="animeColumn253" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow254"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(254,'6',2,2);"><strong>Jungle wa Itsumo Hare nochi Guu Deluxe</strong></a> <small>OVA </small><div style="margin-top: 3px;"><small><span class="lightLink">2273 other members</span> - <a href="anime.php?id=254">Info</a></small></div><div style="display: none;" id="animeTitle254">Jungle wa Itsumo Hare nochi Guu Deluxe</div></td>
+			  <td class="borderClass" align="center" width="60">OVA</td>
+			  <td class="borderClass" align="center" width="40">6</td>
+			</tr>
+			</table>
+			<div id="animeColumn254" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow255"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(255,'7',2,2);"><strong>Jungle wa Itsumo Hare nochi Guu FINAL</strong></a> <small>OVA </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Hare + Guu Final<br><span class="lightLink">2037 other members</span> - <a href="anime.php?id=255">Info</a></small></div><div style="display: none;" id="animeTitle255">Jungle wa Itsumo Hare nochi Guu FINAL</div></td>
+			  <td class="borderClass" align="center" width="60">OVA</td>
+			  <td class="borderClass" align="center" width="40">7</td>
+			</tr>
+			</table>
+			<div id="animeColumn255" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+		<div class="spaceit" style="padding-left: 3px;"><small>Didn't find the anime? Help us by adding it to our <a href="http://myanimelist.net/panel.php?go=anime_series&do=add">anime database</a></small>.</div>
+		<br />
+		
+	<div class="normal_header">Manga Results</div>
+			<div id="mrow8386"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(8386,'1',5,2,2);"><strong>Akutou</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Scoundrel 2 - Devilish Lips<br><span title="Synonyms">Syn:</span> Akutou 2 Akuma no Kuchibiru; Green Apple Romance; Bad Kozo Doki; Mitsumete Bike Boy; Jungle Boy<br><span class="lightLink">123 other members</span> - <a href="manga.php?id=8386">Info</a></small></div><div style="display: none;" id="mangaTitle8386">Akutou</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn8386" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow4196"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(4196,'1',4,2,2);"><strong>Animal Jungle</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Animal Jungle<br><span title="Synonyms">Syn:</span> Animaru Janguru<br><span class="lightLink">443 other members</span> - <a href="manga.php?id=4196">Info</a></small></div><div style="display: none;" id="mangaTitle4196">Animal Jungle</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn4196" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow2290"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(2290,'1',6,2,2);"><strong>Jungle King</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span class="lightLink">131 other members</span> - <a href="manga.php?id=2290">Info</a></small></div><div style="display: none;" id="mangaTitle2290">Jungle King</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn2290" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow2777"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(2777,'10',0,2,2);"><strong>Jungle wa Itsumo Hare Nochi Guu</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> The Jungle Was Always Nice, Then Came Guu<br><span title="Synonyms">Syn:</span> Jungle ha Itsumo Hare nochi Guu; The Jungle Was Always Nice; Then Came Guu<br><span class="lightLink">75 other members</span> - <a href="manga.php?id=2777">Info</a></small></div><div style="display: none;" id="mangaTitle2777">Jungle wa Itsumo Hare Nochi Guu</div></td>
+			  <td class="borderClass" align="center" width="40">10  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn2777" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow1771"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(1771,'3',23,2,2);"><strong>Kimba, the white Lion</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Kimba, the white Lion<br><span title="Synonyms">Syn:</span> Jungle Emperor; Kimba The White Lion; Jungle Taitei <br><span class="lightLink">37 other members</span> - <a href="manga.php?id=1771">Info</a></small></div><div style="display: none;" id="mangaTitle1771">Kimba, the white Lion</div></td>
+			  <td class="borderClass" align="center" width="40">3  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn1771" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow10718"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(10718,'20',0,2,2);"><strong>New Jungle King Tar-chan</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> New Jungle King Tar-chan<br><span title="Synonyms">Syn:</span> Shin Janguru no Ouja Tā-chan;Shin Janguru no Ouja Tā-chan<br><span class="lightLink">4 other members</span> - <a href="manga.php?id=10718">Info</a></small></div><div style="display: none;" id="mangaTitle10718">New Jungle King Tar-chan</div></td>
+			  <td class="borderClass" align="center" width="40">20  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn10718" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow12566"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(12566,'1',0,2,2);"><strong>Nightmare Campus</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Nightmare Campus<br><span title="Synonyms">Syn:</span> Black Board Jungle; Gendô Gakuen Black Board Jungle<br><span class="lightLink">2 other members</span> - <a href="manga.php?id=12566">Info</a></small></div><div style="display: none;" id="mangaTitle12566">Nightmare Campus</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn12566" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow11341"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(11341,'2',0,2,2);"><strong>Nouzui Jungle</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Brain Jungle<br><span title="Synonyms">Syn:</span> Nouzui Janguru; Brain Jungle<br><span class="lightLink">1 other members</span> - <a href="manga.php?id=11341">Info</a></small></div><div style="display: none;" id="mangaTitle11341">Nouzui Jungle</div></td>
+			  <td class="borderClass" align="center" width="40">2  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn11341" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow11970"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(11970,'1',3,2,2);"><strong>Wangan Jungle</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Gulf Jungle<br><span title="Synonyms">Syn:</span> Wangan Janguru<br><span class="lightLink">8 other members</span> - <a href="manga.php?id=11970">Info</a></small></div><div style="display: none;" id="mangaTitle11970">Wangan Jungle</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn11970" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+		<div class="spaceit" style="padding-left: 3px;"><small>Didn't find the manga? Help us by adding it to our <a href="http://myanimelist.net/panel.php?go=mangadb&do=add">manga database</a></small>.</div><div id="openedId" style="display: none;"></div>

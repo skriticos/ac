@@ -1,0 +1,141 @@
+HTTP/1.1 200 OK
+Date: Sat, 16 May 2009 18:34:41 GMT
+Server: Apache/2.2.3 (CentOS)
+X-Powered-By: PHP/5.1.6
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+
+	<div class="normal_header">Anime Results</div>
+	
+			<div id="arow5030"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(5030,'12',2,2);"><strong>Maria†Holic</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Maria+Holic; Maria Holic; MariaHolic<br><span class="lightLink">11895 other members</span> - <a href="anime.php?id=5030">Info</a></small></div><div style="display: none;" id="animeTitle5030">Maria†Holic</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">12</td>
+			</tr>
+			</table>
+			<div id="animeColumn5030" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow861"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(861,'24',2,2);"><strong>xxxHOLiC</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Holic; Holic TV<br><span class="lightLink">18502 other members</span> - <a href="anime.php?id=861">Info</a></small></div><div style="display: none;" id="animeTitle861">xxxHOLiC</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">24</td>
+			</tr>
+			</table>
+			<div id="animeColumn861" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow3091"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(3091,'13',2,2);"><strong>xxxHOLiC - Kei</strong></a> <small>TV </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> xxxHOLiC: Tsugi; xxxHOLiC TV2; xxxHOLiC New Series; xxxHOLiC second season; xxxHOLiC 2nd series<br><span class="lightLink">10143 other members</span> - <a href="anime.php?id=3091">Info</a></small></div><div style="display: none;" id="animeTitle3091">xxxHOLiC - Kei</div></td>
+			  <td class="borderClass" align="center" width="60">TV</td>
+			  <td class="borderClass" align="center" width="40">13</td>
+			</tr>
+			</table>
+			<div id="animeColumn3091" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow793"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(793,'1',2,2);"><strong>xxxHOLiC - Manatsu no Yoru no Yume</strong></a> <small>Movie </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> xxxHolic - The Movie - A Midsummer`s Night Dream<br><span title="Synonyms">Syn:</span> Gekijouban Horikku - Manatsu no Yoru no Yume; X-zobanHOLIC: Manatsu no Yo no Yume; xxxHOLiC - A Midsummer Night's Dream; xxxHolic The Movie<br><span class="lightLink">8152 other members</span> - <a href="anime.php?id=793">Info</a></small></div><div style="display: none;" id="animeTitle793">xxxHOLiC - Manatsu no Yoru no Yume</div></td>
+			  <td class="borderClass" align="center" width="60">Movie</td>
+			  <td class="borderClass" align="center" width="40">1</td>
+			</tr>
+			</table>
+			<div id="animeColumn793" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="arow4918"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addAnime(4918,'2',1,2);"><strong>xxxHOLiC Shunmuki</strong></a> <small>OVA </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> ×××HOLiC<br><span title="Synonyms">Syn:</span> xxxHOLiC OVA<br><span class="lightLink">4055 other members</span> - <a href="anime.php?id=4918">Info</a></small></div><div style="display: none;" id="animeTitle4918">xxxHOLiC Shunmuki</div></td>
+			  <td class="borderClass" align="center" width="60">OVA</td>
+			  <td class="borderClass" align="center" width="40">2</td>
+			</tr>
+			</table>
+			<div id="animeColumn4918" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+		<div class="spaceit" style="padding-left: 3px;"><small>Didn't find the anime? Help us by adding it to our <a href="http://myanimelist.net/panel.php?go=anime_series&do=add">anime database</a></small>.</div>
+		<br />
+		
+	<div class="normal_header">Manga Results</div>
+			<div id="mrow1118"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(1118,'1',5,2,2);"><strong>Kanshakudama no Yuutsu</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Short-Tempered Melancholic<br><span title="Synonyms">Syn:</span> Short-tempered Melancholy; Firecracker is Melancholy; Short-Tempered Melancholic; Squib Feeling Blue; Kanshakudama no Yuutsu; kanshaku Dama no Yuutsu; Kanshaku-Dama no Yuutsu <br><span class="lightLink">689 other members</span> - <a href="manga.php?id=1118">Info</a></small></div><div style="display: none;" id="mangaTitle1118">Kanshakudama no Yuutsu</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn1118" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow1125"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(1125,'2',10,2,2);"><strong>Loveholic</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Loveholic<br><span title="Synonyms">Syn:</span> Renai Chudoku; Ren'ai Chudoku; Renai Chuudoku<br><span class="lightLink">269 other members</span> - <a href="manga.php?id=1125">Info</a></small></div><div style="display: none;" id="mangaTitle1125">Loveholic</div></td>
+			  <td class="borderClass" align="center" width="40">2  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn1125" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow7342"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(7342,'0',0,1,2);"><strong>Maria†Holic</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Maria†Holic; Maria+Holic; MariaHolic<br><span title="Synonyms">Syn:</span> Maria+Holic; Maria Holic; MariaHolic<br><span class="lightLink">977 other members</span> - <a href="manga.php?id=7342">Info</a></small></div><div style="display: none;" id="mangaTitle7342">Maria†Holic</div></td>
+			  <td class="borderClass" align="center" width="40">0  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn7342" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow1529"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(1529,'5',25,2,2);"><strong>Melancholic Princess</strong></a> <small>Manhua </small><div style="margin-top: 3px;"><small><span title="Synonyms">Syn:</span> Melancholic<br><span class="lightLink">57 other members</span> - <a href="manga.php?id=1529">Info</a></small></div><div style="display: none;" id="mangaTitle1529">Melancholic Princess</div></td>
+			  <td class="borderClass" align="center" width="40">5  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn1529" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow2887"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(2887,'1',7,2,2);"><strong>Nekrateholic</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> Necratoholic<br><span title="Synonyms">Syn:</span> Nekroholic; Necratoholic<br><span class="lightLink">315 other members</span> - <a href="manga.php?id=2887">Info</a></small></div><div style="display: none;" id="mangaTitle2887">Nekrateholic</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn2887" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow10"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(10,'0',0,1,2);"><strong>xxxHOLiC</strong></a> <small>Manga </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> xxxHOLiC<br><span class="lightLink">7950 other members</span> - <a href="manga.php?id=10">Info</a></small></div><div style="display: none;" id="mangaTitle10">xxxHOLiC</div></td>
+			  <td class="borderClass" align="center" width="40">0  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn10" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+			<div id="mrow10183"><table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+			  <td class="borderClass">
+			  <a href="javascript:addManga(10183,'1',3,2,2);"><strong>xxxHOLiC: AnotherHOLiC</strong></a> <small>Novel </small><div style="margin-top: 3px;"><small><span title="English">Eng:</span> xxxHOLiC: AnotherHOLiC<br><span title="Synonyms">Syn:</span> xxxHolic Another Holic: Landolt-Ring Aerosol; xxxHoLic: Another Holic Randoruto-kan Aerosol<br><span class="lightLink">281 other members</span> - <a href="manga.php?id=10183">Info</a></small></div><div style="display: none;" id="mangaTitle10183">xxxHOLiC: AnotherHOLiC</div></td>
+			  <td class="borderClass" align="center" width="40">1  volumes</td>
+			</tr>
+			</table>
+			<div id="mangaColumn10183" class="borderClass" style="padding-left: 48px; display: none;"></div>
+			</div>
+			
+		<div class="spaceit" style="padding-left: 3px;"><small>Didn't find the manga? Help us by adding it to our <a href="http://myanimelist.net/panel.php?go=mangadb&do=add">manga database</a></small>.</div><div id="openedId" style="display: none;"></div>
