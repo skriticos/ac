@@ -1,3 +1,4 @@
+#!/opt/local/bin/python2.5
 import unittest
 import urllib2
 import test.test_urllib2
@@ -48,9 +49,14 @@ class TestListParsing(unittest.TestCase):
             MockHTTPHandler("list.xml.gz"))
         self.request = AniChou.malcom.List(username = "crono22")
 
-    def testOpen(self):
-        # Shouldn't raise.
+    def testIter(self):
+        # Shouldn't raise. Should take time.
         self.request.execute(self.director)
+        # Continue here to avoid new setUp.
+        ac_remote_anime_dict = dict(self.request)
+        self.assert_(len(ac_remote_anime_dict) > 3000)
+        self.assertEqual(52,
+            ac_remote_anime_dict["Jungle Emperor (1989)"]["series_episodes"])
 
 class TestErrorAppInfo(unittest.TestCase):
     def setUp(self):
@@ -86,6 +92,8 @@ class TestMissingLogin(unittest.TestCase):
 class MockHTTPHandler(urllib2.HTTPHandler):
     """
     Has 'server' return contents of local file.
+    
+    These should be full protocol dumps, e.g. created with `curl -i`.
     """
 
     def __init__(self, path):
@@ -95,6 +103,7 @@ class MockHTTPHandler(urllib2.HTTPHandler):
         self.path = os.path.abspath(path)
 
     def http_open(self, req):
+        # Too lazy for os.path.
         if self.path[-3:] == ".gz":
             f = gzip.open(self.path)
         else:

@@ -1,12 +1,17 @@
+#!/opt/local/bin/python2.5
 """
 Malcom communicates with MyAnimeList.
 """
-
+# Standard library.
 import urllib
 import urllib2
 import urlparse
 import re
-from cStringIO import StringIO
+import datetime
+# Third party.
+import BeautifulSoup
+# Our own.
+import data
 
 class Request(object):
     def __init__(self, url, query, head, data = None):
@@ -116,6 +121,62 @@ class List(MAL):
         if typ == "manga":
             query["type"] = typ
         MAL.__init__(self, url, query, {})
+
+    def execute(self, opener):
+        # Super sets attribute.
+        MAL.execute(self, opener)
+        # BeautifulSoup could do the read() and unicode-conversion, if it
+        # weren't for the illegal characters, as it internally doesn't
+        # use 'replace'.
+        fetch_response = unicode(self.content, 'utf-8', 'replace')
+        xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
+        # For unknown reasons it doesn't work without recursive.
+        # Nor does iterating over myanimelist.anime. BS documentation broken?
+        self.anime_nodes = xmldata.myanimelist.findAll('anime',
+            recursive = True)
+
+    def __iter__(self):
+        # We have to manually convert after getting them out of the CDATA.
+        entity = lambda m: BeautifulSoup.Tag.XML_ENTITIES_TO_SPECIAL_CHARS[m.group(1)]
+        for anime in self.anime_nodes:
+            # ac_node builds the output of our function. Everything added to it
+            # must either be made independent of the parse tree by calling
+            # NavigableString.extract() or, preferrably, be turned into a
+            # different type like unicode(). This is a side-effect of using
+            # non-mutators like string.strip()
+            # Failing to do this will crash cPickle.
+            ac_node = dict()
+            for node, typ in data.mal_anime_data_schema.iteritems():
+                try:
+                    value = getattr(anime, node).string.strip()
+                    # One would think re.sub directly accepts string subclasses
+                    # like NavigableString. Raises a TypeError, though.
+                    value = re.sub(r'&(\w+);', entity, value)
+                except AttributeError:
+                    continue
+                if typ is datetime.datetime:
+                    # process my_last_updated unix timestamp
+                    ac_node[node] = datetime.datetime.fromtimestamp(int(value))
+                elif typ is int:
+                    # process integer slots
+                    ac_node[node] = int(value)
+                elif typ is datetime.date and value != '0000-00-00':
+                    # proces date slots
+                    (y,m,d) = value.split('-')
+                    (y,m,d) = int(y), int(m), int(d)
+                    if y and m and d:
+                        ac_node[node] = datetime.date(y,m,d)
+                else:
+                    # process string slots
+                    ac_node[node] = value
+
+            # series titles are used as anime identifiers
+            # the keys for the resulting dictionary are encoded to ASCII, so they
+            # can be simply put into shelves
+            key = ac_node['series_title'].encode('utf-8')
+
+            # add node entry to the resulting nodelist
+            yield key, ac_node
 
 class Search(MAL):
     def __init__(self, query, typ = "anime"):
