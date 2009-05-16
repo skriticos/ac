@@ -143,7 +143,7 @@ class spin(wx.Window):
 		if val != self.data[self.index] and self.simple:
 			self.data[self.index] = val
 			self.txtctl.SetValue(str(self.data[self.index]))
-			change_stack[id(self)] = [self.data, self.index]
+			self.change_stack[id(self)] = [self.data, self.index]
 		elif not self.simple:
 			# composite mode update
 			(value, range) = self.data[self.index]
@@ -152,7 +152,7 @@ class spin(wx.Window):
 				if range == 0: range = '-'
 				t = str(val) + ' / ' + str(range)
 				self.txtctl.SetValue(t)
-				change_stack[id(self)] = [self.data, self.index]
+				self.change_stack[id(self)] = [self.data, self.index]
 		self.selected = False
 	
 	def on_focus(self, *args):
