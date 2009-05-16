@@ -8,6 +8,97 @@ import urlparse
 import re
 from cStringIO import StringIO
 
+class Request(object):
+    def __init__(self, url, query, head, data = None):
+        """
+        Takes one string and three dictionaries.
+        """
+    	# Make tuple mutable.
+    	parts = list(urlparse.urlparse(url))
+    	# Set parameters.
+    	parts[4] = urllib.urlencode(query)
+    	# Dafely modified.
+    	url = urlparse.urlunparse(parts)
+    	self.request = urllib2.Request(url, headers = head)
+    	if data:
+            self.request.add_data(urllib.urlencode(data))
+
+    def execute(self, opener):
+        """
+        Takes OpenDirector.
+        """
+        self.response = opener.open(self.request)
+
+    def __iter__(self):
+        """
+        Yield content.
+        
+        Only after execution!
+        """
+        yield self.response.read()
+
+class LoginError(urllib2.URLError):
+    pass
+
+class UsernameError(LoginError):
+    pass
+
+class PasswordError(LoginError):
+    pass
+
+class MAL(Request):
+    def __init__(self, url, query, head, data = None):
+        default = {"User-Agent": "AniChou"}
+        default.update(head)
+        Request.__init__(self, url, query, default, data)
+
+    def execute(self, opener):
+        Request.execute(self, opener)
+        # Now set.
+        self.content = self.response.read()
+        # Translate 200 OK with human-readable error message.
+        if self.content.strip() == "Invalid username":
+            raise UsernameError, "called appInfo with non-existant nick"
+        match = re.search(
+            r'<div.+?class\s*=\s*["\']?badresult.+?>(.+?)</div>', self.content)
+        if match:
+            result = match.group(1)
+            if "Could not find that username" in result:
+                raise UsernameError, "tried to log in with non-existant nick"
+            elif "Invalid password" in result:
+                raise PasswordError, "tried to log in with wrong password"
+            elif "You must first login" in result:
+                raise LoginError, "not logged in"
+            else:
+                raise urllib2.URLError, "bad result"
+
+    def __iter__(self):
+        yield self.content
+
+class Panel(MAL):
+    def __init__(self, anime):
+        """
+        Takes mal_anime_data_schema.
+        """
+        url = "http://myanimelist.net/panel.php"
+        query = dict(
+            keepThis  = "true",
+            go        = "edit",
+            hidenav   = 1,
+            TB_iframe = "false",
+            id        = anime["my_id"]
+            )
+        data = dict(
+            submitIt          = 2,
+            close_on_update   = "true",
+            series_animedb_id = anime["series_animedb_id"],
+            series_title      = anime["series_animedb_id"],
+            completed_eps     = anime["my_watched_episodes"],
+            status            = anime["my_status"],
+            score             = anime["my_score"]
+            )
+        MAL.__init__(self, url, query, {}, data)
+
 class MALErrorProcessor(urllib2.BaseHandler):
     """
     Translate the site's human-readable error messages into proper HTTP.
