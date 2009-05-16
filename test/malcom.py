@@ -6,6 +6,7 @@ import os
 import sys
 import mimetools
 import gzip
+import datetime
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -57,7 +58,12 @@ class TestListParsing(unittest.TestCase):
         self.assert_(len(ac_remote_anime_dict) > 3000)
         self.assertEqual(52,
             ac_remote_anime_dict["Jungle Emperor (1989)"]["series_episodes"])
-
+        self.assertEqual("Maria+Holic; Maria Holic; MariaHolic",
+            # unicode().encode('utf-8').__repr__()
+            ac_remote_anime_dict['Maria\xe2\x80\xa0Holic']["series_synonyms"])
+        self.assertEqual(datetime.date(2008, 10, 18),
+            ac_remote_anime_dict["Hell's Angels"]["series_start"])
+            
 class TestErrorAppInfo(unittest.TestCase):
     def setUp(self):
         self.director = urllib2.build_opener(
