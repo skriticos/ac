@@ -7,6 +7,8 @@ import urllib2
 import urlparse
 import re
 import datetime
+import os
+import distutils.dir_util
 # Third party.
 import BeautifulSoup
 # Our own.
@@ -67,7 +69,7 @@ class MAL(Request):
         self.content = self.response.read()
         # Translate 200 OK with human-readable error message.
         if self.content.strip() == "Invalid username":
-            raise UsernameError, "called appInfo with non-existant nick"
+            raise UsernameError, "called appInfo with non-existent nick"
         match = re.search(
             r'<div.+?class\s*=\s*["\']?badresult.+?>(.+?)</div>', self.content)
         if match:
@@ -245,6 +247,62 @@ class Login(MAL):
             )
         MAL.__init__(self, url, {}, {}, data)
 
+class Image(object):
+    # Not subclassing MAL because it reads the data.
+    # We could copy the User-Agent code, but who cares.
+    # Not subclassing Request because we do urlparse anyway.
+    def __init__(self, url, cache):
+        """
+        The first argument can be a URL string or a mal_anime_data_schema.
+        This convenience might be removed if the class goes into a global
+        module.
+        
+        Takes the path of a local folder. It should be absolute without ~ or
+        variables. It need not exist.
+        """
+        try: url = url["series_image"]
+        except TypeError: pass
+        # We assume a lot. Strange addresses spell a horrible death.
+    	part = urlparse.urlparse(url)
+    	# If the following algorithm changes, the cache should be deleted.
+    	host = part.hostname
+    	# Some attributes default to None, others to the empty string.
+    	port = part.port or "80"
+    	# Could use urllib.url2pathname(part.path) to make relative.
+    	path = part.path[1:]
+    	locl = os.path.join(cache, host, port, path)
+    	# Create missing ancestors.
+    	distutils.dir_util.mkpath(os.path.dirname(locl))
+    	self.target = locl
+    	self.request = urllib2.Request(url)
+
+    def execute(self, opener):
+        """
+        Takes OpenDirector.
+        
+        Once an image is in the cache, it will never be updated.
+        
+        We do not copy any meta-data (like mtime) from headers
+        onto the file.
+        """
+        if os.path.exists(self.target):
+            return
+        # Inspired by urllib.retrieve
+        resp = opener.open(self.request)
+        locl = open(self.target, 'wb')
+        # Does not check Content-length.
+        locl.write(resp.read())
+        locl.close()
+        resp.close()
+        # We could catch any exceptions and simply pretend 404.
+
+    def __iter__(self):
+        """
+        Yield local filename, or None.
+        """
+        yield self.target
+
+# TODO think it through.
 class Site(object):
     """
     A factory for requests.

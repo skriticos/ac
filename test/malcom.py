@@ -7,6 +7,8 @@ import sys
 import mimetools
 import gzip
 import datetime
+import tempfile
+import shutil
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -128,6 +130,27 @@ class TestMissingLogin(unittest.TestCase):
         self.assertRaises(AniChou.malcom.LoginError,
             lambda: self.request.execute(self.director))
 
+class TestImage(unittest.TestCase):
+    def setUp(self):
+        self.cache = tempfile.mkdtemp()
+        self.url = "http://cdn.myanimelist.net/images/anime/12/3335.jpg"
+        self.director = urllib2.build_opener(
+            MockHTTPHandler("image.bin"))
+        self.request = AniChou.malcom.Image(self.url, self.cache)
+
+    def testDouble(self):
+        self.request.execute(self.director)
+        locl = iter(self.request).next()
+        self.assertEqual(os.path.getsize(locl), 28159)
+        # From cache.
+        req = AniChou.malcom.Image(self.url, self.cache)
+        # Opener shouldn't be used anyway.
+        req.execute(None)
+        self.assertEqual(iter(req).next(), locl)
+
+    def tearDown(self):
+        shutil.rmtree(self.cache)
+
 class MockHTTPHandler(urllib2.HTTPHandler):
     """
     Has 'server' return contents of local file.
@@ -167,5 +190,5 @@ if __name__ == '__main__':
     # Now we can.
     import AniChou.malcom
     # Exclude lengthy tests when working on something else.
-#   unittest.main(defaultTest = "TestErrorLogin")
-    unittest.main()
+    unittest.main(defaultTest = "TestImage")
+#   unittest.main()
