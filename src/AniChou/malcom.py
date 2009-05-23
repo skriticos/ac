@@ -198,6 +198,11 @@ class Search(MAL):
         self.div_nodes = soup.findAll("div", id = True, recursive = True)
 
     def __iter__(self):
+        """
+        Yield incomplete mal_anime_data_schema structures.
+        
+        Unfortunately series_image is not even in the HTML.
+        """
         for div in self.div_nodes:
             m = re.match(r'arow(\d+)', div["id"])
             if not m:
