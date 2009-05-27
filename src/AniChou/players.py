@@ -203,7 +203,7 @@ def get_playing_linmac(players, search_dirs):
 # Check if playtracker supports the current platoform, and call the appropriate
 # tracker or, print a note if it does not.
 this_platform = platform.system()
-if this_platform == 'Linux' or this_platform == 'darwin':
+if this_platform == 'Linux' or this_platform == 'Darwin':
 	get_playing = globals()['get_playing_linmac']
 else:
 	print 'Playtracking on your platform %s is currently not supported, sorry.'\

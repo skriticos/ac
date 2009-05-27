@@ -4,6 +4,8 @@ from __future__ import with_statement
 import os, getopt, sys
 import ConfigParser
 
+import plistlib
+
 # AniChou
 import globs
 
@@ -63,9 +65,9 @@ def options(prog, version, argv):
         elif o in ("-h", "--help"):
             usage(prog)
             sys.exit()
-        elif o in ("-d, --no-gui"):
+        elif o in ("-d", "--no-gui"):
             given.setdefault("startup", {})["gui"] = False
-        elif o in ("-t, --tracker"):
+        elif o in ("-t", "--tracker"):
             given.setdefault("startup", {})["tracker"] = True
         elif o == "-c":
             given.setdefault(None, {})["config"] = a
