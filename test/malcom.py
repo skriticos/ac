@@ -1,4 +1,3 @@
-#!/opt/local/bin/python2.5
 import unittest
 import urllib2
 import test.test_urllib2
@@ -190,5 +189,6 @@ if __name__ == '__main__':
     # Now we can.
     import AniChou.malcom
     # Exclude lengthy tests when working on something else.
-    unittest.main(defaultTest = "TestImage")
-#   unittest.main()
+    unittest.main(
+#       defaultTest = "TestImage"
+        )
