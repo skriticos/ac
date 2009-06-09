@@ -1,13 +1,15 @@
 import unittest
 import urllib2
-import test.test_urllib2
 import os
 import sys
-import mimetools
-import gzip
 import datetime
 import tempfile
 import shutil
+# Python sets cwd to where the module lives.
+sys.path.append(os.path.abspath("../src"))
+# Now we can.
+import AniChou.malcom
+from AniChou.testing import MockHTTPHandler
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -150,44 +152,11 @@ class TestImage(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.cache)
 
-class MockHTTPHandler(urllib2.HTTPHandler):
-    """
-    Has 'server' return contents of local file.
-    
-    These should be full protocol dumps, e.g. created with `curl -i`.
-    """
-
-    def __init__(self, path):
-        # Get rid of tilde.
-        path = os.path.expanduser(path)
-        # Definitely have it start in slash.
-        self.path = os.path.abspath(path)
-
-    def http_open(self, req):
-        # Too lazy for os.path.
-        if self.path[-3:] == ".gz":
-            f = gzip.open(self.path)
-        else:
-            f = open(self.path)
-        # Discard first line.
-        http = f.readline()
-        # Parse header.
-        msg = mimetools.Message(f)
-        # Retain content.
-        body = f.read()
-        f.close()
-        return test.test_urllib2.MockResponse(200, "OK", msg, body,
-            req.get_full_url())
-
 # Comment this in to override the mock setup and test against the live site.
 #class MockHTTPHandler(urllib2.HTTPHandler):
 #    pass
 
 if __name__ == '__main__':
-    # Python sets cwd to where the module lives.
-    sys.path.append(os.path.abspath("../src"))
-    # Now we can.
-    import AniChou.malcom
     # Exclude lengthy tests when working on something else.
     unittest.main(
 #       defaultTest = "TestImage"

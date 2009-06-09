@@ -3,28 +3,11 @@ import urllib2
 import unittest
 import os
 
-# The test in our directory.
-import malcom
 # The library.
 sys.path.append(os.path.abspath("../src"))
 import AniChou.malcom
 from AniChou import fulltext
-
-# Function belongs into some module, maybe malcom.
-def harvest(anime):
-    try:
-        string = anime["series_synonyms"]
-        syn = string.split(";")
-        if len(syn) == 1:
-            # MAL uses various delimiters.
-            syn = string.split(",")
-        # Get red of empty elements from leading or trailing delimiters.
-        titles = filter(None, syn)
-    except KeyError:
-        titles = []
-    titles.append(anime["series_title"])
-    # Delimiter sometimes followed by space.
-    return [t.strip() for t in titles]
+from AniChou.testing import MockHTTPHandler
 
 class TestSplitting(unittest.TestCase):
     def testHarvest(self):
@@ -63,19 +46,18 @@ class TestSplitting(unittest.TestCase):
                 # Don't add empty values.
                 # In reality the key isn't there, either.
                 anime["series_synonyms"] = syn
-            self.assertEqual(split, harvest(anime))
+            self.assertEqual(split, AniChou.malcom.harvest(anime))
         
 class TestIndexing(unittest.TestCase):
     def setUp(self):
-        self.director = urllib2.build_opener(
-            malcom.MockHTTPHandler("list.xml.gz"))
+        self.director = urllib2.build_opener(MockHTTPHandler("list.xml.gz"))
         self.request = AniChou.malcom.List(username = "crono22")
         self.db = fulltext.Index()
 
     def testAdd(self):
         self.request.execute(self.director)
         for key, anime in self.request:
-            titles = harvest(anime)
+            titles = AniChou.malcom.harvest(anime)
             self.db.add(anime["series_animedb_id"], *titles)
         self.db.save()
         self.assertTrue(self.db.has_series(2494))

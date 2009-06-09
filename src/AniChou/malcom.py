@@ -9,10 +9,12 @@ import re
 import datetime
 import os
 import distutils.dir_util
+from xml.etree.cElementTree import XMLTreeBuilder
 # Third party.
 import BeautifulSoup
 # Our own.
 import data
+import tidy
 
 # TODO move out of *mal*com.
 class Request(object):
@@ -127,35 +129,27 @@ class List(MAL):
     def execute(self, opener):
         # Super sets attribute.
         MAL.execute(self, opener)
-        # BeautifulSoup could do the read() and unicode-conversion, if it
-        # weren't for the illegal characters, as it internally doesn't
-        # use 'replace'.
-        fetch_response = unicode(self.content, 'utf-8', 'replace')
-        xmldata = BeautifulSoup.BeautifulStoneSoup(fetch_response)
-        # For unknown reasons it doesn't work without recursive.
-        # Nor does iterating over myanimelist.anime. BS documentation broken?
-        self.anime_nodes = xmldata.myanimelist.findAll('anime',
-            recursive = True)
+        self.content = tidy.xml(self.content)
+        parser = XMLTreeBuilder()
+        parser.feed(self.content)
+        self.tree = parser.close()
 
     def __iter__(self):
         # We have to manually convert after getting them out of the CDATA.
         entity = lambda m: BeautifulSoup.Tag.XML_ENTITIES_TO_SPECIAL_CHARS[m.group(1)]
-        for anime in self.anime_nodes:
+        for anime in self.tree.getiterator("anime"):
             # ac_node builds the output of our function. Everything added to it
-            # must either be made independent of the parse tree by calling
-            # NavigableString.extract() or, preferrably, be turned into a
-            # different type like unicode(). This is a side-effect of using
-            # non-mutators like string.strip()
+            # must either be made independent of the parse tree.
             # Failing to do this will crash cPickle.
             ac_node = dict()
-            for node, typ in data.mal_anime_data_schema.iteritems():
+            for child in anime:
+                node = child.tag
                 try:
-                    value = getattr(anime, node).string.strip()
-                    # One would think re.sub directly accepts string subclasses
-                    # like NavigableString. Raises a TypeError, though.
-                    value = re.sub(r'&(\w+);', entity, value)
-                except AttributeError:
+                    typ = data.mal_anime_data_schema[node]
+                except KeyError:
                     continue
+                value = child.text.strip()
+                value = re.sub(r'&(\w+);', entity, value)
                 if typ is datetime.datetime:
                     # process my_last_updated unix timestamp
                     ac_node[node] = datetime.datetime.fromtimestamp(int(value))
@@ -179,6 +173,24 @@ class List(MAL):
 
             # add node entry to the resulting nodelist
             yield key, ac_node
+
+def harvest(anime):
+    """
+    Return synonyms and title of anime_data_schema.
+    """
+    try:
+        string = anime["series_synonyms"]
+        syn = string.split(";")
+        if len(syn) == 1:
+            # MAL uses various delimiters.
+            syn = string.split(",")
+        # Get red of empty elements from leading or trailing delimiters.
+        titles = filter(None, syn)
+    except KeyError:
+        titles = []
+    titles.append(anime["series_title"])
+    # Delimiter sometimes followed by space.
+    return [t.strip() for t in titles]
 
 class Search(MAL):
     def __init__(self, query, typ = "anime"):
@@ -306,22 +318,3 @@ class Image(object):
         Yield local filename, or None.
         """
         yield self.target
-
-# TODO think it through.
-class Site(object):
-    """
-    A factory for requests.
-    
-    Handles cookie jar, of which there should be one per thread.
-    """
-
-    def __init__(self):
-        # In-memory only.
-        self.cookies = cookielib.CookieJar()
-        parser = urllib2.HTTPCookieProcessor(self.cookies)
-        # Constructor does not add default handlers.
-        self.opener = urllib2.OpenerDirector()
-        self.opener.add_handler(parser)
-        
-    def login(self, username, password):
-        pass
