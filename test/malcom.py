@@ -3,8 +3,6 @@ import urllib2
 import os
 import sys
 import datetime
-import tempfile
-import shutil
 # Python sets cwd to where the module lives.
 sys.path.append(os.path.abspath("../src"))
 # Now we can.
@@ -131,33 +129,9 @@ class TestMissingLogin(unittest.TestCase):
         self.assertRaises(AniChou.malcom.LoginError,
             lambda: self.request.execute(self.director))
 
-class TestImage(unittest.TestCase):
-    def setUp(self):
-        self.cache = tempfile.mkdtemp()
-        self.url = "http://cdn.myanimelist.net/images/anime/12/3335.jpg"
-        self.director = urllib2.build_opener(
-            MockHTTPHandler("image.bin"))
-        self.request = AniChou.malcom.Image(self.url, self.cache)
-
-    def testDouble(self):
-        self.request.execute(self.director)
-        locl = iter(self.request).next()
-        self.assertEqual(os.path.getsize(locl), 28159)
-        # From cache.
-        req = AniChou.malcom.Image(self.url, self.cache)
-        # Opener shouldn't be used anyway.
-        req.execute(None)
-        self.assertEqual(iter(req).next(), locl)
-
-    def tearDown(self):
-        shutil.rmtree(self.cache)
-
 # Comment this in to override the mock setup and test against the live site.
 #class MockHTTPHandler(urllib2.HTTPHandler):
 #    pass
 
 if __name__ == '__main__':
-    # Exclude lengthy tests when working on something else.
-    unittest.main(
-#       defaultTest = "TestImage"
-        )
+    unittest.main()

@@ -4,6 +4,8 @@ import re
 import difflib
 import operator
 
+from wx.lib.pubsub import Publisher
+
 def tokenize(string):
     """
     Return array of words extracted from string.
@@ -38,6 +40,10 @@ def _add_word(cursor, title, position, word):
         VALUES(?, ?, ?)", (title, position, wid))
 
 class Index(object):
+    """
+    Thread-safe by vritue of only being a thin layer around SQLite, which
+    takes care of the locking.
+    """
     def __init__(self, fname = ":memory:"):
         """
         Takes a file name. Will be created if necessary.
@@ -61,6 +67,7 @@ class Index(object):
             word INTEGER
         );
         """)
+        Publisher().subscribe(self.save, "save")
 
     def add(self, series, *titles):
         """
@@ -75,7 +82,7 @@ class Index(object):
         for title in titles:
             _add_title(self.db.cursor(), series, title)
         
-    def save(self):
+    def save(self, message = None):
         self.db.commit()
 
     def has_series(self, series):
