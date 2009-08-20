@@ -1,13 +1,16 @@
 # Copyright (c) 2009 Andre 'Necrotex' Peiffer
 # See COPYING for details
 
-## A complete implementation of the MAL API for animes
-## Works for both, anime and manga lists
+## A complete implementation of the official MAL API.
+## Works for both anime and manga lists
 
 import httplib2
 from urllib import urlencode
 
 class api(object):
+    """
+    Methods expect a numeric global MAL database id and XML data.
+    """
 
     def __init__(self, user, password, type="anime"):
         self.user = user
@@ -16,22 +19,14 @@ class api(object):
         self.base = "http://myanimelist.net/api/"
 
     def __type(self, search=False):
-        """Method needed for building the URI"""
-        if search:
-            if self.type == "anime":
-                return str("anime/")
-            elif self.type == "manga":
-                return str("manga/")
-        elif self.type == "manga":
-            if self.type == "anime":
-                return str("animelist/")
-            elif self.type == "manga":
-                return str("mangalist/")
-        else:
-            raise NameError("Not known Typename!")
+        """Build the URI"""
+        if self.type not in ('anime', 'manga'):
+            raise NameError("Uknown type string")
+        infix = '' if search else 'list'
+        return self.type + infix + '/'
 
     def add(self, id, data):
-        """Adds an Anime to the list"""
+        """Add an anime to the list"""
 
         req = httplib2.Http(".cache")
         req.add_credentials(self.user, self.password)
@@ -40,7 +35,7 @@ class api(object):
         return req.request(q, "POST", headers=header, body=urlencode(data))
 
     def update(self, id, data):
-        """Updates series infos"""
+        """Update series info"""
 
         req = httplib2.Http(".cache")
         req.add_credentials(self.user, self.password)
@@ -49,7 +44,7 @@ class api(object):
         return req.request(q, "POST", headers=header, body=urlencode(data))
 
     def delete(self, id, data):
-        """Deletes listentries"""
+        """Deletes list entries"""
 
         req = httplib2.Http(".cache")
         req.add_credentials(self.user, self.password)
@@ -58,7 +53,7 @@ class api(object):
         return req.request(q, "DELETE", headers=header, body=urlencode(data))[1]
 
     def search(self, query):
-        """Search method."""
+        """Search for series"""
 
         req = httplib2.Http(".cache")
         req.add_credentials(self.user, self.password)
