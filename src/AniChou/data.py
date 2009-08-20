@@ -1,6 +1,7 @@
 
 # Copyright (c) 2008 Gareth Latty
 # Copyright (c) 2009 Sebastian Bartos
+# Copyright (c) 2009 Andre 'Necrotex' Peiffer
 # See COPYING for details
 
 """ data.py -- core data schemas
@@ -47,7 +48,7 @@ mal_anime_data_schema = {
 ##                                                  the above (2 in this case)
 ##
 ## { 'Lucky \xe2\x98\x86 Star': {u'my_id': 12345,
-##                             u'my_last_updated': 
+##                             u'my_last_updated':
 ##                                   datetime.datetime(2009, 3, 26...),
 ##                             u'my_rewatching': 0,
 ##                             u'my_rewatching_ep': 0,
@@ -108,12 +109,51 @@ mal_manga_data_schema = {
 	'my_last_updated': datetime}   # sync variable
 
 
+## Anime Datastructure for the MAL API
+mal_api_anime_schema = {
+    'episode' :  int,
+    'status': int, #OR string. 1/watching, 2/completed, 3/onhold, 4/dropped, 6/plantowatch
+    'score' : int,
+    'downloaded_episodes' : int,
+    'storage_type' : int, # (will be updated to accomodate strings soon)
+    'storage_value': float,
+    'times_rewatched' : int,
+    'rewatch_value' : int,
+    'date_start' : date, #mmddyyyy
+    'date_finish' : date, #mmddyyyy
+    'priority' : int,
+    'enable_discussion' : int, #1=enable, 0=disable
+    'enable_rewatching' : int, #1=enable, 0=disable
+    'comments' : str,
+    'fansub_group' : str,
+    'tags. string' : list #tags separated by commas
+}
+
+## Manga Datastructure for the MAL API
+mal_api_manga_schema = {
+    'chapter' : int,
+    'volume' : int,
+    'status' : int, #OR string. 1/reading, 2/completed, 3/onhold, 4/dropped, 6/plantoread
+    'score' : int,
+    'downloaded_chapters' : int,
+    'times_reread' : int,
+    'reread_value' : int,
+    'date_start' : date, #mmddyyyy
+    'date_finish' : date, #mmddyyyy
+    'priority' : int,
+    'enable_discussion' : int, #1=enable, 0=disable
+    'enable_rereading' : int, #1=enable, 0=disable
+    'comments' : str,
+    'scan_group' : str,
+    'tags. string' : list,
+    'retail_volumes' : int}
+
 
 ## These are the status code mappings the mal server is sending in the XML file
 ( WATCHING, COMPLETED, ONHOLD, DROPPED, UNKNOWN, PLANTOWATCH ) = range(1, 7)
 
 # Here is the reverse mapping of the above for widget adressing and similar
-STATUS = {	
+STATUS = {
 	1: 'watching',
 	2: 'completed',
 	3: 'onhold',
